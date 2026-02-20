@@ -1,0 +1,1 @@
+---\n- hosts: onprem\n  become: true\n  roles: []\n

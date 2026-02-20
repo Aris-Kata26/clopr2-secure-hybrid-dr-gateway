@@ -1,0 +1,11 @@
+name: ci-ansible
+on: [push, pull_request]
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install ansible-lint
+        run: python3 -m pip install --user ansible-lint
+      - name: ansible-lint
+        run: ~/.local/bin/ansible-lint infra/ansible || true

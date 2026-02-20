@@ -8,4 +8,5 @@ jobs:
       - name: Install yamllint
         run: sudo apt-get update && sudo apt-get install -y yamllint
       - name: Lint YAML
-        run: yamllint -d relaxed deploy/k8s || true
+        run: yamllint -d relaxed deploy/k8s 
+

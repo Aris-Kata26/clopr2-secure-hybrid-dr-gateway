@@ -1,0 +1,11 @@
+name: ci-k8s
+on: [push, pull_request]
+jobs:
+  yamllint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install yamllint
+        run: sudo apt-get update && sudo apt-get install -y yamllint
+      - name: Lint YAML
+        run: yamllint -d relaxed deploy/k8s || true

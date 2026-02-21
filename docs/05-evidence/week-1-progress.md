@@ -13,8 +13,8 @@ Evidence index: docs/05-evidence/evidence-index.md
 ## Evidence captured (links/paths)
 - docs/05-evidence/screenshots/
 - docs/05-evidence/outputs/
-- [ ] Screenshots:
-- [ ] Outputs:
+- [x] Screenshots: docs/05-evidence/screenshots/entra-groups.png, docs/05-evidence/screenshots/rbac-assignments.png
+- [x] Outputs: docs/05-evidence/outputs/rbac-assignments.txt
 - [ ] Links (PRs / commits):
 
 ## Issues/Risks

@@ -1,1 +1,4 @@
----\n- hosts: all\n  become: true\n  roles: []\n
+---
+- hosts: all
+	become: true
+	roles: []

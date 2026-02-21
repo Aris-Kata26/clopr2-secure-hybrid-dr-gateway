@@ -1,1 +1,4 @@
----\n- hosts: onprem\n  become: true\n  roles: []\n
+---
+- hosts: onprem
+	become: true
+	roles: []

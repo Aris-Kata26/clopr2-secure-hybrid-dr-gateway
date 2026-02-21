@@ -1,1 +1,20 @@
-apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: app\n  namespace: clopr2\nspec:\n  replicas: 1\n  selector:\n    matchLabels:\n      app: app\n  template:\n    metadata:\n      labels:\n        app: app\n    spec:\n      containers:\n      - name: app\n        image: nginx:alpine\n        ports:\n        - containerPort: 80\n
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+	name: app
+	namespace: clopr2
+spec:
+	replicas: 1
+	selector:
+		matchLabels:
+			app: app
+	template:
+		metadata:
+			labels:
+				app: app
+		spec:
+			containers:
+			- name: app
+				image: nginx:alpine
+				ports:
+				- containerPort: 80

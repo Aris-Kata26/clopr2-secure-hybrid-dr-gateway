@@ -1,1 +1,7 @@
-apiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: app-config\n  namespace: clopr2\ndata:\n  APP_ENV: "dev"\n
+apiVersion: v1
+kind: ConfigMap
+metadata:
+	name: app-config
+	namespace: clopr2
+data:
+	APP_ENV: "dev"

@@ -36,3 +36,34 @@ Terraform commands will detect it and remind you to do so if necessary.
 
 terraform validate
 Success! The configuration is valid.
+
+terraform apply -auto-approve (germanywestcentral)
+Apply complete! Resources: 10 added, 0 changed, 0 destroyed.
+
+Outputs:
+key_vault_id = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.KeyVault/vaults/kvclopr2katarweu01gwc"
+key_vault_uri = "https://kvclopr2katarweu01gwc.vault.azure.net/"
+loganalytics_workspace_id = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.OperationalInsights/workspaces/log-clopr2-dev-gwc"
+nsg_ids = {
+	"aks-subnet" = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/networkSecurityGroups/vnet-clopr2-dev-gwc-aks-nsg"
+	"mgmt-subnet" = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/networkSecurityGroups/vnet-clopr2-dev-gwc-mgmt-nsg"
+}
+resource_group_name = "rg-clopr2-katar711-gwc"
+subnet_ids = {
+	"aks-subnet" = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/virtualNetworks/vnet-clopr2-dev-gwc/subnets/aks-subnet"
+	"mgmt-subnet" = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/virtualNetworks/vnet-clopr2-dev-gwc/subnets/mgmt-subnet"
+}
+vnet_id = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/virtualNetworks/vnet-clopr2-dev-gwc"
+
+terraform state list
+data.azurerm_client_config.current
+azurerm_resource_group.this
+module.keyvault.azurerm_key_vault.this
+module.loganalytics.azurerm_log_analytics_workspace.this
+module.network.azurerm_network_security_group.this["aks-subnet"]
+module.network.azurerm_network_security_group.this["mgmt-subnet"]
+module.network.azurerm_subnet.this["aks-subnet"]
+module.network.azurerm_subnet.this["mgmt-subnet"]
+module.network.azurerm_subnet_network_security_group_association.this["aks-subnet"]
+module.network.azurerm_subnet_network_security_group_association.this["mgmt-subnet"]
+module.network.azurerm_virtual_network.this

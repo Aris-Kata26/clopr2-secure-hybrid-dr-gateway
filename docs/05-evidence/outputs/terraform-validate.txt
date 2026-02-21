@@ -1,0 +1,8 @@
+terraform validate output (dev environment)
+
+Command:
+terraform -chdir=infra/terraform/envs/dev init -backend=false
+terraform -chdir=infra/terraform/envs/dev validate
+
+Result:
+<replace with actual output>

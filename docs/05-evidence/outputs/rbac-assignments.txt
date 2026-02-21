@@ -1,0 +1,10 @@
+
+
+aris@Aristide:/mnt/c/Users/akata/Documents/Projects/CLOPR2/clopr2-secure-hybrid-dr-gateway$ az role assignment list --scope "$RG_SCOPE" --include-inherited -o table
+Principal           Role         Scope
+------------------  -----------  -----------------------------------------------------------------------------------------  
+katar1@bts.lgk.lu   Owner        /subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb
+katar1@bts.lgk.lu   Owner        /subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb
+BCLC24-OPS-VIEWERS  Reader       /subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-weu  
+BCLC24-OPS-ADMINS   Contributor  /subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-weu  
+

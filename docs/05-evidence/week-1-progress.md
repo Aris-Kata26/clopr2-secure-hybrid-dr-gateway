@@ -1,6 +1,6 @@
 # Week 1 Progress (Sprint 1)
 
-Evidence index: docs/05-evidence/evidence-index.md
+Evidence index: [docs/05-evidence/evidence-index.md](docs/05-evidence/evidence-index.md)
 
 ## Goals (Week 1)
 - Establish repo structure and baseline documentation.
@@ -11,10 +11,10 @@ Evidence index: docs/05-evidence/evidence-index.md
 - 
 
 ## Evidence captured (links/paths)
-- docs/05-evidence/screenshots/
-- docs/05-evidence/outputs/
-- [x] Screenshots: docs/05-evidence/screenshots/entra-groups.png, docs/05-evidence/screenshots/rbac-assignments.png
-- [x] Outputs: docs/05-evidence/outputs/rbac-assignments.txt
+- [docs/05-evidence/screenshots/](docs/05-evidence/screenshots/)
+- [docs/05-evidence/outputs/](docs/05-evidence/outputs/)
+- [x] Screenshots: [docs/05-evidence/screenshots/entra-groups.png](docs/05-evidence/screenshots/entra-groups.png), [docs/05-evidence/screenshots/rbac-assignments.png](docs/05-evidence/screenshots/rbac-assignments.png)
+- [x] Outputs: [docs/05-evidence/outputs/rbac-assignments.txt](docs/05-evidence/outputs/rbac-assignments.txt)
 - [ ] Links (PRs / commits):
 
 ## Issues/Risks

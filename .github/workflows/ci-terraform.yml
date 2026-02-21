@@ -8,3 +8,7 @@ jobs:
       - uses: hashicorp/setup-terraform@v3
       - name: Terraform fmt
         run: terraform fmt -check -recursive
+      - name: Terraform init
+        run: terraform -chdir=infra/terraform/envs/dev init -backend=false
+      - name: Terraform validate
+        run: terraform -chdir=infra/terraform/envs/dev validate

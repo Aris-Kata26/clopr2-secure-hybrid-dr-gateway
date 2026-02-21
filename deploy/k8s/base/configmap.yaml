@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-	name: app-config
-	namespace: clopr2
+  name: app-config
+  namespace: clopr2
 data:
-	APP_ENV: "dev"
+  APP_ENV: "dev"

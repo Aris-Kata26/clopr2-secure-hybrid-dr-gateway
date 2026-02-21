@@ -6,6 +6,7 @@
 - **Hybrid scope:** Azure + On-Prem (School Proxmox)
 - **Core technologies:** AKS, Terraform, Ansible, Microsoft Entra ID (IAM), RBAC, Azure Key Vault, Microsoft Defender for Cloud, Azure Monitor + Log Analytics, Docker (on-prem)
 - Evidence & weekly progress: docs/05-evidence/evidence-index.md and docs/05-evidence/week-1-progress.md
+- Operations baseline (portal-first): docs/03-operations/portal-baseline-steps.md
 
 > This section maps directly to the mandatory project guidelines: Hybrid (Azure+Proxmox), IAM/Kubernetes, IaC (Terraform+Ansible), Security (AZ-500), monitoring, cost governance, and tagging.
 

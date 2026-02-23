@@ -1,10 +1,23 @@
-# Defender for Cloud configuration + key recommendations.\n
+# Defender for Cloud baseline (AZ-500)
 
-Plan selection: We enabled Foundational CSPM (Free) to meet baseline posture management requirements while controlling costs under an Azure for Students subscription. The paid Defender CSPM plan remains disabled to avoid per-resource charges.
-Current posture: At this early stage (limited deployed resources), Defender for Cloud has not yet generated posture recommendations/risk calculations. As more baseline services (Key Vault, Log Analytics, networking) are deployed, recommendations will populate and will be captured and addressed in later sprints.
+## Purpose
+Establish early security posture management (AZ-500) with visibility into secure score and recommendations for the project scope.
 
+## Scope and compliance
+- Scope: Subscription-level baseline with focus on RG `rg-clopr2-katar711-gwc`.
+- Region compliance: Germany West Central (EU-only requirement).
 
-updates:
+## What was enabled
+- Microsoft Defender for Cloud baseline (Foundational CSPM / Free plan).
+- Paid Defender plans remain disabled to avoid unnecessary cost at this stage.
 
+## Secure score snapshot
+Secure score provides a high-level view of posture. At this early baseline, scores may be low or incomplete until more services emit signals.
 
-Defender CSPM was temporarily enabled to generate actionable recommendations and validate security posture. After collecting evidence, the plan can be disabled again to control costs under Azure for Students credits.
+## Top recommendations observed
+No recommendations were listed at capture time (baseline deployment just completed). Refresh later and replace this section with at least five recommendation titles when they appear.
+
+## Evidence
+- docs/05-evidence/screenshots/defender-enabled.png
+- docs/05-evidence/screenshots/secure-score.png
+- docs/05-evidence/screenshots/recommendations.png

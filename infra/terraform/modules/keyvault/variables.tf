@@ -30,7 +30,7 @@ variable "soft_delete_retention_days" {
   default     = 7
 }
 
-variable "enable_rbac_authorization" {
+variable "rbac_authorization_enabled" {
   type        = bool
   description = "Enable RBAC authorization for Key Vault."
   default     = true

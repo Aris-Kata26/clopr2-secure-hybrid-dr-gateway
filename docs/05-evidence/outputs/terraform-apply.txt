@@ -1,0 +1,335 @@
+aris@Aristide:/mnt/c/Users/akata/Documents/Projects/CLOPR2/clopr2-secure-hybrid-dr-gateway/infra/terraform/envs/dev$
+ cd /mnt/c/Users/akata/Documents/Projects/CLOPR2/clopr2-secure-hybrid-dr-gateway/infra/terraform/envs/dev
+
+# Update tfvars to allowed region + new names
+sed -i 's/^location.*/location           = "germanywestcentral"/' terraform.tfvars
+sed -i 's/^resource_group_name.*/resource_group_name = "rg-clopr2-katar711-gwc"/' terraform.tfvars
+sed -i 's/^vnet_name.*/vnet_name          = "vnet-clopr2-dev-gwc"/' terraform.tfvars
+sed -i 's/^loganalytics_name.*/loganalytics_name  = "log-clopr2-dev-gwc"/' terraform.tfvars
+sed -i 's/^keyvault_name.*/keyvault_name      = "kvclopr2katarweu01gwc"/' terraform.tfvars
+
+# Remove the old RG from state (current state points to Belgium Central RG)
+terraform state rm azurerm_resource_group.this
+
+# Apply
+terraform init -backend=false
+terraform apply -auto-approve
+terraform state list
+Removed azurerm_resource_group.this
+Successfully removed 1 resource instance(s).
+Initializing modules...
+Initializing provider plugins...
+- Reusing previous version of hashicorp/azurerm from the dependency lock file
+- Using previously-installed hashicorp/azurerm v3.117.1
+
+Terraform has been successfully initialized!
+
+You may now begin working with Terraform. Try running "terraform plan" to see
+any changes that are required for your infrastructure. All Terraform commands
+should now work.
+
+If you ever set or change modules or backend configuration for Terraform,
+rerun this command to reinitialize your working directory. If you forget, other
+commands will detect it and remind you to do so if necessary.
+data.azurerm_client_config.current: Reading...
+data.azurerm_client_config.current: Read complete after 0s [id=Y2xpZW50Q29uZmlncy9jbGllbnRJZD0wNGIwNzc5NS04ZGRiLTQ2MWEtYmJlZS0wMmY5ZTFiZjdiNDY7b2JqZWN0SWQ9ZTI1NzRlNDItMTA2MS00ZjE3LWFjNTctMjg3MjY3N2U3MzhlO3N1YnNjcmlwdGlvbklkPTk0ZTU3MDRhLWI0MTEtNDAyYi1hOGYzLWVmNDYzMDlmZTVmYjt0ZW5hbnRJZD01MzM4ZTBiYy1jOWEzLTQ3YmEtOGRkNS00Y2Y4YWUxOTFkOTk=]
+
+Terraform used the selected providers to generate the following execution plan. Resource actions are indicated with 
+the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # azurerm_resource_group.this will be created
+  + resource "azurerm_resource_group" "this" {
+      + id       = (known after apply)
+      + location = "germanywestcentral"
+      + name     = "rg-clopr2-katar711-gwc"
+      + tags     = {
+          + "Environment" = "dev"
+          + "Owner"       = "KATAR711"
+          + "Team"        = "BCLC24"
+        }
+    }
+
+  # module.keyvault.azurerm_key_vault.this will be created
+  + resource "azurerm_key_vault" "this" {
+      + access_policy                 = (known after apply)
+      + enable_rbac_authorization     = true
+      + id                            = (known after apply)
+      + location                      = "germanywestcentral"
+      + name                          = "kvclopr2katarweu01gwc"
+      + public_network_access_enabled = true
+      + purge_protection_enabled      = false
+      + resource_group_name           = "rg-clopr2-katar711-gwc"
+      + sku_name                      = "standard"
+      + soft_delete_retention_days    = 7
+      + tags                          = {
+          + "Environment" = "dev"
+          + "Owner"       = "KATAR711"
+          + "Team"        = "BCLC24"
+        }
+      + tenant_id                     = "5338e0bc-c9a3-47ba-8dd5-4cf8ae191d99"
+      + vault_uri                     = (known after apply)
+
+      + contact (known after apply)
+
+      + network_acls (known after apply)
+    }
+
+  # module.loganalytics.azurerm_log_analytics_workspace.this will be created
+  + resource "azurerm_log_analytics_workspace" "this" {
+      + allow_resource_only_permissions = true
+      + daily_quota_gb                  = -1
+      + id                              = (known after apply)
+      + internet_ingestion_enabled      = true
+      + internet_query_enabled          = true
+      + local_authentication_disabled   = false
+      + location                        = "germanywestcentral"
+      + name                            = "log-clopr2-dev-gwc"
+      + primary_shared_key              = (sensitive value)
+      + resource_group_name             = "rg-clopr2-katar711-gwc"
+      + retention_in_days               = 30
+      + secondary_shared_key            = (sensitive value)
+      + sku                             = "PerGB2018"
+      + tags                            = {
+          + "Environment" = "dev"
+          + "Owner"       = "KATAR711"
+          + "Team"        = "BCLC24"
+        }
+      + workspace_id                    = (known after apply)
+    }
+
+  # module.network.azurerm_network_security_group.this["aks-subnet"] will be created
+  + resource "azurerm_network_security_group" "this" {
+      + id                  = (known after apply)
+      + location            = "germanywestcentral"
+      + name                = "vnet-clopr2-dev-gwc-aks-nsg"
+      + resource_group_name = "rg-clopr2-katar711-gwc"
+      + security_rule       = (known after apply)
+      + tags                = {
+          + "Environment" = "dev"
+          + "Owner"       = "KATAR711"
+          + "Team"        = "BCLC24"
+        }
+    }
+
+  # module.network.azurerm_network_security_group.this["mgmt-subnet"] will be created
+  + resource "azurerm_network_security_group" "this" {
+      + id                  = (known after apply)
+      + location            = "germanywestcentral"
+      + name                = "vnet-clopr2-dev-gwc-mgmt-nsg"
+      + resource_group_name = "rg-clopr2-katar711-gwc"
+      + security_rule       = (known after apply)
+      + tags                = {
+          + "Environment" = "dev"
+          + "Owner"       = "KATAR711"
+          + "Team"        = "BCLC24"
+        }
+    }
+
+  # module.network.azurerm_subnet.this["aks-subnet"] will be created
+  + resource "azurerm_subnet" "this" {
+      + address_prefixes                               = [
+          + "10.10.1.0/24",
+        ]
+      + default_outbound_access_enabled                = true
+      + enforce_private_link_endpoint_network_policies = (known after apply)
+      + enforce_private_link_service_network_policies  = (known after apply)
+      + id                                             = (known after apply)
+      + name                                           = "aks-subnet"
+      + private_endpoint_network_policies              = (known after apply)
+      + private_endpoint_network_policies_enabled      = (known after apply)
+      + private_link_service_network_policies_enabled  = (known after apply)
+      + resource_group_name                            = "rg-clopr2-katar711-gwc"
+      + virtual_network_name                           = "vnet-clopr2-dev-gwc"
+    }
+
+  # module.network.azurerm_subnet.this["mgmt-subnet"] will be created
+  + resource "azurerm_subnet" "this" {
+      + address_prefixes                               = [
+          + "10.10.2.0/24",
+        ]
+      + default_outbound_access_enabled                = true
+      + enforce_private_link_endpoint_network_policies = (known after apply)
+      + enforce_private_link_service_network_policies  = (known after apply)
+      + id                                             = (known after apply)
+      + name                                           = "mgmt-subnet"
+      + private_endpoint_network_policies              = (known after apply)
+      + private_endpoint_network_policies_enabled      = (known after apply)
+      + private_link_service_network_policies_enabled  = (known after apply)
+      + resource_group_name                            = "rg-clopr2-katar711-gwc"
+      + virtual_network_name                           = "vnet-clopr2-dev-gwc"
+    }
+
+  # module.network.azurerm_subnet_network_security_group_association.this["aks-subnet"] will be created
+  + resource "azurerm_subnet_network_security_group_association" "this" {
+      + id                        = (known after apply)
+      + network_security_group_id = (known after apply)
+      + subnet_id                 = (known after apply)
+    }
+
+  # module.network.azurerm_subnet_network_security_group_association.this["mgmt-subnet"] will be created
+  + resource "azurerm_subnet_network_security_group_association" "this" {
+      + id                        = (known after apply)
+      + network_security_group_id = (known after apply)
+      + subnet_id                 = (known after apply)
+    }
+
+  # module.network.azurerm_virtual_network.this will be created
+  + resource "azurerm_virtual_network" "this" {
+      + address_space       = [
+          + "10.10.0.0/16",
+        ]
+      + dns_servers         = (known after apply)
+      + guid                = (known after apply)
+      + id                  = (known after apply)
+      + location            = "germanywestcentral"
+      + name                = "vnet-clopr2-dev-gwc"
+      + resource_group_name = "rg-clopr2-katar711-gwc"
+      + subnet              = (known after apply)
+      + tags                = {
+          + "Environment" = "dev"
+          + "Owner"       = "KATAR711"
+          + "Team"        = "BCLC24"
+        }
+    }
+
+Plan: 10 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  + key_vault_id              = (known after apply)
+  + key_vault_uri             = (known after apply)
+  + loganalytics_workspace_id = (known after apply)
+  + nsg_ids                   = {
+      + aks-subnet  = (known after apply)
+      + mgmt-subnet = (known after apply)
+    }
+  ~ resource_group_name       = "rg-clopr2-katar711-bec" -> "rg-clopr2-katar711-gwc"
+  + subnet_ids                = {
+      + aks-subnet  = (known after apply)
+      + mgmt-subnet = (known after apply)
+    }
+  + vnet_id                   = (known after apply)
+azurerm_resource_group.this: Creating...
+azurerm_resource_group.this: Still creating... [00m10s elapsed]
+azurerm_resource_group.this: Creation complete after 10s [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc]
+module.network.azurerm_virtual_network.this: Creating...
+module.network.azurerm_network_security_group.this["aks-subnet"]: Creating...
+module.keyvault.azurerm_key_vault.this: Creating...
+module.network.azurerm_network_security_group.this["mgmt-subnet"]: Creating...
+module.loganalytics.azurerm_log_analytics_workspace.this: Creating...
+module.network.azurerm_network_security_group.this["aks-subnet"]: Creation complete after 7s [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/networkSecurityGroups/vnet-clopr2-dev-gwc-aks-nsg]
+module.network.azurerm_network_security_group.this["mgmt-subnet"]: Creation complete after 9s [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/networkSecurityGroups/vnet-clopr2-dev-gwc-mgmt-nsg]
+module.network.azurerm_virtual_network.this: Creation complete after 10s [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/virtualNetworks/vnet-clopr2-dev-gwc]
+module.network.azurerm_subnet.this["mgmt-subnet"]: Creating...
+module.network.azurerm_subnet.this["aks-subnet"]: Creating...
+module.keyvault.azurerm_key_vault.this: Still creating... [00m10s elapsed]
+module.loganalytics.azurerm_log_analytics_workspace.this: Still creating... [00m10s elapsed]
+module.network.azurerm_subnet.this["mgmt-subnet"]: Creation complete after 5s [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/virtualNetworks/vnet-clopr2-dev-gwc/subnets/mgmt-subnet]
+module.network.azurerm_subnet.this["aks-subnet"]: Creation complete after 10s [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/virtualNetworks/vnet-clopr2-dev-gwc/subnets/aks-subnet]
+module.network.azurerm_subnet_network_security_group_association.this["mgmt-subnet"]: Creating...
+module.network.azurerm_subnet_network_security_group_association.this["aks-subnet"]: Creating...
+module.keyvault.azurerm_key_vault.this: Still creating... [00m21s elapsed]
+module.loganalytics.azurerm_log_analytics_workspace.this: Still creating... [00m21s elapsed]
+module.network.azurerm_subnet_network_security_group_association.this["aks-subnet"]: Creation complete after 7s [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/virtualNetworks/vnet-clopr2-dev-gwc/subnets/aks-subnet]
+module.network.azurerm_subnet_network_security_group_association.this["mgmt-subnet"]: Still creating... [00m11s elapsed]
+module.keyvault.azurerm_key_vault.this: Still creating... [00m31s elapsed]
+module.loganalytics.azurerm_log_analytics_workspace.this: Still creating... [00m31s elapsed]
+module.network.azurerm_subnet_network_security_group_association.this["mgmt-subnet"]: Creation complete after 12s [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/virtualNetworks/vnet-clopr2-dev-gwc/subnets/mgmt-subnet]
+module.keyvault.azurerm_key_vault.this: Still creating... [00m41s elapsed]
+module.loganalytics.azurerm_log_analytics_workspace.this: Still creating... [00m41s elapsed]
+module.loganalytics.azurerm_log_analytics_workspace.this: Creation complete after 44s [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.OperationalInsights/workspaces/log-clopr2-dev-gwc]
+module.keyvault.azurerm_key_vault.this: Still creating... [00m51s elapsed]
+module.keyvault.azurerm_key_vault.this: Still creating... [01m02s elapsed]
+module.keyvault.azurerm_key_vault.this: Still creating... [01m12s elapsed]
+module.keyvault.azurerm_key_vault.this: Still creating... [01m22s elapsed]
+module.keyvault.azurerm_key_vault.this: Still creating... [01m33s elapsed]
+module.keyvault.azurerm_key_vault.this: Still creating... [01m43s elapsed]
+module.keyvault.azurerm_key_vault.this: Still creating... [01m53s elapsed]
+module.keyvault.azurerm_key_vault.this: Still creating... [02m04s elapsed]
+module.keyvault.azurerm_key_vault.this: Still creating... [02m14s elapsed]
+module.keyvault.azurerm_key_vault.this: Still creating... [02m24s elapsed]
+module.keyvault.azurerm_key_vault.this: Still creating... [02m35s elapsed]
+module.keyvault.azurerm_key_vault.this: Creation complete after 2m43s [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.KeyVault/vaults/kvclopr2katarweu01gwc]  
+
+Apply complete! Resources: 10 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+key_vault_id = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.KeyVault/vaults/kvclopr2katarweu01gwc"
+key_vault_uri = "https://kvclopr2katarweu01gwc.vault.azure.net/"
+loganalytics_workspace_id = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.OperationalInsights/workspaces/log-clopr2-dev-gwc"
+nsg_ids = {
+  "aks-subnet" = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/networkSecurityGroups/vnet-clopr2-dev-gwc-aks-nsg"
+  "mgmt-subnet" = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/networkSecurityGroups/vnet-clopr2-dev-gwc-mgmt-nsg"
+}
+resource_group_name = "rg-clopr2-katar711-gwc"
+
+key_vault_id = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.KeyVault/vaults/kvclopr2katarweu01gwc"
+key_vault_uri = "https://kvclopr2katarweu01gwc.vault.azure.net/"
+loganalytics_workspace_id = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.OperationalInsights/workspaces/log-clopr2-dev-gwc"
+nsg_ids = {
+  "aks-subnet" = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/networkSecurityGroups/vnet-clopr2-dev-gwc-aks-nsg"
+  "mgmt-subnet" = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/networkSecurityGroups/vnet-clopr2-dev-gwc-mgmt-nsg"
+}
+resource_group_name = "rg-clopr2-katar711-gwc"
+subnet_ids = {
+key_vault_uri = "https://kvclopr2katarweu01gwc.vault.azure.net/"
+loganalytics_workspace_id = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.OperationalInsights/workspaces/log-clopr2-dev-gwc"
+nsg_ids = {
+  "aks-subnet" = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/networkSecurityGroups/vnet-clopr2-dev-gwc-aks-nsg"
+  "mgmt-subnet" = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/networkSecurityGroups/vnet-clopr2-dev-gwc-mgmt-nsg"
+}
+resource_group_name = "rg-clopr2-katar711-gwc"
+subnet_ids = {
+nsg_ids = {
+  "aks-subnet" = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/networkSecurityGroups/vnet-clopr2-dev-gwc-aks-nsg"
+  "mgmt-subnet" = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/networkSecurityGroups/vnet-clopr2-dev-gwc-mgmt-nsg"
+}
+resource_group_name = "rg-clopr2-katar711-gwc"
+oviders/Microsoft.Network/networkSecurityGroups/vnet-clopr2-dev-gwc-aks-nsg"
+  "mgmt-subnet" = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/networkSecurityGroups/vnet-clopr2-dev-gwc-mgmt-nsg"
+}
+resource_group_name = "rg-clopr2-katar711-gwc"
+subnet_ids = {
+}
+resource_group_name = "rg-clopr2-katar711-gwc"
+subnet_ids = {
+resource_group_name = "rg-clopr2-katar711-gwc"
+subnet_ids = {
+  "aks-subnet" = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/virtualNetworks/vnet-clopr2-dev-gwc/subnets/aks-subnet"
+  "mgmt-subnet" = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/virtualNetworks/vnet-clopr2-dev-gwc/subnets/mgmt-subnet"
+}
+vnet_id = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/virtualNetworks/vnet-clopr2-dev-gwc"
+  "aks-subnet" = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/virtualNetworks/vnet-clopr2-dev-gwc/subnets/aks-subnet"
+  "mgmt-subnet" = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/virtualNetworks/vnet-clopr2-dev-gwc/subnets/mgmt-subnet"
+}
+vnet_id = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/virtualNetworks/vnet-clopr2-dev-gwc"
+data.azurerm_client_config.current
+  "mgmt-subnet" = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/virtualNetworks/vnet-clopr2-dev-gwc/subnets/mgmt-subnet"
+}
+vnet_id = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/virtualNetworks/vnet-clopr2-dev-gwc"
+data.azurerm_client_config.current
+}
+vnet_id = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/virtualNetworks/vnet-clopr2-dev-gwc"
+data.azurerm_client_config.current
+azurerm_resource_group.this
+/Microsoft.Network/virtualNetworks/vnet-clopr2-dev-gwc"
+data.azurerm_client_config.current
+azurerm_resource_group.this
+data.azurerm_client_config.current
+azurerm_resource_group.this
+module.keyvault.azurerm_key_vault.this
+azurerm_resource_group.this
+module.keyvault.azurerm_key_vault.this
+module.keyvault.azurerm_key_vault.this
+module.loganalytics.azurerm_log_analytics_workspace.this
+module.network.azurerm_network_security_group.this["aks-subnet"]
+module.network.azurerm_network_security_group.this["aks-subnet"]
+module.network.azurerm_network_security_group.this["mgmt-subnet"]
+module.network.azurerm_subnet.this["aks-subnet"]
+module.network.azurerm_subnet.this["mgmt-subnet"]
+module.network.azurerm_subnet_network_security_group_association.this["aks-subnet"]
+module.network.azurerm_subnet_network_security_group_association.this["mgmt-subnet"]
+module.network.azurerm_virtual_network.this

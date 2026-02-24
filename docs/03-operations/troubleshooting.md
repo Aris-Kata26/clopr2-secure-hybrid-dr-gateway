@@ -30,3 +30,13 @@
 
 **Evidence:**
 - [docs/05-evidence/outputs/terraform-validate.txt](docs/05-evidence/outputs/terraform-validate.txt)
+
+## US9 Defender recommendations (initially empty)
+**Issue:** Defender recommendations list was empty after baseline enablement.
+
+**Root cause:** CSPM evaluation had not completed yet.
+
+**Fix:** Waited for evaluation after enabling Defender CSPM; recommendations populated.
+
+**Evidence:**
+- [docs/05-evidence/screenshots/recommendations-by-title.png](docs/05-evidence/screenshots/recommendations-by-title.png)

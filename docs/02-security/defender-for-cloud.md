@@ -14,10 +14,21 @@ Establish early security posture management (AZ-500) with visibility into secure
 ## Secure score snapshot
 Secure score provides a high-level view of posture. At this early baseline, scores may be low or incomplete until more services emit signals.
 
-## Top recommendations observed
-No recommendations were listed at capture time (baseline deployment just completed). Refresh later and replace this section with at least five recommendation titles when they appear.
+## Observed recommendations (Sprint 1)
+- Disabled accounts with owner permissions on Azure resources should be removed
+- Guest accounts with read permissions on Azure resources should be removed
+- There should be more than one owner assigned to subscriptions
+- Guest accounts with write permissions on Azure resources should be removed
+- Subnets should be associated with a network security group
+- Disabled accounts with read and write permissions on Azure resources should be removed
+- A maximum of 3 owners should be designated for subscriptions
+- Guest accounts with owner permissions on Azure resources should be removed
+- Azure DDoS Protection Standard should be enabled
+
+These recommendations are now visible after enabling Defender CSPM. Remediation will be planned and implemented in Sprint 4 with evidence.
 
 ## Evidence
 - docs/05-evidence/screenshots/defender-enabled.png
 - docs/05-evidence/screenshots/secure-score.png
 - docs/05-evidence/screenshots/recommendations.png
+- docs/05-evidence/screenshots/recommendations-by-title.png

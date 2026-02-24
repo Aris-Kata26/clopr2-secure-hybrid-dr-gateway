@@ -5,9 +5,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - name: Install ansible-lint
-        run: python3 -m pip install --user ansible-lint
+      - name: Install Ansible and ansible-lint
+        run: python3 -m pip install --user ansible ansible-lint
       - name: ansible-lint
-        run: ~/.local/bin/ansible-lint infra/ansible || true
+        run: ~/.local/bin/ansible-lint infra/ansible
+      - name: Ansible syntax check
+        run: ~/.local/bin/ansible-playbook --syntax-check infra/ansible/playbooks/site.yml
 
 

@@ -1,4 +1,5 @@
 ---
-- hosts: onprem
+- name: On-prem baseline configuration
+  hosts: onprem
   become: true
   roles: []

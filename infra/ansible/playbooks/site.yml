@@ -1,4 +1,5 @@
 ---
-- hosts: all
+- name: Baseline site configuration
+  hosts: all
   become: true
   roles: []

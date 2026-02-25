@@ -1,0 +1,12 @@
+# Terraform local state / providers
+.terraform/
+.terraform.lock.hcl
+
+# Local-only secrets
+terraform.tfvars
+*.tfvars
+*.tfvars.json
+
+# State files
+*.tfstate
+*.tfstate.*

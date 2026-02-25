@@ -40,3 +40,13 @@
 
 **Evidence:**
 - [docs/05-evidence/screenshots/recommendations-by-title.png](docs/05-evidence/screenshots/recommendations-by-title.png)
+
+## US4/US5 On-prem provisioning (Proxmox RBAC: VM.Clone)
+**Issue:** `terraform apply` failed with `received an HTTP 403 response - Reason: Permission check failed (/vms/200, VM.Clone)`.
+
+**Root cause:** The Proxmox API token/user had enough rights to read cluster info (plan/authcheck), but did not have `VM.Clone` permission on the cloud-init template VM (VMID 200).
+
+**Fix:** In Proxmox UI, grant the token/user a role containing `VM.Clone` on `/vms/200` (template VM) or at a higher scope (e.g., the pool containing the template, or Datacenter `/`). Then re-run `terraform apply`.
+
+**Evidence:**
+- [docs/05-evidence/outputs/terraform-onprem-apply.txt](docs/05-evidence/outputs/terraform-onprem-apply.txt)

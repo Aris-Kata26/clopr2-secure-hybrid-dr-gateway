@@ -1,0 +1,393 @@
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # proxmox_virtual_environment_vm.app will be created
+  + resource "proxmox_virtual_environment_vm" "app" {
+      + acpi                                 = true
+      + bios                                 = "seabios"
+      + boot_order                           = (known after apply)
+      + delete_unreferenced_disks_on_destroy = true
+      + hotplug                              = (known after apply)
+      + id                                   = (known after apply)
+      + ipv4_addresses                       = (known after apply)
+      + ipv6_addresses                       = (known after apply)
+      + keyboard_layout                      = "en-us"
+      + mac_addresses                        = (known after apply)
+      + migrate                              = false
+      + name                                 = "app-onprem"
+      + network_interface_names              = (known after apply)
+      + node_name                            = "TheBetterBTS"
+      + on_boot                              = true
+      + pool_id                              = "katar711"
+      + protection                           = false
+      + purge_on_destroy                     = true
+      + reboot                               = false
+      + reboot_after_update                  = true
+      + scsi_hardware                        = "virtio-scsi-single"
+      + started                              = true
+      + stop_on_destroy                      = false
+      + tablet_device                        = true
+      + template                             = false
+      + timeout_clone                        = 1800
+      + timeout_create                       = 1800
+      + timeout_migrate                      = 1800
+      + timeout_move_disk                    = 1800
+      + timeout_reboot                       = 1800
+      + timeout_shutdown_vm                  = 1800
+      + timeout_start_vm                     = 1800
+      + timeout_stop_vm                      = 300
+      + vm_id                                = 203
+
+      + agent {
+          + enabled = true
+          + timeout = "15m"
+          + trim    = false
+          + type    = "virtio"
+        }
+
+      + clone {
+          + full    = true
+          + retries = 1
+          + vm_id   = 200
+        }
+
+      + cpu {
+          + cores      = 2
+          + hotplugged = 0
+          + limit      = 0
+          + numa       = false
+          + sockets    = 1
+          + type       = "qemu64"
+          + units      = (known after apply)
+        }
+
+      + disk {
+          + aio               = "io_uring"
+          + backup            = true
+          + cache             = "none"
+          + datastore_id      = "Slightly-Big-Data"
+          + discard           = "ignore"
+          + file_format       = (known after apply)
+          + interface         = "scsi0"
+          + iothread          = false
+          + path_in_datastore = (known after apply)
+          + replicate         = true
+          + size              = 30
+          + ssd               = false
+        }
+
+      + initialization {
+          + datastore_id         = "local-lvm"
+          + file_format          = (known after apply)
+          + meta_data_file_id    = (known after apply)
+          + network_data_file_id = (known after apply)
+          + type                 = (known after apply)
+          + user_data_file_id    = (known after apply)
+          + vendor_data_file_id  = (known after apply)
+
+          + ip_config {
+              + ipv4 {
+                  + address = "10.20.20.13/24"
+                  + gateway = "10.20.20.1"
+                }
+            }
+
+          + user_account {
+              + keys     = [
+                  + "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE0wgUwPk532ofKDeivuPL6wzp6cupTyx1Ci873ieQpj katar711@school",
+                ]
+              + username = "ubuntu"
+            }
+        }
+
+      + memory {
+          + dedicated      = 4096
+          + floating       = 0
+          + keep_hugepages = false
+          + shared         = 0
+        }
+
+      + network_device {
+          + bridge      = "vmbr0"
+          + enabled     = true
+          + firewall    = false
+          + mac_address = (known after apply)
+          + model       = "virtio"
+          + mtu         = 0
+          + queues      = 0
+          + rate_limit  = 0
+          + vlan_id     = 0
+        }
+
+      + operating_system {
+          + type = "l26"
+        }
+
+      + vga (known after apply)
+    }
+
+  # proxmox_virtual_environment_vm.pg_primary will be created
+  + resource "proxmox_virtual_environment_vm" "pg_primary" {
+      + acpi                                 = true
+      + bios                                 = "seabios"
+      + boot_order                           = (known after apply)
+      + delete_unreferenced_disks_on_destroy = true
+      + hotplug                              = (known after apply)
+      + id                                   = (known after apply)
+      + ipv4_addresses                       = (known after apply)
+      + ipv6_addresses                       = (known after apply)
+      + keyboard_layout                      = "en-us"
+      + mac_addresses                        = (known after apply)
+      + migrate                              = false
+      + name                                 = "pg-primary"
+      + network_interface_names              = (known after apply)
+      + node_name                            = "TheBetterBTS"
+      + on_boot                              = true
+      + pool_id                              = "katar711"
+      + protection                           = false
+      + purge_on_destroy                     = true
+      + reboot                               = false
+      + reboot_after_update                  = true
+      + scsi_hardware                        = "virtio-scsi-single"
+      + started                              = true
+      + stop_on_destroy                      = false
+      + tablet_device                        = true
+      + template                             = false
+      + timeout_clone                        = 1800
+      + timeout_create                       = 1800
+      + timeout_migrate                      = 1800
+      + timeout_move_disk                    = 1800
+      + timeout_reboot                       = 1800
+      + timeout_shutdown_vm                  = 1800
+      + timeout_start_vm                     = 1800
+      + timeout_stop_vm                      = 300
+      + vm_id                                = 201
+
+      + agent {
+          + enabled = true
+          + timeout = "15m"
+          + trim    = false
+          + type    = "virtio"
+        }
+
+      + clone {
+          + full    = true
+          + retries = 1
+          + vm_id   = 200
+        }
+
+      + cpu {
+          + cores      = 4
+          + hotplugged = 0
+          + limit      = 0
+          + numa       = false
+          + sockets    = 1
+          + type       = "qemu64"
+          + units      = (known after apply)
+        }
+
+      + disk {
+          + aio               = "io_uring"
+          + backup            = true
+          + cache             = "none"
+          + datastore_id      = "Slightly-Big-Data"
+          + discard           = "ignore"
+          + file_format       = (known after apply)
+          + interface         = "scsi0"
+          + iothread          = false
+          + path_in_datastore = (known after apply)
+          + replicate         = true
+          + size              = 50
+          + ssd               = false
+        }
+
+      + initialization {
+          + datastore_id         = "local-lvm"
+          + file_format          = (known after apply)
+          + meta_data_file_id    = (known after apply)
+          + network_data_file_id = (known after apply)
+          + type                 = (known after apply)
+          + user_data_file_id    = (known after apply)
+          + vendor_data_file_id  = (known after apply)
+
+          + ip_config {
+              + ipv4 {
+                  + address = "10.20.20.11/24"
+                  + gateway = "10.20.20.1"
+                }
+            }
+
+          + user_account {
+              + keys     = [
+                  + "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE0wgUwPk532ofKDeivuPL6wzp6cupTyx1Ci873ieQpj katar711@school",
+                ]
+              + username = "ubuntu"
+            }
+        }
+
+      + memory {
+          + dedicated      = 8192
+          + floating       = 0
+          + keep_hugepages = false
+          + shared         = 0
+        }
+
+      + network_device {
+          + bridge      = "vmbr0"
+          + enabled     = true
+          + firewall    = false
+          + mac_address = (known after apply)
+          + model       = "virtio"
+          + mtu         = 0
+          + queues      = 0
+          + rate_limit  = 0
+          + vlan_id     = 0
+        }
+
+      + operating_system {
+          + type = "l26"
+        }
+
+      + vga (known after apply)
+    }
+
+  # proxmox_virtual_environment_vm.pg_standby will be created
+  + resource "proxmox_virtual_environment_vm" "pg_standby" {
+      + acpi                                 = true
+      + bios                                 = "seabios"
+      + boot_order                           = (known after apply)
+      + delete_unreferenced_disks_on_destroy = true
+      + hotplug                              = (known after apply)
+      + id                                   = (known after apply)
+      + ipv4_addresses                       = (known after apply)
+      + ipv6_addresses                       = (known after apply)
+      + keyboard_layout                      = "en-us"
+      + mac_addresses                        = (known after apply)
+      + migrate                              = false
+      + name                                 = "pg-standby"
+      + network_interface_names              = (known after apply)
+      + node_name                            = "TheBetterBTS"
+      + on_boot                              = true
+      + pool_id                              = "katar711"
+      + protection                           = false
+      + purge_on_destroy                     = true
+      + reboot                               = false
+      + reboot_after_update                  = true
+      + scsi_hardware                        = "virtio-scsi-single"
+      + started                              = true
+      + stop_on_destroy                      = false
+      + tablet_device                        = true
+      + template                             = false
+      + timeout_clone                        = 1800
+      + timeout_create                       = 1800
+      + timeout_migrate                      = 1800
+      + timeout_move_disk                    = 1800
+      + timeout_reboot                       = 1800
+      + timeout_shutdown_vm                  = 1800
+      + timeout_start_vm                     = 1800
+      + timeout_stop_vm                      = 300
+      + vm_id                                = 202
+
+      + agent {
+          + enabled = true
+          + timeout = "15m"
+          + trim    = false
+          + type    = "virtio"
+        }
+
+      + clone {
+          + full    = true
+          + retries = 1
+          + vm_id   = 200
+        }
+
+      + cpu {
+          + cores      = 4
+          + hotplugged = 0
+          + limit      = 0
+          + numa       = false
+          + sockets    = 1
+          + type       = "qemu64"
+          + units      = (known after apply)
+        }
+
+      + disk {
+          + aio               = "io_uring"
+          + backup            = true
+          + cache             = "none"
+          + datastore_id      = "Slightly-Big-Data"
+          + discard           = "ignore"
+          + file_format       = (known after apply)
+          + interface         = "scsi0"
+          + iothread          = false
+          + path_in_datastore = (known after apply)
+          + replicate         = true
+          + size              = 50
+          + ssd               = false
+        }
+
+      + initialization {
+          + datastore_id         = "local-lvm"
+          + file_format          = (known after apply)
+          + meta_data_file_id    = (known after apply)
+          + network_data_file_id = (known after apply)
+          + type                 = (known after apply)
+          + user_data_file_id    = (known after apply)
+          + vendor_data_file_id  = (known after apply)
+
+          + ip_config {
+              + ipv4 {
+                  + address = "10.20.20.12/24"
+                  + gateway = "10.20.20.1"
+                }
+            }
+
+          + user_account {
+              + keys     = [
+                  + "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE0wgUwPk532ofKDeivuPL6wzp6cupTyx1Ci873ieQpj katar711@school",
+                ]
+              + username = "ubuntu"
+            }
+        }
+
+      + memory {
+          + dedicated      = 8192
+          + floating       = 0
+          + keep_hugepages = false
+          + shared         = 0
+        }
+
+      + network_device {
+          + bridge      = "vmbr0"
+          + enabled     = true
+          + firewall    = false
+          + mac_address = (known after apply)
+          + model       = "virtio"
+          + mtu         = 0
+          + queues      = 0
+          + rate_limit  = 0
+          + vlan_id     = 0
+        }
+
+      + operating_system {
+          + type = "l26"
+        }
+
+      + vga (known after apply)
+    }
+
+Plan: 3 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  + vm_ipv4_addresses = {
+      + app        = (known after apply)
+      + pg_primary = (known after apply)
+      + pg_standby = (known after apply)
+    }
+proxmox_virtual_environment_vm.app: Creating...
+proxmox_virtual_environment_vm.pg_primary: Creating...
+proxmox_virtual_environment_vm.pg_standby: Creating...

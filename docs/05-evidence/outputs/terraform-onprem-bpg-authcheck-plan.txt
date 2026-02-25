@@ -1,0 +1,22 @@
+[0m[1mdata.proxmox_virtual_environment_nodes.nodes: Reading...[0m[0m
+[0m[1mdata.proxmox_virtual_environment_version.version: Reading...[0m[0m
+[0m[1mdata.proxmox_virtual_environment_version.version: Read complete after 0s [id=version][0m
+[0m[1mdata.proxmox_virtual_environment_nodes.nodes: Read complete after 0s [id=nodes][0m
+
+Changes to Outputs:
+  [32m+[0m[0m node_names  = [
+      [32m+[0m[0m "TheBetterBTS",
+    ]
+  [32m+[0m[0m node_online = [
+      [32m+[0m[0m true,
+    ]
+  [32m+[0m[0m pve_release = "9.1"
+  [32m+[0m[0m pve_version = "9.1.4"
+
+You can apply this plan to save these new output values to the Terraform
+state, without changing any real infrastructure.
+[90m
+─────────────────────────────────────────────────────────────────────────────[0m
+
+Note: You didn't use the -out option to save this plan, so Terraform can't
+guarantee to take exactly these actions if you run "terraform apply" now.

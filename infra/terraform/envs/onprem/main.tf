@@ -3,111 +3,213 @@ terraform {
 
   required_providers {
     proxmox = {
-      source  = "telmate/proxmox"
-      version = "~> 3.0.1"
+      source  = "bpg/proxmox"
+      version = "~> 0.97"
     }
   }
 }
 
+locals {
+  # bpg provider endpoint must NOT include /api2/json
+  endpoint_raw = trimsuffix(trimsuffix(var.pm_api_url, "/api2/json/"), "/api2/json")
+  endpoint     = endswith(local.endpoint_raw, "/") ? local.endpoint_raw : "${local.endpoint_raw}/"
+
+  # bpg provider token format: user@realm!tokenid=SECRET
+  api_token = "${var.pm_api_token_id}=${var.pm_api_token_secret}"
+
+  pg_primary_disk_size_gb = tonumber(regex("^[0-9]+", var.pg_primary_disk_gb))
+  pg_standby_disk_size_gb = tonumber(regex("^[0-9]+", var.pg_standby_disk_gb))
+  app_disk_size_gb        = tonumber(regex("^[0-9]+", var.app_disk_gb))
+
+  pg_primary_ipv4_address = strcontains(var.pg_primary_ipconfig0, "dhcp") ? "dhcp" : regex("ip=([^,]+)", var.pg_primary_ipconfig0)[0]
+  pg_primary_ipv4_gateway = strcontains(var.pg_primary_ipconfig0, "dhcp") ? null : regex("gw=([^,]+)", var.pg_primary_ipconfig0)[0]
+
+  pg_standby_ipv4_address = strcontains(var.pg_standby_ipconfig0, "dhcp") ? "dhcp" : regex("ip=([^,]+)", var.pg_standby_ipconfig0)[0]
+  pg_standby_ipv4_gateway = strcontains(var.pg_standby_ipconfig0, "dhcp") ? null : regex("gw=([^,]+)", var.pg_standby_ipconfig0)[0]
+
+  app_ipv4_address = strcontains(var.app_ipconfig0, "dhcp") ? "dhcp" : regex("ip=([^,]+)", var.app_ipconfig0)[0]
+  app_ipv4_gateway = strcontains(var.app_ipconfig0, "dhcp") ? null : regex("gw=([^,]+)", var.app_ipconfig0)[0]
+}
+
 provider "proxmox" {
-  pm_api_url          = var.pm_api_url
-  pm_api_token_id     = var.pm_api_token_id
-  pm_api_token_secret = var.pm_api_token_secret
-  pm_tls_insecure     = var.pm_tls_insecure
+  endpoint  = local.endpoint
+  api_token = local.api_token
+  insecure  = var.pm_tls_insecure
 }
 
-resource "proxmox_vm_qemu" "pg_primary" {
-  name                    = "pg-primary"
-  target_node             = var.pm_target_node
-  pool                    = var.pm_pool
-  vmid                    = var.pg_primary_vmid
-  clone                   = var.template_name
-  full_clone              = true
-  os_type                 = "cloud-init"
-  cloudinit_cdrom_storage = var.cloudinit_storage
-  agent                   = 1
-  onboot                  = true
+resource "proxmox_virtual_environment_vm" "pg_primary" {
+  name      = "pg-primary"
+  node_name = var.pm_target_node
+  pool_id   = var.pm_pool
+  vm_id     = var.pg_primary_vmid
 
-  cores   = var.pg_primary_cores
-  memory  = var.pg_primary_memory_mb
-  scsihw  = "virtio-scsi-single"
-  bootdisk = "scsi0"
+  clone {
+    vm_id = tonumber(var.template_name)
+    full  = true
+  }
+
+  agent {
+    enabled = true
+  }
+
+  on_boot = true
+
+  cpu {
+    cores = var.pg_primary_cores
+  }
+
+  memory {
+    dedicated = var.pg_primary_memory_mb
+  }
+
+  scsi_hardware = "virtio-scsi-single"
 
   disk {
-    size    = var.pg_primary_disk_gb
-    storage = var.vm_storage
+    datastore_id = var.vm_storage
+    interface    = "scsi0"
+    size         = local.pg_primary_disk_size_gb
   }
 
-  network {
-    model  = "virtio"
+  initialization {
+    datastore_id = var.cloudinit_storage
+
+    ip_config {
+      ipv4 {
+        address = local.pg_primary_ipv4_address
+        gateway = local.pg_primary_ipv4_gateway
+      }
+    }
+
+    user_account {
+      username = var.ci_user
+      keys     = [trimspace(var.ci_ssh_public_key)]
+    }
+  }
+
+  network_device {
     bridge = var.vm_bridge
+    model  = "virtio"
   }
 
-  ciuser   = var.ci_user
-  sshkeys  = var.ci_ssh_public_key
-  ipconfig0 = var.pg_primary_ipconfig0
+  operating_system {
+    type = "l26"
+  }
 }
 
-resource "proxmox_vm_qemu" "pg_standby" {
-  name                    = "pg-standby"
-  target_node             = var.pm_target_node
-  pool                    = var.pm_pool
-  vmid                    = var.pg_standby_vmid
-  clone                   = var.template_name
-  full_clone              = true
-  os_type                 = "cloud-init"
-  cloudinit_cdrom_storage = var.cloudinit_storage
-  agent                   = 1
-  onboot                  = true
+resource "proxmox_virtual_environment_vm" "pg_standby" {
+  name      = "pg-standby"
+  node_name = var.pm_target_node
+  pool_id   = var.pm_pool
+  vm_id     = var.pg_standby_vmid
 
-  cores   = var.pg_standby_cores
-  memory  = var.pg_standby_memory_mb
-  scsihw  = "virtio-scsi-single"
-  bootdisk = "scsi0"
+  clone {
+    vm_id = tonumber(var.template_name)
+    full  = true
+  }
+
+  agent {
+    enabled = true
+  }
+
+  on_boot = true
+
+  cpu {
+    cores = var.pg_standby_cores
+  }
+
+  memory {
+    dedicated = var.pg_standby_memory_mb
+  }
+
+  scsi_hardware = "virtio-scsi-single"
 
   disk {
-    size    = var.pg_standby_disk_gb
-    storage = var.vm_storage
+    datastore_id = var.vm_storage
+    interface    = "scsi0"
+    size         = local.pg_standby_disk_size_gb
   }
 
-  network {
-    model  = "virtio"
+  initialization {
+    datastore_id = var.cloudinit_storage
+
+    ip_config {
+      ipv4 {
+        address = local.pg_standby_ipv4_address
+        gateway = local.pg_standby_ipv4_gateway
+      }
+    }
+
+    user_account {
+      username = var.ci_user
+      keys     = [trimspace(var.ci_ssh_public_key)]
+    }
+  }
+
+  network_device {
     bridge = var.vm_bridge
+    model  = "virtio"
   }
 
-  ciuser   = var.ci_user
-  sshkeys  = var.ci_ssh_public_key
-  ipconfig0 = var.pg_standby_ipconfig0
+  operating_system {
+    type = "l26"
+  }
 }
 
-resource "proxmox_vm_qemu" "app" {
-  name                    = "app-01"
-  target_node             = var.pm_target_node
-  pool                    = var.pm_pool
-  vmid                    = var.app_vmid
-  clone                   = var.template_name
-  full_clone              = true
-  os_type                 = "cloud-init"
-  cloudinit_cdrom_storage = var.cloudinit_storage
-  agent                   = 1
-  onboot                  = true
+resource "proxmox_virtual_environment_vm" "app" {
+  name      = "app-onprem"
+  node_name = var.pm_target_node
+  pool_id   = var.pm_pool
+  vm_id     = var.app_vmid
 
-  cores   = var.app_cores
-  memory  = var.app_memory_mb
-  scsihw  = "virtio-scsi-single"
-  bootdisk = "scsi0"
+  clone {
+    vm_id = tonumber(var.template_name)
+    full  = true
+  }
+
+  agent {
+    enabled = true
+  }
+
+  on_boot = true
+
+  cpu {
+    cores = var.app_cores
+  }
+
+  memory {
+    dedicated = var.app_memory_mb
+  }
+
+  scsi_hardware = "virtio-scsi-single"
 
   disk {
-    size    = var.app_disk_gb
-    storage = var.vm_storage
+    datastore_id = var.vm_storage
+    interface    = "scsi0"
+    size         = local.app_disk_size_gb
   }
 
-  network {
-    model  = "virtio"
+  initialization {
+    datastore_id = var.cloudinit_storage
+
+    ip_config {
+      ipv4 {
+        address = local.app_ipv4_address
+        gateway = local.app_ipv4_gateway
+      }
+    }
+
+    user_account {
+      username = var.ci_user
+      keys     = [trimspace(var.ci_ssh_public_key)]
+    }
+  }
+
+  network_device {
     bridge = var.vm_bridge
+    model  = "virtio"
   }
 
-  ciuser   = var.ci_user
-  sshkeys  = var.ci_ssh_public_key
-  ipconfig0 = var.app_ipconfig0
+  operating_system {
+    type = "l26"
+  }
 }

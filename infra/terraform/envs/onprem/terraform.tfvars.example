@@ -3,7 +3,7 @@ pm_api_token_id     = "katar711@pve!terraform"
 pm_api_token_secret = "REPLACE_ME"
 pm_target_node      = "TheBetterBTS"
 pm_pool             = "katar711"
-template_name        = "101"
+template_name        = "200"
 
 vm_storage       = "Slightly-Big-Data"
 cloudinit_storage = "local-lvm"
@@ -21,14 +21,14 @@ app_vmid        = 203
 pg_primary_cores     = 4
 pg_primary_memory_mb = 8192
 pg_primary_disk_gb   = "50G"
-pg_primary_ipconfig0 = "ip=dhcp"
+pg_primary_ipconfig0 = "ip=10.20.20.11/24,gw=10.20.20.1"
 
 pg_standby_cores     = 4
 pg_standby_memory_mb = 8192
 pg_standby_disk_gb   = "50G"
-pg_standby_ipconfig0 = "ip=dhcp"
+pg_standby_ipconfig0 = "ip=10.20.20.12/24,gw=10.20.20.1"
 
 app_cores     = 2
 app_memory_mb = 4096
 app_disk_gb   = "30G"
-app_ipconfig0 = "ip=dhcp"
+app_ipconfig0 = "ip=10.20.20.13/24,gw=10.20.20.1"

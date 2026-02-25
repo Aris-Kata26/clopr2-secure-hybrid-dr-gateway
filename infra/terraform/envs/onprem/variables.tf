@@ -1,6 +1,6 @@
 variable "pm_api_url" {
   type        = string
-  description = "Proxmox API URL, e.g. https://10.0.10.161:8006/api2/json"
+  description = "Proxmox API URL. For bpg/proxmox this should be like https://10.0.10.161:8006/ (no /api2/json). This env will also accept the /api2/json suffix and strip it."
 }
 
 variable "pm_api_token_id" {
@@ -32,7 +32,7 @@ variable "pm_pool" {
 
 variable "template_name" {
   type        = string
-  description = "Template VM name or ID to clone"
+  description = "Template VM ID to clone (numeric, e.g. 200). Stored as string for convenience."
 }
 
 variable "vm_storage" {

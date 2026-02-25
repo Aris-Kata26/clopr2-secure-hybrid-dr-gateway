@@ -1,0 +1,9 @@
+# Proxmox API endpoint (note: no /api2/json)
+endpoint = "https://10.0.10.161:8006/"
+
+# bpg token format is a single string: user@realm!tokenname=SECRET
+# NEVER commit real secrets. Keep secrets in terraform.tfvars (ignored) or environment variables.
+api_token = "katar711@pve!terraform=8bdabb2c-4883-4d2b-8d0c-6e369f5be4c4"
+
+# self-signed TLS certs (typical in labs)
+insecure = true

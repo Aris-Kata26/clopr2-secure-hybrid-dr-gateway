@@ -3,7 +3,7 @@
 ## Main expected cost drivers
 - AKS nodes and control plane-related charges.
 - VPN Gateway for hybrid connectivity.
-- Azure Database for PostgreSQL.
+- Azure VM PostgreSQL DR replica.
 - Log Analytics ingestion and retention.
 
 ## Cost control actions

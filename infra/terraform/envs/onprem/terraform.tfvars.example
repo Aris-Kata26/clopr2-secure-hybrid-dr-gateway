@@ -1,0 +1,34 @@
+pm_api_url          = "https://10.0.10.161:8006/api2/json"
+pm_api_token_id     = "katar711@pve!terraform"
+pm_api_token_secret = "REPLACE_ME"
+pm_target_node      = "TheBetterBTS"
+pm_pool             = "katar711"
+template_name        = "101"
+
+vm_storage       = "Slightly-Big-Data"
+cloudinit_storage = "local-lvm"
+vm_bridge        = "vmbr0"
+ci_user          = "ubuntu"
+
+ci_ssh_public_key = <<EOF
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE0wgUwPk532ofKDeivuPL6wzp6cupTyx1Ci873ieQpj katar711@school
+EOF
+
+pg_primary_vmid = 201
+pg_standby_vmid = 202
+app_vmid        = 203
+
+pg_primary_cores     = 4
+pg_primary_memory_mb = 8192
+pg_primary_disk_gb   = "50G"
+pg_primary_ipconfig0 = "ip=dhcp"
+
+pg_standby_cores     = 4
+pg_standby_memory_mb = 8192
+pg_standby_disk_gb   = "50G"
+pg_standby_ipconfig0 = "ip=dhcp"
+
+app_cores     = 2
+app_memory_mb = 4096
+app_disk_gb   = "30G"
+app_ipconfig0 = "ip=dhcp"

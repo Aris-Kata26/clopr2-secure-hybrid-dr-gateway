@@ -1,5 +1,8 @@
 # ADR-001: Database single source of truth
 
+## Status
+Superseded by ADR-004
+
 ## Context
 Hybrid DR requires consistent data and clean failover.
 

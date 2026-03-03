@@ -1,0 +1,10 @@
+[0m[1mproxmox_virtual_environment_vm.mgmt_jump: Importing from ID "bcc07/104"...[0m
+[0m[1m[32mproxmox_virtual_environment_vm.mgmt_jump: Import prepared![0m
+[0m[32m  Prepared proxmox_virtual_environment_vm for import[0m
+[0m[1mproxmox_virtual_environment_vm.mgmt_jump: Refreshing state... [id=104][0m
+[0m[32m
+Import successful!
+
+The resources that were imported are shown above. These resources are now in
+your Terraform state and will henceforth be managed by Terraform.
+[0m

@@ -1,0 +1,48 @@
+pg-primary | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "append": true,
+    "changed": false,
+    "comment": "katar711",
+    "group": 1000,
+    "groups": "sudo",
+    "home": "/home/katar711",
+    "move_home": false,
+    "name": "katar711",
+    "shell": "/bin/bash",
+    "state": "present",
+    "uid": 1000
+}
+app-onprem | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "append": true,
+    "changed": false,
+    "comment": "katar711",
+    "group": 1000,
+    "groups": "sudo",
+    "home": "/home/katar711",
+    "move_home": false,
+    "name": "katar711",
+    "shell": "/bin/bash",
+    "state": "present",
+    "uid": 1000
+}
+pg-standby | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "append": true,
+    "changed": false,
+    "comment": "katar711",
+    "group": 1000,
+    "groups": "sudo",
+    "home": "/home/katar711",
+    "move_home": false,
+    "name": "katar711",
+    "shell": "/bin/bash",
+    "state": "present",
+    "uid": 1000
+}

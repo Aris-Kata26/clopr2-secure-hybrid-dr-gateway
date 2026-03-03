@@ -1,0 +1,39 @@
+proxmox_virtual_environment_vm.pg_standby: Refreshing state... [id=102]
+proxmox_virtual_environment_vm.pg_primary: Refreshing state... [id=101]
+proxmox_virtual_environment_vm.app: Refreshing state... [id=103]
+
+Changes to Outputs:
+  + vm_ipv4_addresses = {
+      + app        = [
+          + [
+              + "127.0.0.1",
+            ],
+          + [
+              + "10.0.96.13",
+            ],
+        ]
+      + pg_primary = [
+          + [
+              + "127.0.0.1",
+            ],
+          + [
+              + "10.0.96.11",
+            ],
+        ]
+      + pg_standby = [
+          + [
+              + "127.0.0.1",
+            ],
+          + [
+              + "10.0.96.12",
+            ],
+        ]
+    }
+
+You can apply this plan to save these new output values to the Terraform
+state, without changing any real infrastructure.
+
+─────────────────────────────────────────────────────────────────────────────
+
+Note: You didn't use the -out option to save this plan, so Terraform can't
+guarantee to take exactly these actions if you run "terraform apply" now.

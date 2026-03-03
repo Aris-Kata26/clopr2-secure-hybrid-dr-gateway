@@ -1,0 +1,3 @@
+proxmox_virtual_environment_vm.pg_primary: Refreshing state... [id=101]
+proxmox_virtual_environment_vm.app: Refreshing state... [id=103]
+proxmox_virtual_environment_vm.pg_standby: Refreshing state... [id=102]

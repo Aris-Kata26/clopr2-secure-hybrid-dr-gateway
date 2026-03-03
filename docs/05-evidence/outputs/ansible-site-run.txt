@@ -1,0 +1,13 @@
+
+PLAY [Baseline site configuration] *********************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [pg-primary]
+ok: [app-onprem]
+ok: [pg-standby]
+
+PLAY RECAP *********************************************************************
+app-onprem                 : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+pg-primary                 : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+pg-standby                 : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+

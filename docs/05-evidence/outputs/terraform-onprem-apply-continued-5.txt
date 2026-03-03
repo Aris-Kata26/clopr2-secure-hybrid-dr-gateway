@@ -1,0 +1,49 @@
+[0m[1mproxmox_virtual_environment_vm.app: Refreshing state... [id=103][0m
+[0m[1mproxmox_virtual_environment_vm.pg_primary: Refreshing state... [id=101][0m
+[0m[1mproxmox_virtual_environment_vm.pg_standby: Refreshing state... [id=102][0m
+
+[0m[1m[32mNo changes.[0m[1m Your infrastructure matches the configuration.[0m
+
+[0mTerraform has compared your real infrastructure against your configuration
+and found no differences, so no changes are needed.
+[0m[1m[32m
+Apply complete! Resources: 0 added, 0 changed, 0 destroyed.[0m
+[0m[1m[32m
+Outputs:
+
+[0mvm_ids = {
+  "app" = 103
+  "pg_primary" = 101
+  "pg_standby" = 102
+}
+vm_ipv4_addresses = {
+  "app" = tolist([
+    tolist([
+      "127.0.0.1",
+    ]),
+    tolist([
+      "10.0.96.13",
+    ]),
+  ])
+  "pg_primary" = tolist([
+    tolist([
+      "127.0.0.1",
+    ]),
+    tolist([
+      "10.0.96.11",
+    ]),
+  ])
+  "pg_standby" = tolist([
+    tolist([
+      "127.0.0.1",
+    ]),
+    tolist([
+      "10.0.96.12",
+    ]),
+  ])
+}
+vm_names = {
+  "app" = "app-onprem"
+  "pg_primary" = "pg-primary"
+  "pg_standby" = "pg-standby"
+}

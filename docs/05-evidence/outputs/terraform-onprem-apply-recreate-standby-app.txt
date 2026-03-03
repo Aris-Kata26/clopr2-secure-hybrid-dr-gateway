@@ -1,0 +1,192 @@
+proxmox_virtual_environment_vm.app: Refreshing state... [id=103]
+proxmox_virtual_environment_vm.pg_primary: Refreshing state... [id=101]
+proxmox_virtual_environment_vm.pg_standby: Refreshing state... [id=102]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+-/+ destroy and then create replacement
+
+Terraform will perform the following actions:
+
+  # proxmox_virtual_environment_vm.app is tainted, so must be replaced
+-/+ resource "proxmox_virtual_environment_vm" "app" {
+      ~ boot_order                           = [
+          - "scsi0",
+          - "ide2",
+          - "net0",
+        ] -> (known after apply)
+      + hotplug                              = (known after apply)
+      ~ id                                   = "103" -> (known after apply)
+      ~ ipv4_addresses                       = [] -> (known after apply)
+      ~ ipv6_addresses                       = [] -> (known after apply)
+      ~ mac_addresses                        = [
+          - "BC:24:11:FE:01:43",
+        ] -> (known after apply)
+        name                                 = "app-onprem"
+      ~ network_interface_names              = [] -> (known after apply)
+      ~ on_boot                              = false -> true
+      ~ started                              = false -> true
+        # (24 unchanged attributes hidden)
+
+      ~ agent {
+          + type    = "virtio"
+            # (3 unchanged attributes hidden)
+        }
+
+      ~ cpu {
+          - flags        = [] -> null
+          ~ type         = "x86-64-v2-AES" -> "qemu64"
+          ~ units        = 0 -> (known after apply)
+            # (7 unchanged attributes hidden)
+        }
+
+      ~ disk {
+          ~ datastore_id      = "local" -> "local-lvm"
+          ~ file_format       = "qcow2" -> (known after apply)
+          ~ iothread          = true -> false
+          ~ path_in_datastore = "103/vm-103-disk-0.qcow2" -> (known after apply)
+            # (11 unchanged attributes hidden)
+        }
+
+      ~ initialization {
+          + file_format          = (known after apply)
+          - interface            = "ide0" -> null
+          + meta_data_file_id    = (known after apply)
+          + network_data_file_id = (known after apply)
+          + type                 = (known after apply)
+          + user_data_file_id    = (known after apply)
+          + vendor_data_file_id  = (known after apply)
+            # (1 unchanged attribute hidden)
+
+          ~ ip_config {
+              ~ ipv4 {
+                  ~ address = "dhcp" -> "10.0.96.13/16"
+                  + gateway = "10.0.0.1"
+                }
+            }
+
+            # (1 unchanged block hidden)
+        }
+
+      ~ network_device {
+          - disconnected = false -> null
+          ~ firewall     = true -> false
+          ~ mac_address  = "BC:24:11:FE:01:43" -> (known after apply)
+            # (8 unchanged attributes hidden)
+        }
+
+      ~ vga (known after apply)
+
+        # (3 unchanged blocks hidden)
+    }
+
+  # proxmox_virtual_environment_vm.pg_standby is tainted, so must be replaced
+-/+ resource "proxmox_virtual_environment_vm" "pg_standby" {
+      ~ boot_order                           = [
+          - "scsi0",
+          - "ide2",
+          - "net0",
+        ] -> (known after apply)
+      + hotplug                              = (known after apply)
+      ~ id                                   = "102" -> (known after apply)
+      ~ ipv4_addresses                       = [] -> (known after apply)
+      ~ ipv6_addresses                       = [] -> (known after apply)
+      ~ mac_addresses                        = [
+          - "BC:24:11:EA:A9:8E",
+        ] -> (known after apply)
+        name                                 = "pg-standby"
+      ~ network_interface_names              = [] -> (known after apply)
+      ~ on_boot                              = false -> true
+      ~ started                              = false -> true
+        # (24 unchanged attributes hidden)
+
+      ~ agent {
+          + type    = "virtio"
+            # (3 unchanged attributes hidden)
+        }
+
+      ~ cpu {
+          ~ cores        = 2 -> 4
+          - flags        = [] -> null
+          ~ type         = "x86-64-v2-AES" -> "qemu64"
+          ~ units        = 0 -> (known after apply)
+            # (6 unchanged attributes hidden)
+        }
+
+      ~ disk {
+          ~ datastore_id      = "local" -> "local-lvm"
+          ~ file_format       = "qcow2" -> (known after apply)
+          ~ path_in_datastore = "102/vm-102-disk-0.qcow2" -> (known after apply)
+          ~ size              = 20 -> 30
+            # (11 unchanged attributes hidden)
+        }
+
+      ~ initialization {
+          + file_format          = (known after apply)
+          - interface            = "ide0" -> null
+          + meta_data_file_id    = (known after apply)
+          + network_data_file_id = (known after apply)
+          + type                 = (known after apply)
+          + user_data_file_id    = (known after apply)
+          + vendor_data_file_id  = (known after apply)
+            # (1 unchanged attribute hidden)
+
+          ~ ip_config {
+              ~ ipv4 {
+                  ~ address = "dhcp" -> "10.0.96.12/16"
+                  + gateway = "10.0.0.1"
+                }
+            }
+
+            # (1 unchanged block hidden)
+        }
+
+      ~ memory {
+          ~ dedicated      = 4096 -> 8192
+            # (4 unchanged attributes hidden)
+        }
+
+      ~ network_device {
+          - disconnected = false -> null
+          ~ firewall     = true -> false
+          ~ mac_address  = "BC:24:11:EA:A9:8E" -> (known after apply)
+            # (8 unchanged attributes hidden)
+        }
+
+      ~ vga (known after apply)
+
+        # (2 unchanged blocks hidden)
+    }
+
+Plan: 2 to add, 0 to change, 2 to destroy.
+
+Changes to Outputs:
+  ~ vm_ipv4_addresses = {
+      ~ app        = [
+          - [
+              - "127.0.0.1",
+            ],
+          - [
+              - "10.0.96.13",
+            ],
+        ] -> (known after apply)
+      ~ pg_standby = [
+          - [
+              - "127.0.0.1",
+            ],
+          - [
+              - "10.0.96.12",
+            ],
+        ] -> (known after apply)
+        # (1 unchanged attribute hidden)
+    }
+proxmox_virtual_environment_vm.pg_standby: Destroying... [id=102]
+proxmox_virtual_environment_vm.app: Destroying... [id=103]
+
+Error: All attempts fail:
+#1: task "UPID:bcc07:003656CB:26136934:69A5622C:qmdestroy:103:root@pam!terraform:" failed to complete with exit code: storage 'rockstor' is not online
+
+
+Error: All attempts fail:
+#1: task "UPID:bcc07:003656CA:26136934:69A5622C:qmdestroy:102:root@pam!terraform:" failed to complete with exit code: storage 'rockstor' is not online
+

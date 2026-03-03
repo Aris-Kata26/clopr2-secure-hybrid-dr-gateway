@@ -1,0 +1,32 @@
+ansible-playbook [core 2.16.15]
+  config file = /mnt/c/Users/akata/Documents/Projects/CLOPR2/clopr2-secure-hybrid-dr-gateway/infra/ansible/ansible.cfg
+  configured module search path = ['/home/aris/.ansible/plugins/modules', '/usr/share/ansible/plugins/modules']
+  ansible python module location = /home/aris/.local/lib/python3.12/site-packages/ansible
+  ansible collection location = /home/aris/.ansible/collections:/usr/share/ansible/collections
+  executable location = /home/aris/.local/bin/ansible-playbook
+  python version = 3.12.3 (main, Jan 22 2026, 20:57:42) [GCC 13.3.0] (/usr/bin/python3)
+  jinja version = 3.1.4
+  libyaml = True
+Using /mnt/c/Users/akata/Documents/Projects/CLOPR2/clopr2-secure-hybrid-dr-gateway/infra/ansible/ansible.cfg as config file
+Skipping callback 'default', as we already have a stdout callback.
+Skipping callback 'minimal', as we already have a stdout callback.
+Skipping callback 'oneline', as we already have a stdout callback.
+
+PLAYBOOK: site.yml *************************************************************
+1 plays in infra/ansible/playbooks/site.yml
+
+PLAY [Baseline site configuration] *********************************************
+
+TASK [Gathering Facts] *********************************************************
+task path: /mnt/c/Users/akata/Documents/Projects/CLOPR2/clopr2-secure-hybrid-dr-gateway/infra/ansible/playbooks/site.yml:2
+fatal: [pg-primary]: UNREACHABLE! => {"changed": false, "msg": "Failed to connect to the host via ssh: aris@10.0.96.11: Permission denied (publickey,password).", "unreachable": true}
+fatal: [pg-standby]: UNREACHABLE! => {"changed": false, "msg": "Failed to connect to the host via ssh: aris@10.0.96.146: Permission denied (publickey,password).", "unreachable": true}
+fatal: [mgmt-jump]: UNREACHABLE! => {"changed": false, "msg": "Failed to connect to the host via ssh: aris@10.0.96.195: Permission denied (publickey,password).", "unreachable": true}
+fatal: [app-onprem]: UNREACHABLE! => {"changed": false, "msg": "Failed to connect to the host via ssh: ssh: connect to host 10.0.96.13 port 22: Connection timed out", "unreachable": true}
+
+PLAY RECAP *********************************************************************
+app-onprem                 : ok=0    changed=0    unreachable=1    failed=0    skipped=0    rescued=0    ignored=0   
+mgmt-jump                  : ok=0    changed=0    unreachable=1    failed=0    skipped=0    rescued=0    ignored=0   
+pg-primary                 : ok=0    changed=0    unreachable=1    failed=0    skipped=0    rescued=0    ignored=0   
+pg-standby                 : ok=0    changed=0    unreachable=1    failed=0    skipped=0    rescued=0    ignored=0   
+

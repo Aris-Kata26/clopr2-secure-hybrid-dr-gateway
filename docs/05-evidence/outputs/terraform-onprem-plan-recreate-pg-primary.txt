@@ -1,0 +1,10 @@
+
+Error: Error acquiring the state lock
+
+Error message: resource temporarily unavailable
+open .terraform.tfstate.lock.info: no such file or directory
+
+Terraform acquires a state lock to protect the state from being written
+by multiple users at the same time. Please resolve the issue above and try
+again. For most commands, you can disable locking with the "-lock=false"
+flag, but this is not recommended.

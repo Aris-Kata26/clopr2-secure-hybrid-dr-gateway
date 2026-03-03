@@ -1,0 +1,185 @@
+proxmox_virtual_environment_vm.pg_standby: Refreshing state... [id=102]
+proxmox_virtual_environment_vm.app: Refreshing state... [id=103]
+proxmox_virtual_environment_vm.pg_primary: Refreshing state... [id=101]
+
+Note: Objects have changed outside of Terraform
+
+Terraform detected the following changes made outside of Terraform since the
+last "terraform apply" which may have affected this plan:
+
+  # proxmox_virtual_environment_vm.pg_standby has been deleted
+  - resource "proxmox_virtual_environment_vm" "pg_standby" {
+        id                                   = "102"
+      - ipv4_addresses                       = [
+          - [
+              - "127.0.0.1",
+            ],
+          - [
+              - "10.0.96.12",
+            ],
+        ] -> null
+        name                                 = "pg-standby"
+        # (30 unchanged attributes hidden)
+
+        # (8 unchanged blocks hidden)
+    }
+
+
+Unless you have made equivalent changes to your configuration, or ignored the
+relevant attributes using ignore_changes, the following plan may include
+actions to undo or respond to these changes.
+
+─────────────────────────────────────────────────────────────────────────────
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # proxmox_virtual_environment_vm.pg_standby will be created
+  + resource "proxmox_virtual_environment_vm" "pg_standby" {
+      + acpi                                 = true
+      + bios                                 = "seabios"
+      + boot_order                           = (known after apply)
+      + delete_unreferenced_disks_on_destroy = true
+      + hotplug                              = (known after apply)
+      + id                                   = (known after apply)
+      + ipv4_addresses                       = (known after apply)
+      + ipv6_addresses                       = (known after apply)
+      + keyboard_layout                      = "en-us"
+      + mac_addresses                        = (known after apply)
+      + migrate                              = false
+      + name                                 = "pg-standby"
+      + network_interface_names              = (known after apply)
+      + node_name                            = "bcc07"
+      + on_boot                              = true
+      + protection                           = false
+      + purge_on_destroy                     = true
+      + reboot                               = false
+      + reboot_after_update                  = true
+      + scsi_hardware                        = "virtio-scsi-single"
+      + started                              = true
+      + stop_on_destroy                      = false
+      + tablet_device                        = true
+      + template                             = false
+      + timeout_clone                        = 1800
+      + timeout_create                       = 1800
+      + timeout_migrate                      = 1800
+      + timeout_move_disk                    = 1800
+      + timeout_reboot                       = 1800
+      + timeout_shutdown_vm                  = 1800
+      + timeout_start_vm                     = 1800
+      + timeout_stop_vm                      = 300
+      + vm_id                                = 102
+
+      + agent {
+          + enabled = true
+          + timeout = "15m"
+          + trim    = false
+          + type    = "virtio"
+        }
+
+      + clone {
+          + full    = true
+          + retries = 1
+          + vm_id   = 100
+        }
+
+      + cpu {
+          + cores      = 4
+          + hotplugged = 0
+          + limit      = 0
+          + numa       = false
+          + sockets    = 1
+          + type       = "qemu64"
+          + units      = (known after apply)
+        }
+
+      + disk {
+          + aio               = "io_uring"
+          + backup            = true
+          + cache             = "none"
+          + datastore_id      = "local-lvm"
+          + discard           = "ignore"
+          + file_format       = (known after apply)
+          + interface         = "scsi0"
+          + iothread          = true
+          + path_in_datastore = (known after apply)
+          + replicate         = true
+          + size              = 30
+          + ssd               = false
+        }
+
+      + initialization {
+          + datastore_id         = "local-lvm"
+          + file_format          = (known after apply)
+          + meta_data_file_id    = (known after apply)
+          + network_data_file_id = (known after apply)
+          + type                 = (known after apply)
+          + user_data_file_id    = (known after apply)
+          + vendor_data_file_id  = (known after apply)
+
+          + ip_config {
+              + ipv4 {
+                  + address = "10.0.96.12/16"
+                  + gateway = "10.0.0.1"
+                }
+            }
+
+          + user_account {
+              + keys     = [
+                  + "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE0wgUwPk532ofKDeivuPL6wzp6cupTyx1Ci873ieQpj katar711@school",
+                ]
+              + username = "ubuntu"
+            }
+        }
+
+      + memory {
+          + dedicated      = 8192
+          + floating       = 0
+          + keep_hugepages = false
+          + shared         = 0
+        }
+
+      + network_device {
+          + bridge      = "vmbr0"
+          + enabled     = true
+          + firewall    = false
+          + mac_address = (known after apply)
+          + model       = "virtio"
+          + mtu         = 0
+          + queues      = 0
+          + rate_limit  = 0
+          + vlan_id     = 0
+        }
+
+      + operating_system {
+          + type = "l26"
+        }
+
+      + vga (known after apply)
+    }
+
+Plan: 1 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  ~ vm_ipv4_addresses = {
+      ~ pg_standby = [
+          - [
+              - "127.0.0.1",
+            ],
+          - [
+              - "10.0.96.12",
+            ],
+        ] -> (known after apply)
+        # (2 unchanged attributes hidden)
+    }
+
+Do you want to perform these actions?
+  Terraform will perform the actions described above.
+  Only 'yes' will be accepted to approve.
+
+  Enter a value: 
+proxmox_virtual_environment_vm.pg_standby: Creating...
+proxmox_virtual_environment_vm.pg_standby: Still creating... [00m10s elapsed]

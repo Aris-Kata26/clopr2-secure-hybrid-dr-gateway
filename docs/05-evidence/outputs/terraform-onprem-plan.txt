@@ -1,405 +1,392 @@
 
 Terraform used the selected providers to generate the following execution
 plan. Resource actions are indicated with the following symbols:
-  [32m+[0m create[0m
+  + create
 
 Terraform will perform the following actions:
 
-[1m  # proxmox_virtual_environment_vm.app[0m will be created
-[0m  [32m+[0m[0m resource "proxmox_virtual_environment_vm" "app" {
-      [32m+[0m[0m acpi                                 = true
-      [32m+[0m[0m bios                                 = "seabios"
-      [32m+[0m[0m boot_order                           = (known after apply)
-      [32m+[0m[0m delete_unreferenced_disks_on_destroy = true
-      [32m+[0m[0m hotplug                              = (known after apply)
-      [32m+[0m[0m id                                   = (known after apply)
-      [32m+[0m[0m ipv4_addresses                       = (known after apply)
-      [32m+[0m[0m ipv6_addresses                       = (known after apply)
-      [32m+[0m[0m keyboard_layout                      = "en-us"
-      [32m+[0m[0m mac_addresses                        = (known after apply)
-      [32m+[0m[0m migrate                              = false
-      [32m+[0m[0m name                                 = "app-onprem"
-      [32m+[0m[0m network_interface_names              = (known after apply)
-      [32m+[0m[0m node_name                            = "TheBetterBTS"
-      [32m+[0m[0m on_boot                              = true
-      [32m+[0m[0m pool_id                              = "katar711"
-      [32m+[0m[0m protection                           = false
-      [32m+[0m[0m purge_on_destroy                     = true
-      [32m+[0m[0m reboot                               = false
-      [32m+[0m[0m reboot_after_update                  = true
-      [32m+[0m[0m scsi_hardware                        = "virtio-scsi-single"
-      [32m+[0m[0m started                              = true
-      [32m+[0m[0m stop_on_destroy                      = false
-      [32m+[0m[0m tablet_device                        = true
-      [32m+[0m[0m template                             = false
-      [32m+[0m[0m timeout_clone                        = 1800
-      [32m+[0m[0m timeout_create                       = 1800
-      [32m+[0m[0m timeout_migrate                      = 1800
-      [32m+[0m[0m timeout_move_disk                    = 1800
-      [32m+[0m[0m timeout_reboot                       = 1800
-      [32m+[0m[0m timeout_shutdown_vm                  = 1800
-      [32m+[0m[0m timeout_start_vm                     = 1800
-      [32m+[0m[0m timeout_stop_vm                      = 300
-      [32m+[0m[0m vm_id                                = 203
+  # proxmox_virtual_environment_vm.app will be created
+  + resource "proxmox_virtual_environment_vm" "app" {
+      + acpi                                 = true
+      + bios                                 = "seabios"
+      + boot_order                           = (known after apply)
+      + delete_unreferenced_disks_on_destroy = true
+      + hotplug                              = (known after apply)
+      + id                                   = (known after apply)
+      + ipv4_addresses                       = (known after apply)
+      + ipv6_addresses                       = (known after apply)
+      + keyboard_layout                      = "en-us"
+      + mac_addresses                        = (known after apply)
+      + migrate                              = false
+      + name                                 = "app-onprem"
+      + network_interface_names              = (known after apply)
+      + node_name                            = "bcc07"
+      + on_boot                              = true
+      + protection                           = false
+      + purge_on_destroy                     = true
+      + reboot                               = false
+      + reboot_after_update                  = true
+      + scsi_hardware                        = "virtio-scsi-single"
+      + started                              = true
+      + stop_on_destroy                      = false
+      + tablet_device                        = true
+      + template                             = false
+      + timeout_clone                        = 1800
+      + timeout_create                       = 1800
+      + timeout_migrate                      = 1800
+      + timeout_move_disk                    = 1800
+      + timeout_reboot                       = 1800
+      + timeout_shutdown_vm                  = 1800
+      + timeout_start_vm                     = 1800
+      + timeout_stop_vm                      = 300
+      + vm_id                                = 203
 
-      [32m+[0m[0m agent {
-          [32m+[0m[0m enabled = true
-          [32m+[0m[0m timeout = "15m"
-          [32m+[0m[0m trim    = false
-          [32m+[0m[0m type    = "virtio"
+      + agent {
+          + enabled = true
+          + timeout = "15m"
+          + trim    = false
+          + type    = "virtio"
         }
 
-      [32m+[0m[0m clone {
-          [32m+[0m[0m full    = true
-          [32m+[0m[0m retries = 1
-          [32m+[0m[0m vm_id   = 200
+      + clone {
+          + full    = true
+          + retries = 1
+          + vm_id   = 100
         }
 
-      [32m+[0m[0m cpu {
-          [32m+[0m[0m cores      = 2
-          [32m+[0m[0m hotplugged = 0
-          [32m+[0m[0m limit      = 0
-          [32m+[0m[0m numa       = false
-          [32m+[0m[0m sockets    = 1
-          [32m+[0m[0m type       = "qemu64"
-          [32m+[0m[0m units      = (known after apply)
+      + cpu {
+          + cores      = 2
+          + hotplugged = 0
+          + limit      = 0
+          + numa       = false
+          + sockets    = 1
+          + type       = "qemu64"
+          + units      = (known after apply)
         }
 
-      [32m+[0m[0m disk {
-          [32m+[0m[0m aio               = "io_uring"
-          [32m+[0m[0m backup            = true
-          [32m+[0m[0m cache             = "none"
-          [32m+[0m[0m datastore_id      = "Slightly-Big-Data"
-          [32m+[0m[0m discard           = "ignore"
-          [32m+[0m[0m file_format       = (known after apply)
-          [32m+[0m[0m interface         = "scsi0"
-          [32m+[0m[0m iothread          = false
-          [32m+[0m[0m path_in_datastore = (known after apply)
-          [32m+[0m[0m replicate         = true
-          [32m+[0m[0m size              = 30
-          [32m+[0m[0m ssd               = false
+      + disk {
+          + aio               = "io_uring"
+          + backup            = true
+          + cache             = "none"
+          + datastore_id      = "local-lvm"
+          + discard           = "ignore"
+          + file_format       = (known after apply)
+          + interface         = "scsi0"
+          + iothread          = false
+          + path_in_datastore = (known after apply)
+          + replicate         = true
+          + size              = 30
+          + ssd               = false
         }
 
-      [32m+[0m[0m initialization {
-          [32m+[0m[0m datastore_id         = "local-lvm"
-          [32m+[0m[0m file_format          = (known after apply)
-          [32m+[0m[0m meta_data_file_id    = (known after apply)
-          [32m+[0m[0m network_data_file_id = (known after apply)
-          [32m+[0m[0m type                 = (known after apply)
-          [32m+[0m[0m user_data_file_id    = (known after apply)
-          [32m+[0m[0m vendor_data_file_id  = (known after apply)
+      + initialization {
+          + datastore_id         = "local-lvm"
+          + file_format          = (known after apply)
+          + meta_data_file_id    = (known after apply)
+          + network_data_file_id = (known after apply)
+          + type                 = (known after apply)
+          + user_data_file_id    = (known after apply)
+          + vendor_data_file_id  = (known after apply)
 
-          [32m+[0m[0m ip_config {
-              [32m+[0m[0m ipv4 {
-                  [32m+[0m[0m address = "10.20.20.13/24"
-                  [32m+[0m[0m gateway = "10.20.20.1"
+          + ip_config {
+              + ipv4 {
+                  + address = "10.0.96.13/16"
+                  + gateway = "10.0.0.1"
                 }
             }
 
-          [32m+[0m[0m user_account {
-              [32m+[0m[0m keys     = [
-                  [32m+[0m[0m "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE0wgUwPk532ofKDeivuPL6wzp6cupTyx1Ci873ieQpj katar711@school",
+          + user_account {
+              + keys     = [
+                  + "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE0wgUwPk532ofKDeivuPL6wzp6cupTyx1Ci873ieQpj katar711@school",
                 ]
-              [32m+[0m[0m username = "ubuntu"
+              + username = "ubuntu"
             }
         }
 
-      [32m+[0m[0m memory {
-          [32m+[0m[0m dedicated      = 4096
-          [32m+[0m[0m floating       = 0
-          [32m+[0m[0m keep_hugepages = false
-          [32m+[0m[0m shared         = 0
+      + memory {
+          + dedicated      = 4096
+          + floating       = 0
+          + keep_hugepages = false
+          + shared         = 0
         }
 
-      [32m+[0m[0m network_device {
-          [32m+[0m[0m bridge      = "vmbr0"
-          [32m+[0m[0m enabled     = true
-          [32m+[0m[0m firewall    = false
-          [32m+[0m[0m mac_address = (known after apply)
-          [32m+[0m[0m model       = "virtio"
-          [32m+[0m[0m mtu         = 0
-          [32m+[0m[0m queues      = 0
-          [32m+[0m[0m rate_limit  = 0
-          [32m+[0m[0m vlan_id     = 0
+      + network_device {
+          + bridge      = "vmbr0"
+          + enabled     = true
+          + firewall    = false
+          + mac_address = (known after apply)
+          + model       = "virtio"
+          + mtu         = 0
+          + queues      = 0
+          + rate_limit  = 0
+          + vlan_id     = 0
         }
 
-      [32m+[0m[0m operating_system {
-          [32m+[0m[0m type = "l26"
+      + operating_system {
+          + type = "l26"
         }
 
-      [32m+[0m[0m vga (known after apply)
+      + vga (known after apply)
     }
 
-[1m  # proxmox_virtual_environment_vm.pg_primary[0m will be created
-[0m  [32m+[0m[0m resource "proxmox_virtual_environment_vm" "pg_primary" {
-      [32m+[0m[0m acpi                                 = true
-      [32m+[0m[0m bios                                 = "seabios"
-      [32m+[0m[0m boot_order                           = (known after apply)
-      [32m+[0m[0m delete_unreferenced_disks_on_destroy = true
-      [32m+[0m[0m hotplug                              = (known after apply)
-      [32m+[0m[0m id                                   = (known after apply)
-      [32m+[0m[0m ipv4_addresses                       = (known after apply)
-      [32m+[0m[0m ipv6_addresses                       = (known after apply)
-      [32m+[0m[0m keyboard_layout                      = "en-us"
-      [32m+[0m[0m mac_addresses                        = (known after apply)
-      [32m+[0m[0m migrate                              = false
-      [32m+[0m[0m name                                 = "pg-primary"
-      [32m+[0m[0m network_interface_names              = (known after apply)
-      [32m+[0m[0m node_name                            = "TheBetterBTS"
-      [32m+[0m[0m on_boot                              = true
-      [32m+[0m[0m pool_id                              = "katar711"
-      [32m+[0m[0m protection                           = false
-      [32m+[0m[0m purge_on_destroy                     = true
-      [32m+[0m[0m reboot                               = false
-      [32m+[0m[0m reboot_after_update                  = true
-      [32m+[0m[0m scsi_hardware                        = "virtio-scsi-single"
-      [32m+[0m[0m started                              = true
-      [32m+[0m[0m stop_on_destroy                      = false
-      [32m+[0m[0m tablet_device                        = true
-      [32m+[0m[0m template                             = false
-      [32m+[0m[0m timeout_clone                        = 1800
-      [32m+[0m[0m timeout_create                       = 1800
-      [32m+[0m[0m timeout_migrate                      = 1800
-      [32m+[0m[0m timeout_move_disk                    = 1800
-      [32m+[0m[0m timeout_reboot                       = 1800
-      [32m+[0m[0m timeout_shutdown_vm                  = 1800
-      [32m+[0m[0m timeout_start_vm                     = 1800
-      [32m+[0m[0m timeout_stop_vm                      = 300
-      [32m+[0m[0m vm_id                                = 201
+  # proxmox_virtual_environment_vm.pg_primary will be created
+  + resource "proxmox_virtual_environment_vm" "pg_primary" {
+      + acpi                                 = true
+      + bios                                 = "seabios"
+      + boot_order                           = (known after apply)
+      + delete_unreferenced_disks_on_destroy = true
+      + hotplug                              = (known after apply)
+      + id                                   = (known after apply)
+      + ipv4_addresses                       = (known after apply)
+      + ipv6_addresses                       = (known after apply)
+      + keyboard_layout                      = "en-us"
+      + mac_addresses                        = (known after apply)
+      + migrate                              = false
+      + name                                 = "pg-primary"
+      + network_interface_names              = (known after apply)
+      + node_name                            = "bcc07"
+      + on_boot                              = true
+      + protection                           = false
+      + purge_on_destroy                     = true
+      + reboot                               = false
+      + reboot_after_update                  = true
+      + scsi_hardware                        = "virtio-scsi-single"
+      + started                              = true
+      + stop_on_destroy                      = false
+      + tablet_device                        = true
+      + template                             = false
+      + timeout_clone                        = 1800
+      + timeout_create                       = 1800
+      + timeout_migrate                      = 1800
+      + timeout_move_disk                    = 1800
+      + timeout_reboot                       = 1800
+      + timeout_shutdown_vm                  = 1800
+      + timeout_start_vm                     = 1800
+      + timeout_stop_vm                      = 300
+      + vm_id                                = 201
 
-      [32m+[0m[0m agent {
-          [32m+[0m[0m enabled = true
-          [32m+[0m[0m timeout = "15m"
-          [32m+[0m[0m trim    = false
-          [32m+[0m[0m type    = "virtio"
+      + agent {
+          + enabled = true
+          + timeout = "15m"
+          + trim    = false
+          + type    = "virtio"
         }
 
-      [32m+[0m[0m clone {
-          [32m+[0m[0m full    = true
-          [32m+[0m[0m retries = 1
-          [32m+[0m[0m vm_id   = 200
+      + clone {
+          + full    = true
+          + retries = 1
+          + vm_id   = 100
         }
 
-      [32m+[0m[0m cpu {
-          [32m+[0m[0m cores      = 4
-          [32m+[0m[0m hotplugged = 0
-          [32m+[0m[0m limit      = 0
-          [32m+[0m[0m numa       = false
-          [32m+[0m[0m sockets    = 1
-          [32m+[0m[0m type       = "qemu64"
-          [32m+[0m[0m units      = (known after apply)
+      + cpu {
+          + cores      = 4
+          + hotplugged = 0
+          + limit      = 0
+          + numa       = false
+          + sockets    = 1
+          + type       = "qemu64"
+          + units      = (known after apply)
         }
 
-      [32m+[0m[0m disk {
-          [32m+[0m[0m aio               = "io_uring"
-          [32m+[0m[0m backup            = true
-          [32m+[0m[0m cache             = "none"
-          [32m+[0m[0m datastore_id      = "Slightly-Big-Data"
-          [32m+[0m[0m discard           = "ignore"
-          [32m+[0m[0m file_format       = (known after apply)
-          [32m+[0m[0m interface         = "scsi0"
-          [32m+[0m[0m iothread          = false
-          [32m+[0m[0m path_in_datastore = (known after apply)
-          [32m+[0m[0m replicate         = true
-          [32m+[0m[0m size              = 50
-          [32m+[0m[0m ssd               = false
+      + disk {
+          + aio               = "io_uring"
+          + backup            = true
+          + cache             = "none"
+          + datastore_id      = "local-lvm"
+          + discard           = "ignore"
+          + file_format       = (known after apply)
+          + interface         = "scsi0"
+          + iothread          = false
+          + path_in_datastore = (known after apply)
+          + replicate         = true
+          + size              = 50
+          + ssd               = false
         }
 
-      [32m+[0m[0m initialization {
-          [32m+[0m[0m datastore_id         = "local-lvm"
-          [32m+[0m[0m file_format          = (known after apply)
-          [32m+[0m[0m meta_data_file_id    = (known after apply)
-          [32m+[0m[0m network_data_file_id = (known after apply)
-          [32m+[0m[0m type                 = (known after apply)
-          [32m+[0m[0m user_data_file_id    = (known after apply)
-          [32m+[0m[0m vendor_data_file_id  = (known after apply)
+      + initialization {
+          + datastore_id         = "local-lvm"
+          + file_format          = (known after apply)
+          + meta_data_file_id    = (known after apply)
+          + network_data_file_id = (known after apply)
+          + type                 = (known after apply)
+          + user_data_file_id    = (known after apply)
+          + vendor_data_file_id  = (known after apply)
 
-          [32m+[0m[0m ip_config {
-              [32m+[0m[0m ipv4 {
-                  [32m+[0m[0m address = "10.20.20.11/24"
-                  [32m+[0m[0m gateway = "10.20.20.1"
+          + ip_config {
+              + ipv4 {
+                  + address = "10.0.96.11/16"
+                  + gateway = "10.0.0.1"
                 }
             }
 
-          [32m+[0m[0m user_account {
-              [32m+[0m[0m keys     = [
-                  [32m+[0m[0m "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE0wgUwPk532ofKDeivuPL6wzp6cupTyx1Ci873ieQpj katar711@school",
+          + user_account {
+              + keys     = [
+                  + "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE0wgUwPk532ofKDeivuPL6wzp6cupTyx1Ci873ieQpj katar711@school",
                 ]
-              [32m+[0m[0m username = "ubuntu"
+              + username = "ubuntu"
             }
         }
 
-      [32m+[0m[0m memory {
-          [32m+[0m[0m dedicated      = 8192
-          [32m+[0m[0m floating       = 0
-          [32m+[0m[0m keep_hugepages = false
-          [32m+[0m[0m shared         = 0
+      + memory {
+          + dedicated      = 8192
+          + floating       = 0
+          + keep_hugepages = false
+          + shared         = 0
         }
 
-      [32m+[0m[0m network_device {
-          [32m+[0m[0m bridge      = "vmbr0"
-          [32m+[0m[0m enabled     = true
-          [32m+[0m[0m firewall    = false
-          [32m+[0m[0m mac_address = (known after apply)
-          [32m+[0m[0m model       = "virtio"
-          [32m+[0m[0m mtu         = 0
-          [32m+[0m[0m queues      = 0
-          [32m+[0m[0m rate_limit  = 0
-          [32m+[0m[0m vlan_id     = 0
+      + network_device {
+          + bridge      = "vmbr0"
+          + enabled     = true
+          + firewall    = false
+          + mac_address = (known after apply)
+          + model       = "virtio"
+          + mtu         = 0
+          + queues      = 0
+          + rate_limit  = 0
+          + vlan_id     = 0
         }
 
-      [32m+[0m[0m operating_system {
-          [32m+[0m[0m type = "l26"
+      + operating_system {
+          + type = "l26"
         }
 
-      [32m+[0m[0m vga (known after apply)
+      + vga (known after apply)
     }
 
-[1m  # proxmox_virtual_environment_vm.pg_standby[0m will be created
-[0m  [32m+[0m[0m resource "proxmox_virtual_environment_vm" "pg_standby" {
-      [32m+[0m[0m acpi                                 = true
-      [32m+[0m[0m bios                                 = "seabios"
-      [32m+[0m[0m boot_order                           = (known after apply)
-      [32m+[0m[0m delete_unreferenced_disks_on_destroy = true
-      [32m+[0m[0m hotplug                              = (known after apply)
-      [32m+[0m[0m id                                   = (known after apply)
-      [32m+[0m[0m ipv4_addresses                       = (known after apply)
-      [32m+[0m[0m ipv6_addresses                       = (known after apply)
-      [32m+[0m[0m keyboard_layout                      = "en-us"
-      [32m+[0m[0m mac_addresses                        = (known after apply)
-      [32m+[0m[0m migrate                              = false
-      [32m+[0m[0m name                                 = "pg-standby"
-      [32m+[0m[0m network_interface_names              = (known after apply)
-      [32m+[0m[0m node_name                            = "TheBetterBTS"
-      [32m+[0m[0m on_boot                              = true
-      [32m+[0m[0m pool_id                              = "katar711"
-      [32m+[0m[0m protection                           = false
-      [32m+[0m[0m purge_on_destroy                     = true
-      [32m+[0m[0m reboot                               = false
-      [32m+[0m[0m reboot_after_update                  = true
-      [32m+[0m[0m scsi_hardware                        = "virtio-scsi-single"
-      [32m+[0m[0m started                              = true
-      [32m+[0m[0m stop_on_destroy                      = false
-      [32m+[0m[0m tablet_device                        = true
-      [32m+[0m[0m template                             = false
-      [32m+[0m[0m timeout_clone                        = 1800
-      [32m+[0m[0m timeout_create                       = 1800
-      [32m+[0m[0m timeout_migrate                      = 1800
-      [32m+[0m[0m timeout_move_disk                    = 1800
-      [32m+[0m[0m timeout_reboot                       = 1800
-      [32m+[0m[0m timeout_shutdown_vm                  = 1800
-      [32m+[0m[0m timeout_start_vm                     = 1800
-      [32m+[0m[0m timeout_stop_vm                      = 300
-      [32m+[0m[0m vm_id                                = 202
+  # proxmox_virtual_environment_vm.pg_standby will be created
+  + resource "proxmox_virtual_environment_vm" "pg_standby" {
+      + acpi                                 = true
+      + bios                                 = "seabios"
+      + boot_order                           = (known after apply)
+      + delete_unreferenced_disks_on_destroy = true
+      + hotplug                              = (known after apply)
+      + id                                   = (known after apply)
+      + ipv4_addresses                       = (known after apply)
+      + ipv6_addresses                       = (known after apply)
+      + keyboard_layout                      = "en-us"
+      + mac_addresses                        = (known after apply)
+      + migrate                              = false
+      + name                                 = "pg-standby"
+      + network_interface_names              = (known after apply)
+      + node_name                            = "bcc07"
+      + on_boot                              = true
+      + protection                           = false
+      + purge_on_destroy                     = true
+      + reboot                               = false
+      + reboot_after_update                  = true
+      + scsi_hardware                        = "virtio-scsi-single"
+      + started                              = true
+      + stop_on_destroy                      = false
+      + tablet_device                        = true
+      + template                             = false
+      + timeout_clone                        = 1800
+      + timeout_create                       = 1800
+      + timeout_migrate                      = 1800
+      + timeout_move_disk                    = 1800
+      + timeout_reboot                       = 1800
+      + timeout_shutdown_vm                  = 1800
+      + timeout_start_vm                     = 1800
+      + timeout_stop_vm                      = 300
+      + vm_id                                = 202
 
-      [32m+[0m[0m agent {
-          [32m+[0m[0m enabled = true
-          [32m+[0m[0m timeout = "15m"
-          [32m+[0m[0m trim    = false
-          [32m+[0m[0m type    = "virtio"
+      + agent {
+          + enabled = true
+          + timeout = "15m"
+          + trim    = false
+          + type    = "virtio"
         }
 
-      [32m+[0m[0m clone {
-          [32m+[0m[0m full    = true
-          [32m+[0m[0m retries = 1
-          [32m+[0m[0m vm_id   = 200
+      + clone {
+          + full    = true
+          + retries = 1
+          + vm_id   = 100
         }
 
-      [32m+[0m[0m cpu {
-          [32m+[0m[0m cores      = 4
-          [32m+[0m[0m hotplugged = 0
-          [32m+[0m[0m limit      = 0
-          [32m+[0m[0m numa       = false
-          [32m+[0m[0m sockets    = 1
-          [32m+[0m[0m type       = "qemu64"
-          [32m+[0m[0m units      = (known after apply)
+      + cpu {
+          + cores      = 4
+          + hotplugged = 0
+          + limit      = 0
+          + numa       = false
+          + sockets    = 1
+          + type       = "qemu64"
+          + units      = (known after apply)
         }
 
-      [32m+[0m[0m disk {
-          [32m+[0m[0m aio               = "io_uring"
-          [32m+[0m[0m backup            = true
-          [32m+[0m[0m cache             = "none"
-          [32m+[0m[0m datastore_id      = "Slightly-Big-Data"
-          [32m+[0m[0m discard           = "ignore"
-          [32m+[0m[0m file_format       = (known after apply)
-          [32m+[0m[0m interface         = "scsi0"
-          [32m+[0m[0m iothread          = false
-          [32m+[0m[0m path_in_datastore = (known after apply)
-          [32m+[0m[0m replicate         = true
-          [32m+[0m[0m size              = 50
-          [32m+[0m[0m ssd               = false
+      + disk {
+          + aio               = "io_uring"
+          + backup            = true
+          + cache             = "none"
+          + datastore_id      = "local-lvm"
+          + discard           = "ignore"
+          + file_format       = (known after apply)
+          + interface         = "scsi0"
+          + iothread          = false
+          + path_in_datastore = (known after apply)
+          + replicate         = true
+          + size              = 50
+          + ssd               = false
         }
 
-      [32m+[0m[0m initialization {
-          [32m+[0m[0m datastore_id         = "local-lvm"
-          [32m+[0m[0m file_format          = (known after apply)
-          [32m+[0m[0m meta_data_file_id    = (known after apply)
-          [32m+[0m[0m network_data_file_id = (known after apply)
-          [32m+[0m[0m type                 = (known after apply)
-          [32m+[0m[0m user_data_file_id    = (known after apply)
-          [32m+[0m[0m vendor_data_file_id  = (known after apply)
+      + initialization {
+          + datastore_id         = "local-lvm"
+          + file_format          = (known after apply)
+          + meta_data_file_id    = (known after apply)
+          + network_data_file_id = (known after apply)
+          + type                 = (known after apply)
+          + user_data_file_id    = (known after apply)
+          + vendor_data_file_id  = (known after apply)
 
-          [32m+[0m[0m ip_config {
-              [32m+[0m[0m ipv4 {
-                  [32m+[0m[0m address = "10.20.20.12/24"
-                  [32m+[0m[0m gateway = "10.20.20.1"
+          + ip_config {
+              + ipv4 {
+                  + address = "10.0.96.12/16"
+                  + gateway = "10.0.0.1"
                 }
             }
 
-          [32m+[0m[0m user_account {
-              [32m+[0m[0m keys     = [
-                  [32m+[0m[0m "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE0wgUwPk532ofKDeivuPL6wzp6cupTyx1Ci873ieQpj katar711@school",
+          + user_account {
+              + keys     = [
+                  + "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE0wgUwPk532ofKDeivuPL6wzp6cupTyx1Ci873ieQpj katar711@school",
                 ]
-              [32m+[0m[0m username = "ubuntu"
+              + username = "ubuntu"
             }
         }
 
-      [32m+[0m[0m memory {
-          [32m+[0m[0m dedicated      = 8192
-          [32m+[0m[0m floating       = 0
-          [32m+[0m[0m keep_hugepages = false
-          [32m+[0m[0m shared         = 0
+      + memory {
+          + dedicated      = 8192
+          + floating       = 0
+          + keep_hugepages = false
+          + shared         = 0
         }
 
-      [32m+[0m[0m network_device {
-          [32m+[0m[0m bridge      = "vmbr0"
-          [32m+[0m[0m enabled     = true
-          [32m+[0m[0m firewall    = false
-          [32m+[0m[0m mac_address = (known after apply)
-          [32m+[0m[0m model       = "virtio"
-          [32m+[0m[0m mtu         = 0
-          [32m+[0m[0m queues      = 0
-          [32m+[0m[0m rate_limit  = 0
-          [32m+[0m[0m vlan_id     = 0
+      + network_device {
+          + bridge      = "vmbr0"
+          + enabled     = true
+          + firewall    = false
+          + mac_address = (known after apply)
+          + model       = "virtio"
+          + mtu         = 0
+          + queues      = 0
+          + rate_limit  = 0
+          + vlan_id     = 0
         }
 
-      [32m+[0m[0m operating_system {
-          [32m+[0m[0m type = "l26"
+      + operating_system {
+          + type = "l26"
         }
 
-      [32m+[0m[0m vga (known after apply)
+      + vga (known after apply)
     }
 
-[1mPlan:[0m [0m3 to add, 0 to change, 0 to destroy.
+Plan: 3 to add, 0 to change, 0 to destroy.
 
 Changes to Outputs:
-  [32m+[0m[0m vm_ids            = {
-      [32m+[0m[0m app        = 203
-      [32m+[0m[0m pg_primary = 201
-      [32m+[0m[0m pg_standby = 202
+  + vm_ipv4_addresses = {
+      + app        = (known after apply)
+      + pg_primary = (known after apply)
+      + pg_standby = (known after apply)
     }
-  [32m+[0m[0m vm_ipv4_addresses = {
-      [32m+[0m[0m app        = (known after apply)
-      [32m+[0m[0m pg_primary = (known after apply)
-      [32m+[0m[0m pg_standby = (known after apply)
-    }
-  [32m+[0m[0m vm_names          = {
-      [32m+[0m[0m app        = "app-onprem"
-      [32m+[0m[0m pg_primary = "pg-primary"
-      [32m+[0m[0m pg_standby = "pg-standby"
-    }
-[90m
-─────────────────────────────────────────────────────────────────────────────[0m
+
+─────────────────────────────────────────────────────────────────────────────
 
 Note: You didn't use the -out option to save this plan, so Terraform can't
 guarantee to take exactly these actions if you run "terraform apply" now.

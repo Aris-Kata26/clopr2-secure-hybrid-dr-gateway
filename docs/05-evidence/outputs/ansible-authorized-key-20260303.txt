@@ -1,0 +1,51 @@
+app-onprem | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "changed": false,
+    "comment": null,
+    "exclusive": false,
+    "follow": false,
+    "key": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE0wgUwPk532ofKDeivuPL6wzp6cupTyx1Ci873ieQpj katar711@school",
+    "key_options": null,
+    "keyfile": "/home/katar711/.ssh/authorized_keys",
+    "manage_dir": true,
+    "path": null,
+    "state": "present",
+    "user": "katar711",
+    "validate_certs": true
+}
+pg-primary | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "changed": false,
+    "comment": null,
+    "exclusive": false,
+    "follow": false,
+    "key": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE0wgUwPk532ofKDeivuPL6wzp6cupTyx1Ci873ieQpj katar711@school",
+    "key_options": null,
+    "keyfile": "/home/katar711/.ssh/authorized_keys",
+    "manage_dir": true,
+    "path": null,
+    "state": "present",
+    "user": "katar711",
+    "validate_certs": true
+}
+pg-standby | CHANGED => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "changed": true,
+    "comment": null,
+    "exclusive": false,
+    "follow": false,
+    "key": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE0wgUwPk532ofKDeivuPL6wzp6cupTyx1Ci873ieQpj katar711@school",
+    "key_options": null,
+    "keyfile": "/home/katar711/.ssh/authorized_keys",
+    "manage_dir": true,
+    "path": null,
+    "state": "present",
+    "user": "katar711",
+    "validate_certs": true
+}

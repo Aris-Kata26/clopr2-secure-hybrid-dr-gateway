@@ -1,5 +1,18 @@
 ---
 - name: Baseline site configuration
   hosts: all
-  become: true
   roles: []
+  tasks:
+    - name: Disable ssh.socket
+      become: true
+      ansible.builtin.systemd:
+        name: ssh.socket
+        enabled: false
+        state: stopped
+
+    - name: Enable and start ssh.service
+      become: true
+      ansible.builtin.systemd:
+        name: ssh.service
+        enabled: true
+        state: started

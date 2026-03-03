@@ -1,0 +1,8 @@
+proxmox_virtual_environment_vm.app: Refreshing state... [id=103]
+proxmox_virtual_environment_vm.pg_primary: Refreshing state... [id=101]
+proxmox_virtual_environment_vm.pg_standby: Refreshing state... [id=102]
+
+No changes. Your infrastructure matches the configuration.
+
+Terraform has compared your real infrastructure against your configuration
+and found no differences, so no changes are needed.

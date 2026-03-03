@@ -1,0 +1,11 @@
+@all:
+  |--@ungrouped:
+  |--@onprem:
+  |  |--@pg_primary:
+  |  |  |--pg-primary
+  |  |--@pg_standby:
+  |  |  |--pg-standby
+  |  |--@app_onprem:
+  |  |  |--app-onprem
+  |  |--@mgmt_jump:
+  |  |  |--mgmt-jump

@@ -1,0 +1,9 @@
+[0m[1mproxmox_virtual_environment_vm.mgmt_jump: Refreshing state... [id=104][0m
+[0m[1mproxmox_virtual_environment_vm.pg_primary: Refreshing state... [id=101][0m
+[0m[1mproxmox_virtual_environment_vm.pg_standby: Refreshing state... [id=102][0m
+[0m[1mproxmox_virtual_environment_vm.app: Refreshing state... [id=103][0m
+
+[0m[1m[32mNo changes.[0m[1m Your infrastructure matches the configuration.[0m
+
+[0mTerraform has compared your real infrastructure against your configuration
+and found no differences, so no changes are needed.

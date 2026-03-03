@@ -1,0 +1,3 @@
+Removed proxmox_virtual_environment_vm.app
+Removed proxmox_virtual_environment_vm.pg_primary
+Successfully removed 2 resource instance(s).

@@ -1,0 +1,56 @@
+proxmox_virtual_environment_vm.pg_primary: Refreshing state... [id=101]
+proxmox_virtual_environment_vm.app: Refreshing state... [id=103]
+proxmox_virtual_environment_vm.pg_standby: Refreshing state... [id=102]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  ~ update in-place
+
+Terraform will perform the following actions:
+
+  # proxmox_virtual_environment_vm.pg_primary will be updated in-place
+  ~ resource "proxmox_virtual_environment_vm" "pg_primary" {
+        id                                   = "101"
+      ~ ipv4_addresses                       = [] -> (known after apply)
+      ~ ipv6_addresses                       = [] -> (known after apply)
+        name                                 = "pg-primary"
+      ~ network_interface_names              = [] -> (known after apply)
+      ~ started                              = false -> true
+        # (27 unchanged attributes hidden)
+
+        # (8 unchanged blocks hidden)
+    }
+
+  # proxmox_virtual_environment_vm.pg_standby will be updated in-place
+  ~ resource "proxmox_virtual_environment_vm" "pg_standby" {
+        id                                   = "102"
+      ~ ipv4_addresses                       = [] -> (known after apply)
+      ~ ipv6_addresses                       = [] -> (known after apply)
+        name                                 = "pg-standby"
+      ~ network_interface_names              = [] -> (known after apply)
+      ~ started                              = false -> true
+        # (27 unchanged attributes hidden)
+
+        # (8 unchanged blocks hidden)
+    }
+
+Plan: 0 to add, 2 to change, 0 to destroy.
+
+Changes to Outputs:
+  + vm_ipv4_addresses = {
+      + app        = [
+          + [
+              + "127.0.0.1",
+            ],
+          + [
+              + "10.0.96.13",
+            ],
+        ]
+      + pg_primary = (known after apply)
+      + pg_standby = (known after apply)
+    }
+
+─────────────────────────────────────────────────────────────────────────────
+
+Note: You didn't use the -out option to save this plan, so Terraform can't
+guarantee to take exactly these actions if you run "terraform apply" now.

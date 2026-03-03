@@ -1,0 +1,10 @@
+vm_ids = {
+  "app" = 103
+  "pg_primary" = 101
+  "pg_standby" = 102
+}
+vm_names = {
+  "app" = "app-onprem"
+  "pg_primary" = "pg-primary"
+  "pg_standby" = "pg-standby"
+}

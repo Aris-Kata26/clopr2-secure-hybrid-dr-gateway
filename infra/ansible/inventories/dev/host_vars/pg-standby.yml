@@ -1,0 +1,4 @@
+ansible_ssh_common_args: >-
+  -o ProxyCommand="ssh -i /home/aris/.ssh/id_ed25519_dr -o IdentitiesOnly=yes -W %h:%p katar711@10.0.96.11"
+  -o IdentitiesOnly=yes
+  -o StrictHostKeyChecking=accept-new

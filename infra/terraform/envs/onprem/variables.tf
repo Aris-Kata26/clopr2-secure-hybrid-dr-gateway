@@ -6,12 +6,22 @@ variable "pm_api_url" {
 variable "pm_api_token_id" {
   type        = string
   description = "Proxmox API token ID (user@realm!token)"
+
+  validation {
+    condition     = can(regex("^[^@]+@[^!]+![A-Za-z0-9._-]+$", var.pm_api_token_id))
+    error_message = "pm_api_token_id must be in the format user@realm!tokenname (example: root@pam!terraform)."
+  }
 }
 
 variable "pm_api_token_secret" {
   type        = string
   sensitive   = true
   description = "Proxmox API token secret"
+
+  validation {
+    condition     = can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", trimspace(var.pm_api_token_secret)))
+    error_message = "pm_api_token_secret must be the token *secret* value (UUID-like), without the 'user@realm!tokenname=' prefix."
+  }
 }
 
 variable "pm_tls_insecure" {
@@ -27,7 +37,8 @@ variable "pm_target_node" {
 
 variable "pm_pool" {
   type        = string
-  description = "Proxmox pool name"
+  default     = ""
+  description = "Proxmox pool name (optional). Leave empty to not assign a pool."
 }
 
 variable "template_name" {
@@ -37,8 +48,32 @@ variable "template_name" {
 
 variable "vm_storage" {
   type        = string
-  default     = "Slightly-Big-Data"
+  default     = "local-lvm"
   description = "Storage for VM disks"
+}
+
+variable "pg_primary_storage" {
+  type        = string
+  default     = ""
+  description = "Override disk datastore for pg-primary (optional). If empty, uses vm_storage."
+}
+
+variable "pg_standby_storage" {
+  type        = string
+  default     = ""
+  description = "Override disk datastore for pg-standby (optional). If empty, uses vm_storage."
+}
+
+variable "app_storage" {
+  type        = string
+  default     = ""
+  description = "Override disk datastore for app (optional). If empty, uses vm_storage."
+}
+
+variable "mgmt_jump_storage" {
+  type        = string
+  default     = ""
+  description = "Override disk datastore for mgmt-jump (optional). If empty, uses vm_storage."
 }
 
 variable "cloudinit_storage" {
@@ -68,18 +103,44 @@ variable "pg_primary_vmid" {
   type        = number
   default     = 201
   description = "VM ID for pg-primary"
+
+  validation {
+    condition     = var.pg_primary_vmid >= 100 && var.pg_primary_vmid <= 2147483647
+    error_message = "pg_primary_vmid must be in the range 100-2147483647."
+  }
 }
 
 variable "pg_standby_vmid" {
   type        = number
   default     = 202
   description = "VM ID for pg-standby"
+
+  validation {
+    condition     = var.pg_standby_vmid >= 100 && var.pg_standby_vmid <= 2147483647
+    error_message = "pg_standby_vmid must be in the range 100-2147483647."
+  }
 }
 
 variable "app_vmid" {
   type        = number
   default     = 203
   description = "VM ID for app"
+
+  validation {
+    condition     = var.app_vmid >= 100 && var.app_vmid <= 2147483647
+    error_message = "app_vmid must be in the range 100-2147483647."
+  }
+}
+
+variable "mgmt_jump_vmid" {
+  type        = number
+  default     = 204
+  description = "VM ID for mgmt-jump"
+
+  validation {
+    condition     = var.mgmt_jump_vmid >= 100 && var.mgmt_jump_vmid <= 2147483647
+    error_message = "mgmt_jump_vmid must be in the range 100-2147483647."
+  }
 }
 
 variable "pg_primary_cores" {
@@ -152,4 +213,28 @@ variable "app_ipconfig0" {
   type        = string
   default     = "ip=dhcp"
   description = "Cloud-Init IP config for app"
+}
+
+variable "mgmt_jump_cores" {
+  type        = number
+  default     = 2
+  description = "CPU cores for mgmt-jump"
+}
+
+variable "mgmt_jump_memory_mb" {
+  type        = number
+  default     = 2048
+  description = "Memory MB for mgmt-jump"
+}
+
+variable "mgmt_jump_disk_gb" {
+  type        = string
+  default     = "20G"
+  description = "Disk size for mgmt-jump"
+}
+
+variable "mgmt_jump_ipconfig0" {
+  type        = string
+  default     = "ip=dhcp"
+  description = "Cloud-Init IP config for mgmt-jump"
 }

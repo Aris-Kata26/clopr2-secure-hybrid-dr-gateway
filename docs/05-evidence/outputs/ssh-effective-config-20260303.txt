@@ -1,0 +1,6 @@
+user katar711
+hostname 10.0.96.146
+canonicalizehostname false
+identityfile /home/aris/.ssh/id_ed25519_dr
+userknownhostsfile /home/aris/.ssh/known_hosts /home/aris/.ssh/known_hosts2
+proxyjump pg-primary

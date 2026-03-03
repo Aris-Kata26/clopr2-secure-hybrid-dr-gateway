@@ -1,0 +1,4 @@
+proxmox_virtual_environment_vm.app
+proxmox_virtual_environment_vm.mgmt_jump
+proxmox_virtual_environment_vm.pg_primary
+proxmox_virtual_environment_vm.pg_standby

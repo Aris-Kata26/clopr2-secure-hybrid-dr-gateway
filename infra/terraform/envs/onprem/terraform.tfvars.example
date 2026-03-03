@@ -2,11 +2,19 @@ pm_api_url          = "https://10.0.10.161:8006/api2/json"
 pm_api_token_id     = "katar711@pve!terraform"
 pm_api_token_secret = "REPLACE_ME"
 pm_target_node      = "TheBetterBTS"
-pm_pool             = "katar711"
+# Optional: set a pool name if you use Proxmox pools. Leave empty or remove to not assign a pool.
+pm_pool             = ""
 template_name        = "200"
 
-vm_storage       = "Slightly-Big-Data"
+vm_storage       = "local-lvm"
 cloudinit_storage = "local-lvm"
+
+# Optional per-VM overrides (useful if template/VM disks end up on different storage). Avoid pointing at the unreliable
+# rockstor datastore; stick to local or local-lvm unless you have a healthy alternative.
+# pg_primary_storage = "local-lvm"
+# pg_standby_storage = "local-lvm"
+# app_storage        = "local-lvm"
+# mgmt_jump_storage  = "local-lvm"
 vm_bridge        = "vmbr0"
 ci_user          = "ubuntu"
 
@@ -17,6 +25,7 @@ EOF
 pg_primary_vmid = 201
 pg_standby_vmid = 202
 app_vmid        = 203
+mgmt_jump_vmid  = 204
 
 pg_primary_cores     = 4
 pg_primary_memory_mb = 8192
@@ -32,3 +41,8 @@ app_cores     = 2
 app_memory_mb = 4096
 app_disk_gb   = "30G"
 app_ipconfig0 = "ip=10.20.20.13/24,gw=10.20.20.1"
+
+mgmt_jump_cores     = 2
+mgmt_jump_memory_mb = 2048
+mgmt_jump_disk_gb   = "20G"
+mgmt_jump_ipconfig0 = "ip=10.20.20.195/24,gw=10.20.20.1"

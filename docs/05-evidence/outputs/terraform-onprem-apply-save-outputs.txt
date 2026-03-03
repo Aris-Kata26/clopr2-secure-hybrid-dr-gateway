@@ -1,0 +1,75 @@
+proxmox_virtual_environment_vm.pg_standby: Refreshing state... [id=102]
+proxmox_virtual_environment_vm.pg_primary: Refreshing state... [id=101]
+proxmox_virtual_environment_vm.app: Refreshing state... [id=103]
+
+Changes to Outputs:
+  + vm_ipv4_addresses = {
+      + app        = [
+          + [
+              + "127.0.0.1",
+            ],
+          + [
+              + "10.0.96.13",
+            ],
+        ]
+      + pg_primary = [
+          + [
+              + "127.0.0.1",
+            ],
+          + [
+              + "10.0.96.11",
+            ],
+        ]
+      + pg_standby = [
+          + [
+              + "127.0.0.1",
+            ],
+          + [
+              + "10.0.96.12",
+            ],
+        ]
+    }
+
+You can apply this plan to save these new output values to the Terraform
+state, without changing any real infrastructure.
+
+Apply complete! Resources: 0 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+vm_ids = {
+  "app" = 103
+  "pg_primary" = 101
+  "pg_standby" = 102
+}
+vm_ipv4_addresses = {
+  "app" = tolist([
+    tolist([
+      "127.0.0.1",
+    ]),
+    tolist([
+      "10.0.96.13",
+    ]),
+  ])
+  "pg_primary" = tolist([
+    tolist([
+      "127.0.0.1",
+    ]),
+    tolist([
+      "10.0.96.11",
+    ]),
+  ])
+  "pg_standby" = tolist([
+    tolist([
+      "127.0.0.1",
+    ]),
+    tolist([
+      "10.0.96.12",
+    ]),
+  ])
+}
+vm_names = {
+  "app" = "app-onprem"
+  "pg_primary" = "pg-primary"
+  "pg_standby" = "pg-standby"
+}

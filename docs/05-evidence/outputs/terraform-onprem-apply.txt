@@ -20,9 +20,8 @@ Terraform will perform the following actions:
       + migrate                              = false
       + name                                 = "app-onprem"
       + network_interface_names              = (known after apply)
-      + node_name                            = "TheBetterBTS"
+      + node_name                            = "bcc07"
       + on_boot                              = true
-      + pool_id                              = "katar711"
       + protection                           = false
       + purge_on_destroy                     = true
       + reboot                               = false
@@ -52,7 +51,7 @@ Terraform will perform the following actions:
       + clone {
           + full    = true
           + retries = 1
-          + vm_id   = 200
+          + vm_id   = 100
         }
 
       + cpu {
@@ -69,7 +68,7 @@ Terraform will perform the following actions:
           + aio               = "io_uring"
           + backup            = true
           + cache             = "none"
-          + datastore_id      = "Slightly-Big-Data"
+          + datastore_id      = "local-lvm"
           + discard           = "ignore"
           + file_format       = (known after apply)
           + interface         = "scsi0"
@@ -91,8 +90,8 @@ Terraform will perform the following actions:
 
           + ip_config {
               + ipv4 {
-                  + address = "10.20.20.13/24"
-                  + gateway = "10.20.20.1"
+                  + address = "10.0.96.13/16"
+                  + gateway = "10.0.0.1"
                 }
             }
 
@@ -145,9 +144,8 @@ Terraform will perform the following actions:
       + migrate                              = false
       + name                                 = "pg-primary"
       + network_interface_names              = (known after apply)
-      + node_name                            = "TheBetterBTS"
+      + node_name                            = "bcc07"
       + on_boot                              = true
-      + pool_id                              = "katar711"
       + protection                           = false
       + purge_on_destroy                     = true
       + reboot                               = false
@@ -177,7 +175,7 @@ Terraform will perform the following actions:
       + clone {
           + full    = true
           + retries = 1
-          + vm_id   = 200
+          + vm_id   = 100
         }
 
       + cpu {
@@ -194,7 +192,7 @@ Terraform will perform the following actions:
           + aio               = "io_uring"
           + backup            = true
           + cache             = "none"
-          + datastore_id      = "Slightly-Big-Data"
+          + datastore_id      = "local-lvm"
           + discard           = "ignore"
           + file_format       = (known after apply)
           + interface         = "scsi0"
@@ -216,8 +214,8 @@ Terraform will perform the following actions:
 
           + ip_config {
               + ipv4 {
-                  + address = "10.20.20.11/24"
-                  + gateway = "10.20.20.1"
+                  + address = "10.0.96.11/16"
+                  + gateway = "10.0.0.1"
                 }
             }
 
@@ -270,9 +268,8 @@ Terraform will perform the following actions:
       + migrate                              = false
       + name                                 = "pg-standby"
       + network_interface_names              = (known after apply)
-      + node_name                            = "TheBetterBTS"
+      + node_name                            = "bcc07"
       + on_boot                              = true
-      + pool_id                              = "katar711"
       + protection                           = false
       + purge_on_destroy                     = true
       + reboot                               = false
@@ -302,7 +299,7 @@ Terraform will perform the following actions:
       + clone {
           + full    = true
           + retries = 1
-          + vm_id   = 200
+          + vm_id   = 100
         }
 
       + cpu {
@@ -319,7 +316,7 @@ Terraform will perform the following actions:
           + aio               = "io_uring"
           + backup            = true
           + cache             = "none"
-          + datastore_id      = "Slightly-Big-Data"
+          + datastore_id      = "local-lvm"
           + discard           = "ignore"
           + file_format       = (known after apply)
           + interface         = "scsi0"
@@ -341,8 +338,8 @@ Terraform will perform the following actions:
 
           + ip_config {
               + ipv4 {
-                  + address = "10.20.20.12/24"
-                  + gateway = "10.20.20.1"
+                  + address = "10.0.96.12/16"
+                  + gateway = "10.0.0.1"
                 }
             }
 
@@ -388,6 +385,110 @@ Changes to Outputs:
       + pg_primary = (known after apply)
       + pg_standby = (known after apply)
     }
-proxmox_virtual_environment_vm.app: Creating...
 proxmox_virtual_environment_vm.pg_primary: Creating...
 proxmox_virtual_environment_vm.pg_standby: Creating...
+proxmox_virtual_environment_vm.app: Creating...
+proxmox_virtual_environment_vm.app: Still creating... [00m11s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [00m11s elapsed]
+proxmox_virtual_environment_vm.pg_standby: Still creating... [00m11s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [00m21s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [00m21s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [00m31s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [00m31s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [00m42s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [00m42s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [00m52s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [00m52s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [01m02s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [01m02s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [01m13s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [01m13s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [01m23s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [01m23s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [01m33s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [01m33s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [01m44s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [01m44s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [01m54s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [01m54s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [02m04s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [02m04s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [02m15s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [02m15s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [02m25s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [02m25s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [02m35s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [02m35s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [02m47s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [02m47s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [02m57s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [02m57s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [03m07s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [03m07s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [03m18s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [03m18s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [03m28s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [03m28s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [03m38s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [03m38s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [03m49s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [03m49s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [03m59s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [03m59s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [04m09s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [04m09s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [04m20s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [04m20s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [04m30s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [04m30s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [04m40s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [04m40s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [04m51s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [04m51s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [05m01s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [05m01s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [05m11s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [05m11s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [05m22s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [05m22s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [05m32s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [05m32s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [05m42s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [05m42s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [05m54s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [05m54s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [06m04s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [06m04s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [06m14s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [06m14s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [06m25s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [06m25s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [06m35s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [06m35s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [06m45s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [06m45s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [06m56s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [06m56s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [07m06s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [07m06s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [07m16s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [07m16s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [07m27s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [07m27s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [07m37s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [07m37s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [07m47s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [07m47s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [07m58s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [07m58s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [08m08s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [08m08s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [08m18s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [08m18s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [08m29s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [08m29s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Still creating... [08m39s elapsed]
+proxmox_virtual_environment_vm.app: Still creating... [08m39s elapsed]
+proxmox_virtual_environment_vm.pg_primary: Creation complete after 8m47s [id=201]
+proxmox_virtual_environment_vm.app: Still creating... [08m49s elapsed]
+proxmox_virtual_environment_vm.app: Creation complete after 8m55s [id=203]

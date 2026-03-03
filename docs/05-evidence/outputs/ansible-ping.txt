@@ -1,0 +1,19 @@
+pg-standby | UNREACHABLE! => {
+    "changed": false,
+    "msg": "Failed to connect to the host via ssh: Connection closed by UNKNOWN port 65535",
+    "unreachable": true
+}
+pg-primary | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "changed": false,
+    "ping": "pong"
+}
+app-onprem | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "changed": false,
+    "ping": "pong"
+}

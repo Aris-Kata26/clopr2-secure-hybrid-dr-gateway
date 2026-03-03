@@ -8,6 +8,7 @@ Provider: `bpg/proxmox` (preferred for Proxmox VE 8/9+).
 - Proxmox API token for the automation user.
 - Template VM ID (cloud-init enabled).
 - SSH public key to inject via cloud-init.
+- Optional: Proxmox pool name (this env works with or without pools).
 
 ## Setup
 1. Copy terraform.tfvars.example to terraform.tfvars and fill values.

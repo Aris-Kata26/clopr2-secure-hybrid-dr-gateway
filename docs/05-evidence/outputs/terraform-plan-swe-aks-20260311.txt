@@ -1,0 +1,61 @@
+data.azurerm_resource_group.this: Reading...
+data.azurerm_container_registry.acr: Reading...
+data.azurerm_resource_group.this: Read complete after 0s [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc]
+azurerm_kubernetes_cluster.this: Refreshing state... [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.ContainerService/managedClusters/aks-b2clc-katar-swe]
+data.azurerm_container_registry.acr: Read complete after 1s [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.ContainerRegistry/registries/acrb2clckatargwc]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+  ~ update in-place
+
+Terraform will perform the following actions:
+
+  # azurerm_kubernetes_cluster.this will be updated in-place
+  ~ resource "azurerm_kubernetes_cluster" "this" {
+        id                                  = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.ContainerService/managedClusters/aks-b2clc-katar-swe"
+        name                                = "aks-b2clc-katar-swe"
+        tags                                = {
+            "Environment" = "dev"
+            "Owner"       = "KATAR711"
+            "Region"      = "swedencentral"
+            "Sprint"      = "prototype-b"
+            "Team"        = "BCLC24"
+        }
+        # (37 unchanged attributes hidden)
+
+      ~ default_node_pool {
+            name                          = "system"
+            tags                          = {}
+            # (31 unchanged attributes hidden)
+
+          - upgrade_settings {
+              - drain_timeout_in_minutes      = 0 -> null
+              - max_surge                     = "10%" -> null
+              - node_soak_duration_in_minutes = 0 -> null
+                # (1 unchanged attribute hidden)
+            }
+        }
+
+        # (5 unchanged blocks hidden)
+    }
+
+  # azurerm_role_assignment.aks_acr_pull will be created
+  + resource "azurerm_role_assignment" "aks_acr_pull" {
+      + condition_version                = (known after apply)
+      + id                               = (known after apply)
+      + name                             = (known after apply)
+      + principal_id                     = "afac4906-1174-418b-b062-74c20235f121"
+      + principal_type                   = (known after apply)
+      + role_definition_id               = (known after apply)
+      + role_definition_name             = "AcrPull"
+      + scope                            = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.ContainerRegistry/registries/acrb2clckatargwc"
+      + skip_service_principal_aad_check = (known after apply)
+    }
+
+Plan: 1 to add, 1 to change, 0 to destroy.
+
+─────────────────────────────────────────────────────────────────────────────
+
+Note: You didn't use the -out option to save this plan, so Terraform can't
+guarantee to take exactly these actions if you run "terraform apply" now.

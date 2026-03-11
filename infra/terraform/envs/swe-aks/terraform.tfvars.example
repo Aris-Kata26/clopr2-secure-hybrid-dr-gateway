@@ -1,0 +1,16 @@
+# swe-aks env — AKS cluster in swedencentral for Prototype B
+# Copy to terraform.tfvars (git-ignored) and fill in values.
+# This env creates ONLY the AKS cluster + AcrPull role assignment.
+# It does NOT touch germanywestcentral DR resources.
+
+environment         = "dev"
+resource_group_name = "rg-clopr2-katar711-gwc"
+acr_name            = "acrb2clckatargwc"
+aks_cluster_name    = "aks-b2clc-katar-swe"
+aks_location        = "swedencentral"
+
+# Standard_B2s_v2 confirmed:
+#   - In AKS allowed SKU list for swedencentral (verified 2026-03-11)
+#   - standardBsv2Family quota: 0/10 avail=10 (verified 2026-03-11)
+#   - PAYG Linux: $0.0864/hr (~$63/mo)
+aks_node_size       = "Standard_B2s_v2"

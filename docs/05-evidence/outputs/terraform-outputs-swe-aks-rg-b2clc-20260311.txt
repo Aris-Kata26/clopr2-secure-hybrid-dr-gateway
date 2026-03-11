@@ -1,0 +1,10 @@
+# Terraform outputs for swe-aks env (2026-03-11)
+# Cluster: aks-b2clc-katar-swe | RG: rg-b2clc-katar-aks-swe | Region: swedencentral
+# NOTE: aks_kube_config_raw redacted — contained client certificate/key (sensitive value)
+# Credentials rotated 2026-03-11 via az aks rotate-certs after accidental commit.
+
+acr_login_server    = "acrb2clckatargwc.azurecr.io"
+aks_cluster_name    = "aks-b2clc-katar-swe"
+aks_kube_config_raw = "<REDACTED — sensitive kubeconfig; use: az aks get-credentials -g rg-b2clc-katar-aks-swe -n aks-b2clc-katar-swe>"
+aks_location        = "swedencentral"
+aks_resource_group  = "rg-b2clc-katar-aks-swe"

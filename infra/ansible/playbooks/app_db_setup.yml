@@ -1,0 +1,79 @@
+---
+# Creates appuser role and appdb database on pg-primary.
+# Idempotent — safe to re-run. Replication propagates schema to pg-standby and Azure DR automatically.
+#
+# Usage:
+#   cd infra/ansible
+#   ANSIBLE_ROLES_PATH="$(pwd)/roles" \
+#   ANSIBLE_VAULT_PASSWORD_FILE=~/.ansible_vault_pass \
+#   ANSIBLE_HOST_KEY_CHECKING=False \
+#   ansible-playbook -i inventories/dev playbooks/app_db_setup.yml \
+#     -e "app_db_password=<password>"
+
+- name: app_db | Create appuser and appdb on pg-primary
+  hosts: pg_primary
+  become: true
+  vars:
+    app_db_name: appdb
+    app_db_user: appuser
+    # Pass app_db_password via -e flag or Ansible Vault — never hardcode here.
+    # Example: -e "app_db_password=MySecretPass2026"
+    app_db_password: "{{ app_db_password }}"
+    pg_version: 16
+
+  tasks:
+    - name: Check if appuser role exists
+      command: >
+        sudo -u postgres psql -tAc
+        "SELECT 1 FROM pg_roles WHERE rolname='{{ app_db_user }}';"
+      register: role_check
+      changed_when: false
+
+    - name: Create appuser PostgreSQL role
+      command: >
+        sudo -u postgres psql -c
+        "CREATE ROLE {{ app_db_user }} WITH LOGIN PASSWORD '{{ app_db_password }}';"
+      when: role_check.stdout.strip() != "1"
+
+    - name: Check if appdb database exists
+      command: >
+        sudo -u postgres psql -tAc
+        "SELECT 1 FROM pg_database WHERE datname='{{ app_db_name }}';"
+      register: db_check
+      changed_when: false
+
+    - name: Create appdb database owned by appuser
+      command: >
+        sudo -u postgres psql -c
+        "CREATE DATABASE {{ app_db_name }} OWNER {{ app_db_user }};"
+      when: db_check.stdout.strip() != "1"
+
+    - name: Grant all privileges on appdb to appuser
+      command: >
+        sudo -u postgres psql -d {{ app_db_name }} -c
+        "GRANT ALL PRIVILEGES ON DATABASE {{ app_db_name }} TO {{ app_db_user }};
+         GRANT ALL ON SCHEMA public TO {{ app_db_user }};"
+
+    - name: Verify appuser and appdb exist
+      command: >
+        sudo -u postgres psql -c
+        "SELECT datname, pg_catalog.pg_get_userbyid(datdba) AS owner
+         FROM pg_database WHERE datname = '{{ app_db_name }}';"
+      register: verify_db
+      changed_when: false
+
+    - name: Show DB verification result
+      debug:
+        msg: "{{ verify_db.stdout }}"
+
+    - name: Verify connection as appuser through VIP
+      command: >
+        psql "postgresql://{{ app_db_user }}:{{ app_db_password }}@{{ pg_vip }}/{{ app_db_name }}"
+        -c "SELECT pg_is_in_recovery(), current_user, inet_server_addr();"
+      register: vip_check
+      changed_when: false
+      ignore_errors: true
+
+    - name: Show VIP connectivity result
+      debug:
+        msg: "{{ vip_check.stdout | default(vip_check.stderr) }}"

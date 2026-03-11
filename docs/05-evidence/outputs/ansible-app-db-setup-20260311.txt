@@ -1,0 +1,46 @@
+[WARNING]: Ansible is being run in a world writable directory
+(/mnt/c/Users/akata/Documents/Projects/CLOPR2/clopr2-secure-hybrid-dr-
+gateway/infra/ansible), ignoring it as an ansible.cfg source. For more
+information see
+https://docs.ansible.com/ansible/devel/reference_appendices/config.html#cfg-in-
+world-writable-dir
+
+PLAY [app_db | Create appuser and appdb on pg-primary] *************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [pg-primary]
+
+TASK [Check if appuser role exists] ********************************************
+ok: [pg-primary]
+
+TASK [Create appuser PostgreSQL role] ******************************************
+changed: [pg-primary]
+
+TASK [Check if appdb database exists] ******************************************
+ok: [pg-primary]
+
+TASK [Create appdb database owned by appuser] **********************************
+changed: [pg-primary]
+
+TASK [Grant all privileges on appdb to appuser] ********************************
+changed: [pg-primary]
+
+TASK [Verify appuser and appdb exist] ******************************************
+ok: [pg-primary]
+
+TASK [Show DB verification result] *********************************************
+ok: [pg-primary] => {
+    "msg": " datname |  owner  \n---------+---------\n appdb   | appuser\n(1 row)"
+}
+
+TASK [Verify connection as appuser through VIP] ********************************
+ok: [pg-primary]
+
+TASK [Show VIP connectivity result] ********************************************
+ok: [pg-primary] => {
+    "msg": " pg_is_in_recovery | current_user | inet_server_addr \n-------------------+--------------+------------------\n f                 | appuser      | 10.0.96.10\n(1 row)"
+}
+
+PLAY RECAP *********************************************************************
+pg-primary                 : ok=10   changed=3    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+

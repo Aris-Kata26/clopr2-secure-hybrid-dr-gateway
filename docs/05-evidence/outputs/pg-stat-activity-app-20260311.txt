@@ -1,0 +1,18 @@
+# pg_stat_activity evidence — Prototype A
+# Captured: 2026-03-11
+# Note: psycopg[binary] uses per-request short-lived connections.
+# Connections open and close within <1ms — pg_stat_activity will not catch them.
+# VIP connectivity proof is confirmed via:
+#   1. GET /health response: {"db_host":"10.0.96.10", "status":"ok", "pg_is_in_recovery":false}
+#   2. ansible-app-db-setup-20260311.txt: inet_server_addr=10.0.96.10 (VIP returned by pg-primary)
+#
+# Below confirms this server IS pg-primary (replicator streaming connection from DR node is active):
+#
+
+ usename   | client_addr |         backend_start         | state
+------------+-------------+-------------------------------+--------
+ replicator | 10.0.96.14  | 2026-03-11 13:31:59.019387+00 | active
+(1 row)
+
+# client_addr 10.0.96.14 = pg-dr-replica, state=active = streaming replication confirmed
+# Only the primary has replicator connections in pg_stat_activity.

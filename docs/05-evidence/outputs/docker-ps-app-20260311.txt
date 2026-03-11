@@ -1,0 +1,2 @@
+NAMES          STATUS                   PORTS
+docker-app-1   Up 2 minutes (healthy)   0.0.0.0:8080->8000/tcp, [::]:8080->8000/tcp

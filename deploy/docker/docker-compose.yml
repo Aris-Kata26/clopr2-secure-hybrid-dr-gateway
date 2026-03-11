@@ -1,1 +1,14 @@
-services:\n  app:\n    image: nginx:alpine\n    ports:\n      - "8080:80"\n
+services:
+  app:
+    build: ../../app
+    ports:
+      - "8080:8000"
+    env_file: ../../app/.env
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+

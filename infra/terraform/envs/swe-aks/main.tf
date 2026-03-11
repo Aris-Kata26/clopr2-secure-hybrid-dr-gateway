@@ -14,17 +14,23 @@ provider "azurerm" {
 }
 
 # ---------------------------------------------------------------------------
-# Data sources — reference existing resources; do NOT recreate them
+# AKS-dedicated resource group (new, swedencentral)
 # ---------------------------------------------------------------------------
 
-data "azurerm_resource_group" "this" {
-  name = var.resource_group_name
+resource "azurerm_resource_group" "aks" {
+  name     = var.aks_resource_group_name
+  location = var.aks_location
+  tags     = local.tags
 }
+
+# ---------------------------------------------------------------------------
+# Data source — existing ACR in germanywestcentral (NOT recreated)
+# ---------------------------------------------------------------------------
 
 # ACR lives in germanywestcentral; AKS (swedencentral) pulls from it cross-region
 data "azurerm_container_registry" "acr" {
   name                = var.acr_name
-  resource_group_name = var.resource_group_name
+  resource_group_name = var.acr_resource_group_name
 }
 
 # ---------------------------------------------------------------------------
@@ -48,7 +54,7 @@ locals {
 resource "azurerm_kubernetes_cluster" "this" {
   name                = var.aks_cluster_name
   location            = var.aks_location
-  resource_group_name = data.azurerm_resource_group.this.name
+  resource_group_name = azurerm_resource_group.aks.name
   dns_prefix          = var.aks_cluster_name
   sku_tier            = "Free" # $0 control-plane cost
 

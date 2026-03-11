@@ -4,9 +4,15 @@ variable "environment" {
   default     = "dev"
 }
 
-variable "resource_group_name" {
+variable "aks_resource_group_name" {
   type        = string
-  description = "Existing resource group that contains the ACR and will host the AKS cluster."
+  description = "Dedicated resource group for the AKS demo cluster (created by this module)."
+  default     = "rg-b2clc-katar-aks-swe"
+}
+
+variable "acr_resource_group_name" {
+  type        = string
+  description = "Resource group containing the existing ACR in germanywestcentral (NOT recreated)."
   default     = "rg-clopr2-katar711-gwc"
 }
 

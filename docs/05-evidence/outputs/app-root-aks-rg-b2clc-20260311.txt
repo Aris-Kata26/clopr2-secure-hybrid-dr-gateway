@@ -1,0 +1,1 @@
+{"app":"clopr2-prototype-a","version":"0.1.0","env":"dev","db_host":"10.0.96.10","health":"/health"}

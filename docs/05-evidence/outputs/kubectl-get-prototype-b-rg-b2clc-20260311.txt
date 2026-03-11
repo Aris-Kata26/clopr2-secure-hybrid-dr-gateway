@@ -1,0 +1,8 @@
+NAME                  READY   UP-TO-DATE   AVAILABLE   AGE    CONTAINERS   IMAGES                                                  SELECTOR
+deployment.apps/app   1/1     1            1           3m2s   app          acrb2clckatargwc.azurecr.io/clopr2-prototype-a:latest   app=app
+
+NAME          TYPE           CLUSTER-IP    EXTERNAL-IP     PORT(S)        AGE    SELECTOR
+service/app   LoadBalancer   10.0.156.32   9.223.173.197   80:32539/TCP   3m1s   app=app
+
+NAME                      READY   STATUS    RESTARTS   AGE    IP             NODE                             NOMINATED NODE   READINESS GATES
+pod/app-cfdb5f788-gpx5q   1/1     Running   0          3m2s   10.244.0.199   aks-system-57210394-vmss000000   <none>           <none>

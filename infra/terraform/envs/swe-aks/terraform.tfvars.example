@@ -3,14 +3,15 @@
 # This env creates ONLY the AKS cluster + AcrPull role assignment.
 # It does NOT touch germanywestcentral DR resources.
 
-environment         = "dev"
-resource_group_name = "rg-clopr2-katar711-gwc"
-acr_name            = "acrb2clckatargwc"
-aks_cluster_name    = "aks-b2clc-katar-swe"
-aks_location        = "swedencentral"
+environment              = "dev"
+aks_resource_group_name  = "rg-b2clc-katar-aks-swe"  # dedicated AKS RG (created by this module)
+acr_resource_group_name  = "rg-clopr2-katar711-gwc"  # existing ACR RG — NOT touched
+acr_name                 = "acrb2clckatargwc"
+aks_cluster_name         = "aks-b2clc-katar-swe"
+aks_location             = "swedencentral"
 
 # Standard_B2s_v2 confirmed:
 #   - In AKS allowed SKU list for swedencentral (verified 2026-03-11)
 #   - standardBsv2Family quota: 0/10 avail=10 (verified 2026-03-11)
 #   - PAYG Linux: $0.0864/hr (~$63/mo)
-aks_node_size       = "Standard_B2s_v2"
+aks_node_size            = "Standard_B2s_v2"

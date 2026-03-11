@@ -1,3 +1,8 @@
+output "aks_resource_group" {
+  description = "Dedicated resource group for the AKS demo cluster."
+  value       = azurerm_resource_group.aks.name
+}
+
 output "aks_cluster_name" {
   description = "Name of the AKS cluster."
   value       = azurerm_kubernetes_cluster.this.name

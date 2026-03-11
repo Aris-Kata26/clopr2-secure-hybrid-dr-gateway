@@ -1,5 +1,17 @@
-{
-  "acr_login_server": {
+# Terraform outputs for swe-aks env — ORIGINAL RG deployment (2026-03-11)
+# Cluster: aks-b2clc-katar-swe | RG: rg-clopr2-katar711-gwc (shared, superseded) | IP: 135.116.53.21 (released)
+# NOTE: aks_kube_config_raw REDACTED — contained client certificate + RSA private key.
+# Security incident GitGuardian b6420978 resolved 2026-03-11:
+#   - az aks rotate-certs completed (Succeeded) — exposed key revoked
+#   - git filter-repo purged sensitive files from all history
+#   - aks_kube_config_raw output block removed from outputs.tf permanently
+# This deployment is HISTORICAL — superseded by rg-b2clc-katar-aks-swe (IP: 9.223.173.197)
+
+acr_login_server    = "acrb2clckatargwc.azurecr.io"
+aks_cluster_name    = "aks-b2clc-katar-swe"
+aks_kube_config_raw = "<REDACTED — sensitive kubeconfig; credentials rotated 2026-03-11>"
+aks_location        = "swedencentral"
+aks_resource_group  = "rg-clopr2-katar711-gwc"
     "sensitive": false,
     "type": "string",
     "value": "acrb2clckatargwc.azurecr.io"

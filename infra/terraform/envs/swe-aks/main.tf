@@ -50,13 +50,13 @@ resource "azurerm_kubernetes_cluster" "this" {
   location            = var.aks_location
   resource_group_name = data.azurerm_resource_group.this.name
   dns_prefix          = var.aks_cluster_name
-  sku_tier            = "Free"       # $0 control-plane cost
+  sku_tier            = "Free" # $0 control-plane cost
 
   default_node_pool {
     name            = "system"
     node_count      = 1
-    vm_size         = var.aks_node_size   # Standard_B2s_v2
-    os_disk_size_gb = 30                  # Minimum — saves vs default 128 GB
+    vm_size         = var.aks_node_size # Standard_B2s_v2
+    os_disk_size_gb = 30                # Minimum — saves vs default 128 GB
     os_disk_type    = "Managed"
   }
 

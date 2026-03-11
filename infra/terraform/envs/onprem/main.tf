@@ -289,9 +289,9 @@ resource "proxmox_virtual_environment_vm" "mgmt_jump" {
   }
 
   network_device {
-    bridge = var.vm_bridge
+    bridge   = var.vm_bridge
     firewall = true
-    model  = "virtio"
+    model    = "virtio"
   }
 
   operating_system {

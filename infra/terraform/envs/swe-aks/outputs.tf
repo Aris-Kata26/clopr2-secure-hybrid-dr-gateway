@@ -18,8 +18,6 @@ output "acr_login_server" {
   value       = data.azurerm_container_registry.acr.login_server
 }
 
-output "aks_kube_config_raw" {
-  description = "Raw kubeconfig for kubectl access. Sensitive."
-  value       = azurerm_kubernetes_cluster.this.kube_config_raw
-  sensitive   = true
-}
+# aks_kube_config_raw intentionally removed: terraform output -json exposes
+# sensitive values in plaintext regardless of sensitive=true.
+# Retrieve credentials with: az aks get-credentials -g <rg> -n <cluster>

@@ -8,6 +8,7 @@ from fastapi import FastAPI, Response
 load_dotenv()
 
 APP_ENV = os.getenv("APP_ENV", "dev")
+DB_ENABLED = os.getenv("DB_ENABLED", "true").lower() == "true"
 DB_HOST = os.getenv("DB_HOST", "10.0.96.10")
 DB_PORT = int(os.getenv("DB_PORT", "5432"))
 DB_NAME = os.getenv("DB_NAME", "appdb")
@@ -33,6 +34,13 @@ def root():
 @app.get("/health")
 def health(response: Response):
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    if not DB_ENABLED:
+        return {
+            "status": "ok",
+            "db": "disabled",
+            "app_env": APP_ENV,
+            "ts": ts,
+        }
     try:
         with psycopg.connect(DSN, connect_timeout=5) as conn:
             with conn.cursor() as cur:

@@ -15,9 +15,14 @@ spec:
     spec:
       containers:
       - name: app
-        image: nginx:alpine
+        image: acrb2clckatargwc.azurecr.io/clopr2-prototype-a:latest
         ports:
-        - containerPort: 80
+        - containerPort: 8000
+        env:
+        - name: DB_ENABLED
+          value: "false"
+        - name: APP_ENV
+          value: "dev"
         resources:
           requests:
             cpu: "50m"
@@ -25,3 +30,15 @@ spec:
           limits:
             cpu: "250m"
             memory: "128Mi"
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 30

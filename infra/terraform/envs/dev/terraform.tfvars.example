@@ -9,3 +9,31 @@ mgmt_subnet_prefix = "10.10.2.0/24"
 
 loganalytics_name  = "log-clopr2-dev"
 keyvault_name      = "kv-clopr2-dev-<unique>"
+
+pg_dr_vm_name              = "vm-pg-dr"
+pg_dr_vm_size              = "Standard_B2s"
+pg_dr_admin_username       = "azureuser"
+pg_dr_admin_ssh_public_key = "ssh-ed25519 AAAA..."
+pg_dr_subnet_name          = "mgmt-subnet"
+
+# CIDRs for SSH access and on-prem replication traffic (VPN/private ranges only)
+pg_dr_allowed_ssh_cidrs = ["10.20.0.0/24"]
+pg_dr_onprem_cidrs      = ["10.30.0.0/24"]
+
+# Store in Key Vault (set via TF_VAR_pg_replication_password for safety)
+pg_replication_password = "<set-via-env>"
+
+# Optional cost controls
+enable_auto_shutdown  = false
+auto_shutdown_time    = "2300"
+auto_shutdown_timezone = "UTC"
+
+# Optional VM backup
+enable_backup    = false
+backup_vault_name = "rsv-clopr2-dr"
+backup_policy_name = "policy-pg-dr"
+
+# Prototype B: Container Registry + AKS (naming: include b2clc + katar)
+acr_name         = "acrb2clckatargwc"
+aks_cluster_name = "aks-b2clc-katar-gwc"
+aks_node_size    = "Standard_B2s"

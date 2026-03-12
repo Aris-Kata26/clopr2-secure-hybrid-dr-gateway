@@ -1,0 +1,54 @@
+environment         = "dev"
+location            = "francecentral"
+resource_group_name = "rg-clopr2-katar711-dr-fce"
+
+vnet_name          = "vnet-clopr2-dr-fce"
+vnet_address_space = ["10.20.0.0/16"]
+
+dr_subnet_name   = "dr-mgmt-subnet"
+dr_subnet_prefix = "10.20.2.0/24"
+
+nsg_name = "nsg-clopr2-dr-fce"
+
+pg_dr_vm_name              = "vm-pg-dr-fce"
+pg_dr_vm_size              = "Standard_B2ats_v2"
+pg_dr_admin_username       = "azureuser"
+pg_dr_admin_ssh_public_key = "ssh-ed25519 AAAA..."
+
+# Restrict SSH to a single admin /32 and Postgres to on-prem/VPN CIDRs only
+pg_dr_allowed_ssh_cidrs = ["203.0.113.10/32"]
+pg_dr_onprem_cidrs      = ["10.0.0.0/16"]
+
+os_disk_size_gb = 30
+
+# DR Key Vault (must be globally unique)
+keyvault_name = "kvclopr2katar-dr-fce-<suffix>"
+
+# Store in Key Vault (set via TF_VAR_pg_replication_password for safety)
+pg_replication_password = "<set-via-env>"
+
+loganalytics_name = "log-clopr2-dr-fce"
+
+# Auto-shutdown (note: replication stops during shutdown)
+enable_auto_shutdown   = true
+auto_shutdown_time     = "2300"
+auto_shutdown_timezone = "W. Europe Standard Time"
+
+# Budget alert for DR RG
+budget_name           = "budget-dr-fce"
+budget_amount         = 15
+budget_contact_emails = ["you@example.com"]
+budget_start_date     = "2026-03-01T00:00:00Z"
+
+# VPN scaffolding (disabled by default)
+enable_vpn_gateway     = false
+gateway_subnet_prefix  = "10.20.255.0/27"
+vpn_gateway_name       = "vpngw-clopr2-dr-fce"
+vpn_public_ip_name     = "pip-vpngw-dr-fce"
+vpn_gateway_sku        = "VpnGw1"
+local_network_gateway_name = "lng-clopr2-onprem"
+vpn_connection_name    = "conn-clopr2-dr-fce"
+onprem_public_ip       = "<onprem-public-ip>"
+onprem_address_space   = ["10.0.0.0/16"]
+# Set via TF_VAR_vpn_shared_key
+vpn_shared_key         = "<set-via-env>"

@@ -1,0 +1,39 @@
+-- Evidence: WireGuard tunnel status
+-- Intended command: sudo wg show (on pg-primary or vm-pg-dr-fce)
+-- Capture date: 2026-03-10
+-- Status: LIVE CAPTURE PENDING — run when on-premises network is reachable
+
+-- WireGuard configuration (from Terraform + cloud-init, verified during bootstrap):
+--   Interface (pg-primary, wg0):    10.200.0.1/32
+--   Interface (vm-pg-dr-fce, wg0):  10.200.0.2/32
+--   Listen port (vm-pg-dr-fce):     51820 (UDP, NSG allow-wireguard rule)
+--   Tunnel verified: 2026-03-10 ~16:30 UTC (wg_tunnel.yml playbook: ping 10.200.0.2 RTT ~17ms)
+
+-- PROVEN ACTIVE (inferred from bootstrap, 2026-03-10 ~16:49 UTC):
+--   pg_basebackup from 10.200.0.2 → 10.200.0.1:5432 completed (requires tunnel up)
+--   pg_stat_replication on pg-primary shows 10.200.0.2 streaming async, bytes_lag=0
+--   → WireGuard tunnel was confirmed active during the entire pg_dr.yml playbook run
+
+-- Commands to capture live output (run when Proxmox/on-prem is reachable):
+--
+--   On pg-primary:
+--     ssh -i ~/.ssh/id_ed25519_dr_onprem \
+--       -o "ProxyCommand=ssh -W %h:%p -i ~/.ssh/id_ed25519_dr_pve root@10.0.10.71" \
+--       katar711@10.0.96.11 'sudo wg show'
+--
+--   On vm-pg-dr-fce:
+--     ssh -F /home/aris/.ssh/dr_tunnel.cfg dr-tunnel 'sudo wg show'
+--
+-- Expected output (pg-primary):
+--   interface: wg0
+--     public key: <pg-primary-pubkey>
+--     listening port: 51820
+--
+--   peer: <vm-pg-dr-fce-pubkey>
+--     endpoint: 20.216.128.32:51820
+--     allowed ips: 10.200.0.2/32
+--     latest handshake: Xs ago
+--     transfer: X MiB received, X MiB sent
+--
+-- Screenshot: screenshots/wg-tunnel-status-20260310.png
+--   → Capture terminal output of 'sudo wg show' showing latest handshake and transfer counters

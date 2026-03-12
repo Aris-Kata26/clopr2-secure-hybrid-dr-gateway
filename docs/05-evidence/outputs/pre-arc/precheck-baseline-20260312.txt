@@ -1,0 +1,278 @@
+[WARNING]: Ansible is being run in a world writable directory
+(/mnt/c/Users/akata/Documents/Projects/CLOPR2/clopr2-secure-hybrid-dr-
+gateway/infra/ansible), ignoring it as an ansible.cfg source. For more
+information see
+https://docs.ansible.com/ansible/devel/reference_appendices/config.html#cfg-in-
+world-writable-dir
+
+PLAY [arc | Pre-check outbound connectivity to Azure endpoints] ****************
+
+TASK [Test HTTPS reachability to management.azure.com] *************************
+ok: [pg-primary]
+ok: [app-onprem]
+ok: [pg-standby]
+
+TASK [Test HTTPS reachability to login.microsoftonline.com] ********************
+ok: [pg-primary]
+ok: [app-onprem]
+ok: [pg-standby]
+
+TASK [Test HTTPS reachability to Arc his endpoint] *****************************
+ok: [pg-primary]
+ok: [app-onprem]
+ok: [pg-standby]
+
+TASK [Report connectivity results] *********************************************
+ok: [pg-primary] => {
+    "msg": [
+        "management.azure.com: REACHABLE",
+        "login.microsoftonline.com: REACHABLE",
+        "his.arc.azure.com: UNREACHABLE (rc=6)"
+    ]
+}
+ok: [pg-standby] => {
+    "msg": [
+        "management.azure.com: UNREACHABLE (rc=6)",
+        "login.microsoftonline.com: REACHABLE",
+        "his.arc.azure.com: UNREACHABLE (rc=6)"
+    ]
+}
+ok: [app-onprem] => {
+    "msg": [
+        "management.azure.com: REACHABLE",
+        "login.microsoftonline.com: REACHABLE",
+        "his.arc.azure.com: UNREACHABLE (rc=6)"
+    ]
+}
+
+TASK [Fail if management.azure.com AND login.microsoftonline.com are both unreachable] ***
+skipping: [pg-primary]
+skipping: [pg-standby]
+skipping: [app-onprem]
+
+TASK [Warn if management.azure.com is unreachable but login is reachable] ******
+skipping: [pg-primary]
+ok: [pg-standby] => {
+    "msg": "WARNING: management.azure.com timed out on pg-standby but login.microsoftonline.com is reachable. This may be a transient DNS round-robin issue or IPv6 fallback delay. Proceeding — TCP 443 outbound is confirmed available. Monitor azcmagent connect for actual failures.\n"
+}
+skipping: [app-onprem]
+
+PLAY [arc | Capture pre-Arc DR baseline] ***************************************
+
+TASK [Check if azcmagent is already installed] *********************************
+ok: [pg-primary]
+ok: [pg-standby]
+ok: [app-onprem]
+
+TASK [Show Arc agent pre-install status] ***************************************
+ok: [pg-primary] => {
+    "msg": "Arc agent not yet installed — clean state confirmed"
+}
+ok: [pg-standby] => {
+    "msg": "Arc agent not yet installed — clean state confirmed"
+}
+ok: [app-onprem] => {
+    "msg": "Arc agent not yet installed — clean state confirmed"
+}
+
+TASK [Capture systemd service states] ******************************************
+ok: [pg-primary]
+ok: [app-onprem]
+ok: [pg-standby]
+
+TASK [Print service status] ****************************************************
+ok: [pg-primary] => {
+    "service_status.stdout_lines": [
+        "=== systemctl status keepalived ===",
+        "● keepalived.service - Keepalive Daemon (LVS and VRRP)",
+        "     Loaded: loaded (/usr/lib/systemd/system/keepalived.service; enabled; preset: enabled)",
+        "     Active: active (running) since Tue 2026-03-10 13:16:33 UTC; 1 day 21h ago",
+        "       Docs: man:keepalived(8)",
+        "             man:keepalived.conf(5)",
+        "             man:genhash(1)",
+        "             https://keepalived.org",
+        "   Main PID: 13933 (keepalived)",
+        "      Tasks: 2 (limit: 1081)",
+        "     Memory: 3.2M (peak: 7.8M)",
+        "        CPU: 1h 33min 54.531s",
+        "     CGroup: /system.slice/keepalived.service",
+        "             ├─13933 /usr/sbin/keepalived --dont-fork",
+        "             └─13934 /usr/sbin/keepalived --dont-fork",
+        "",
+        "Mar 10 13:16:33 pg-primary Keepalived_vrrp[13934]: (pg_ha) Warning - nopreempt will not work with initial state MASTER - clearing",
+        "Mar 10 13:16:33 pg-primary Keepalived_vrrp[13934]: (pg_ha) Entering BACKUP STATE (init)",
+        "Mar 10 13:16:33 pg-primary Keepalived[13933]: Startup complete",
+        "Mar 10 13:16:33 pg-primary systemd[1]: Started keepalived.service - Keepalive Daemon (LVS and VRRP).",
+        "Mar 10 13:16:33 pg-primary Keepalived_vrrp[13934]: VRRP_Script(chk_postgresql) succeeded",
+        "Mar 10 13:16:34 pg-primary Keepalived_vrrp[13934]: (pg_ha) received lower priority (90) advert from 10.0.96.14 - discarding",
+        "Mar 10 13:16:35 pg-primary Keepalived_vrrp[13934]: (pg_ha) received lower priority (90) advert from 10.0.96.14 - discarding",
+        "Mar 10 13:16:36 pg-primary Keepalived_vrrp[13934]: (pg_ha) received lower priority (90) advert from 10.0.96.14 - discarding",
+        "Mar 10 13:16:37 pg-primary Keepalived_vrrp[13934]: (pg_ha) received lower priority (90) advert from 10.0.96.14 - discarding",
+        "Mar 10 13:16:37 pg-primary Keepalived_vrrp[13934]: (pg_ha) Entering MASTER STATE",
+        "",
+        "=== systemctl status postgresql ===",
+        "● postgresql.service - PostgreSQL RDBMS",
+        "     Loaded: loaded (/usr/lib/systemd/system/postgresql.service; enabled; preset: enabled)",
+        "     Active: active (exited) since Tue 2026-03-10 12:56:18 UTC; 1 day 22h ago",
+        "    Process: 29566 ExecReload=/bin/true (code=exited, status=0/SUCCESS)",
+        "   Main PID: 6890 (code=exited, status=0/SUCCESS)",
+        "        CPU: 1ms",
+        "",
+        "Mar 10 12:56:18 pg-primary systemd[1]: Starting postgresql.service - PostgreSQL RDBMS...",
+        "Mar 10 12:56:18 pg-primary systemd[1]: Finished postgresql.service - PostgreSQL RDBMS.",
+        "Mar 10 16:36:24 pg-primary systemd[1]: Reloading postgresql.service - PostgreSQL RDBMS...",
+        "Mar 10 16:36:24 pg-primary systemd[1]: Reloaded postgresql.service - PostgreSQL RDBMS."
+    ]
+}
+ok: [pg-standby] => {
+    "service_status.stdout_lines": [
+        "=== systemctl status keepalived ===",
+        "● keepalived.service - Keepalive Daemon (LVS and VRRP)",
+        "     Loaded: loaded (/usr/lib/systemd/system/keepalived.service; enabled; preset: enabled)",
+        "     Active: active (running) since Tue 2026-03-10 13:14:21 UTC; 1 day 21h ago",
+        "       Docs: man:keepalived(8)",
+        "             man:keepalived.conf(5)",
+        "             man:genhash(1)",
+        "             https://keepalived.org",
+        "   Main PID: 11203 (keepalived)",
+        "      Tasks: 2 (limit: 1081)",
+        "     Memory: 2.1M (peak: 6.6M)",
+        "        CPU: 1h 33min 1.872s",
+        "     CGroup: /system.slice/keepalived.service",
+        "             ├─11203 /usr/sbin/keepalived --dont-fork",
+        "             └─11204 /usr/sbin/keepalived --dont-fork",
+        "",
+        "Mar 10 13:14:21 pg-standby Keepalived[11203]: NOTICE: setting config option max_auto_priority should result in better keepalived performance",
+        "Mar 10 13:14:21 pg-standby Keepalived[11203]: Starting VRRP child process, pid=11204",
+        "Mar 10 13:14:21 pg-standby Keepalived_vrrp[11204]: (/etc/keepalived/keepalived.conf: Line 28) Truncating auth_pass to 8 characters",
+        "Mar 10 13:14:21 pg-standby Keepalived_vrrp[11204]: (pg_ha) Entering BACKUP STATE (init)",
+        "Mar 10 13:14:21 pg-standby Keepalived[11203]: Startup complete",
+        "Mar 10 13:14:21 pg-standby systemd[1]: Started keepalived.service - Keepalive Daemon (LVS and VRRP).",
+        "Mar 10 13:14:21 pg-standby Keepalived_vrrp[11204]: VRRP_Script(chk_postgresql) succeeded",
+        "Mar 10 13:16:27 pg-standby Keepalived_vrrp[11204]: (pg_ha) Entering MASTER STATE",
+        "Mar 10 13:16:37 pg-standby Keepalived_vrrp[11204]: (pg_ha) Master received advert from 10.0.96.11 with higher priority 100, ours 90",
+        "Mar 10 13:16:37 pg-standby Keepalived_vrrp[11204]: (pg_ha) Entering BACKUP STATE",
+        "",
+        "=== systemctl status postgresql ===",
+        "● postgresql.service - PostgreSQL RDBMS",
+        "     Loaded: loaded (/usr/lib/systemd/system/postgresql.service; enabled; preset: enabled)",
+        "     Active: active (exited) since Tue 2026-03-10 13:10:55 UTC; 1 day 21h ago",
+        "   Main PID: 9435 (code=exited, status=0/SUCCESS)",
+        "        CPU: 4ms",
+        "",
+        "Mar 10 13:10:55 pg-standby systemd[1]: Starting postgresql.service - PostgreSQL RDBMS...",
+        "Mar 10 13:10:55 pg-standby systemd[1]: Finished postgresql.service - PostgreSQL RDBMS."
+    ]
+}
+ok: [app-onprem] => {
+    "service_status.stdout_lines": [
+        "=== systemctl status keepalived ===",
+        "Unit keepalived.service could not be found.",
+        "(keepalived not running on this node)",
+        "",
+        "=== systemctl status postgresql ===",
+        "Unit postgresql.service could not be found."
+    ]
+}
+
+TASK [Capture WireGuard tunnel state (pg-primary only)] ************************
+skipping: [pg-standby]
+skipping: [app-onprem]
+ok: [pg-primary]
+
+TASK [Print WireGuard status] **************************************************
+ok: [pg-primary] => {
+    "msg": [
+        "interface: wg0",
+        "  public key: Eux0XtJyGX6tdI+5J0ePgU+cgA2OZuuMUbBNG1wksjQ=",
+        "  private key: (hidden)",
+        "  listening port: 48533",
+        "",
+        "peer: aRTHX9qS0UbWgi/MKBw6UqE3KGSEpsrVhdt1cU+eIkQ=",
+        "  endpoint: 20.216.128.32:51820",
+        "  allowed ips: 10.200.0.2/32",
+        "  latest handshake: 19 hours, 28 minutes, 16 seconds ago",
+        "  transfer: 1.63 MiB received, 47.81 MiB sent",
+        "  persistent keepalive: every 25 seconds"
+    ]
+}
+ok: [pg-standby] => {
+    "msg": [
+        "(skipped — not pg-primary)"
+    ]
+}
+ok: [app-onprem] => {
+    "msg": [
+        "(skipped — not pg-primary)"
+    ]
+}
+
+TASK [Capture pg_stat_replication (pg-primary only)] ***************************
+skipping: [pg-standby]
+skipping: [app-onprem]
+ok: [pg-primary]
+
+TASK [Print pg_stat_replication] ***********************************************
+ok: [pg-primary] => {
+    "msg": [
+        " client_addr |   state   | sync_state | write_lag | replay_lag ",
+        "-------------+-----------+------------+-----------+------------",
+        " 10.0.96.14  | streaming | async      |           | ",
+        "(1 row)"
+    ]
+}
+ok: [pg-standby] => {
+    "msg": [
+        "(skipped — not pg-primary)"
+    ]
+}
+ok: [app-onprem] => {
+    "msg": [
+        "(skipped — not pg-primary)"
+    ]
+}
+
+TASK [Capture pg_is_in_recovery (pg-standby only)] *****************************
+skipping: [pg-primary]
+skipping: [app-onprem]
+ok: [pg-standby]
+
+TASK [Print pg_is_in_recovery] *************************************************
+ok: [pg-primary] => {
+    "msg": "pg_is_in_recovery = (skipped)"
+}
+ok: [pg-standby] => {
+    "msg": "pg_is_in_recovery = t"
+}
+ok: [app-onprem] => {
+    "msg": "pg_is_in_recovery = (skipped)"
+}
+
+TASK [Check Keepalived VIP ownership (pg-primary only)] ************************
+skipping: [pg-standby]
+skipping: [app-onprem]
+ok: [pg-primary]
+
+TASK [Assert VIP is active on pg-primary] **************************************
+ok: [pg-primary] => {
+    "changed": false,
+    "msg": "VIP 10.0.96.10 confirmed active on pg-primary."
+}
+skipping: [pg-standby]
+skipping: [app-onprem]
+
+PLAY [arc | Install Azure Connected Machine agent (azcmagent)] *****************
+
+PLAY [arc | Connect machines to Azure Arc (auto-connect with SP)] **************
+
+PLAY [arc | Connect machines to Azure Arc (auto-connect with SP)] **************
+
+PLAY [arc | Connect machines to Azure Arc (auto-connect with SP)] **************
+
+PLAY [arc | Post-Arc validation — confirm DR stack is unaffected] **************
+
+PLAY RECAP *********************************************************************
+app-onprem                 : ok=11   changed=0    unreachable=0    failed=0    skipped=7    rescued=0    ignored=0   
+pg-primary                 : ok=15   changed=0    unreachable=0    failed=0    skipped=3    rescued=0    ignored=0   
+pg-standby                 : ok=13   changed=0    unreachable=0    failed=0    skipped=5    rescued=0    ignored=0   
+

@@ -1,0 +1,47 @@
+=== ip addr (VIP check) ===
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether bc:24:11:47:c3:33 brd ff:ff:ff:ff:ff:ff
+    inet 10.0.96.11/16 brd 10.0.255.255 scope global eth0
+       valid_lft forever preferred_lft forever
+    inet 10.0.96.10/16 scope global secondary eth0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::be24:11ff:fe47:c333/64 scope link 
+       valid_lft forever preferred_lft forever
+
+=== pg_stat_replication ===
+ client_addr |   state   | sync_state | sent_lsn  | replay_lsn | sync_state 
+-------------+-----------+------------+-----------+------------+------------
+ 10.0.96.14  | streaming | async      | 0/3000B48 | 0/3000B48  | async
+(1 row)
+
+
+=== pg_is_in_recovery() on primary ===
+ f
+
+
+=== keepalived status ===
+● keepalived.service - Keepalive Daemon (LVS and VRRP)
+     Loaded: loaded (/usr/lib/systemd/system/keepalived.service; enabled; preset: enabled)
+     Active: active (running) since Tue 2026-03-10 13:14:21 UTC; 1min 29s ago
+       Docs: man:keepalived(8)
+             man:keepalived.conf(5)
+             man:genhash(1)
+             https://keepalived.org
+   Main PID: 13331 (keepalived)
+      Tasks: 2 (limit: 1081)
+     Memory: 1.7M (peak: 6.1M)
+        CPU: 3.062s
+     CGroup: /system.slice/keepalived.service
+             ├─13331 /usr/sbin/keepalived --dont-fork
+             └─13332 /usr/sbin/keepalived --dont-fork
+
+Mar 10 13:14:21 pg-primary Keepalived[13331]: Configuration file /etc/keepalived/keepalived.conf
+Mar 10 13:14:21 pg-primary Keepalived[13331]: NOTICE: setting config option max_auto_priority should result in better keepalived performance
+Mar 10 13:14:21 pg-primary Keepalived[13331]: Starting VRRP child process, pid=13332
+Mar 10 13:14:21 pg-primary Keepalived_vrrp[13332]: (/etc/keepalived/keepalived.conf: Line 28) Truncating auth_pass to 8 characters
+Mar 10 13:14:21 pg-primary Keepalived_vrrp[13332]: (pg_ha) Warning - nopreempt will not work with initial state MASTER - clearing
+Mar 10 13:14:21 pg-primary Keepalived_vrrp[13332]: (pg_ha) Entering BACKUP STATE (init)
+Mar 10 13:14:21 pg-primary systemd[1]: Started keepalived.service - Keepalive Daemon (LVS and VRRP).
+Mar 10 13:14:21 pg-primary Keepalived[13331]: Startup complete
+Mar 10 13:14:21 pg-primary Keepalived_vrrp[13332]: VRRP_Script(chk_postgresql) succeeded
+Mar 10 13:14:25 pg-primary Keepalived_vrrp[13332]: (pg_ha) Entering MASTER STATE

@@ -1,0 +1,30 @@
+---
+- name: Install keepalived
+  apt:
+    name: keepalived
+    state: present
+    update_cache: true
+
+- name: Deploy keepalived.conf
+  template:
+    src: keepalived.conf.j2
+    dest: /etc/keepalived/keepalived.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: restart keepalived
+
+- name: Enable and start keepalived
+  systemd:
+    name: keepalived
+    enabled: true
+    state: started
+
+- name: Check keepalived status
+  command: systemctl is-active keepalived
+  register: kv_status
+  changed_when: false
+
+- name: Show keepalived state
+  debug:
+    msg: "keepalived on {{ inventory_hostname }}: {{ kv_status.stdout }}"

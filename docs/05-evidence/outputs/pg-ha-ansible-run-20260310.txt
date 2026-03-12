@@ -1,0 +1,206 @@
+[WARNING]: Ansible is being run in a world writable directory
+(/mnt/c/Users/akata/Documents/Projects/CLOPR2/clopr2-secure-hybrid-dr-
+gateway/infra/ansible), ignoring it as an ansible.cfg source. For more
+information see
+https://docs.ansible.com/ansible/devel/reference_appendices/config.html#cfg-in-
+world-writable-dir
+
+PLAY [Install and configure PostgreSQL on all pg nodes] ************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [pg-standby]
+ok: [pg-primary]
+
+TASK [postgres : Install PostgreSQL 16] ****************************************
+ok: [pg-primary]
+ok: [pg-standby]
+
+TASK [postgres : Ensure PostgreSQL service is started and enabled] *************
+ok: [pg-standby]
+ok: [pg-primary]
+
+TASK [postgres : Set listen_addresses to *] ************************************
+ok: [pg-primary]
+ok: [pg-standby]
+
+TASK [postgres : Set wal_level = replica] **************************************
+ok: [pg-primary]
+ok: [pg-standby]
+
+TASK [postgres : Set max_wal_senders = 10] *************************************
+ok: [pg-primary]
+ok: [pg-standby]
+
+TASK [postgres : Set wal_keep_size = 1024] *************************************
+ok: [pg-primary]
+ok: [pg-standby]
+
+TASK [postgres : Set hot_standby = on] *****************************************
+ok: [pg-primary]
+ok: [pg-standby]
+
+TASK [postgres : Allow replication connections in pg_hba.conf] *****************
+ok: [pg-standby]
+ok: [pg-primary]
+
+TASK [postgres : Flush handlers to apply config before primary/standby roles] ***
+
+TASK [postgres : Flush handlers to apply config before primary/standby roles] ***
+
+PLAY [Configure PostgreSQL primary (replication user)] *************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [pg-primary]
+
+TASK [postgres_primary : Check if replication user exists] *********************
+ok: [pg-primary]
+
+TASK [postgres_primary : Create replication user (first run only)] *************
+skipping: [pg-primary]
+
+TASK [postgres_primary : Set replication user password] ************************
+changed: [pg-primary]
+
+TASK [postgres_primary : Verify replication user has REPLICATION privilege] ****
+ok: [pg-primary]
+
+TASK [postgres_primary : Show pg_stat_replication] *****************************
+ok: [pg-primary]
+
+TASK [postgres_primary : Print pg_stat_replication] ****************************
+ok: [pg-primary] => {
+    "msg": " client_addr |   state   | sync_state | sent_lsn  | write_lsn | flush_lsn | replay_lsn \n-------------+-----------+------------+-----------+-----------+-----------+------------\n 10.0.96.14  | streaming | async      | 0/3000A98 | 0/3000A98 | 0/3000A98 | 0/3000A98\n(1 row)"
+}
+
+PLAY [Configure PostgreSQL standby (base backup + recovery)] *******************
+
+TASK [Gathering Facts] *********************************************************
+ok: [pg-standby]
+
+TASK [postgres_standby : Check if standby is already configured (standby.signal exists)] ***
+ok: [pg-standby]
+
+TASK [postgres_standby : Stop PostgreSQL before base backup (only if standby not yet set up)] ***
+skipping: [pg-standby]
+
+TASK [postgres_standby : Remove existing data directory contents before base backup] ***
+skipping: [pg-standby]
+
+TASK [postgres_standby : Run pg_basebackup from primary] ***********************
+skipping: [pg-standby]
+
+TASK [postgres_standby : Print pg_basebackup output] ***************************
+ok: [pg-standby] => {
+    "msg": "pg_basebackup skipped (already configured)"
+}
+
+TASK [postgres_standby : Start PostgreSQL on standby] **************************
+skipping: [pg-standby]
+
+TASK [postgres_standby : Wait for PostgreSQL to be ready on standby] ***********
+ok: [pg-standby]
+
+TASK [postgres_standby : Re-check standby.signal after setup] ******************
+ok: [pg-standby]
+
+TASK [postgres_standby : Assert standby.signal exists] *************************
+ok: [pg-standby] => {
+    "changed": false,
+    "msg": "standby.signal confirmed — standby is set up"
+}
+
+TASK [postgres_standby : Verify pg_is_in_recovery() on standby] ****************
+ok: [pg-standby]
+
+TASK [postgres_standby : Show pg_is_in_recovery() result] **********************
+ok: [pg-standby] => {
+    "msg": "pg_is_in_recovery() = t"
+}
+
+PLAY [Verify streaming replication is active] **********************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [pg-primary]
+
+TASK [Wait up to 30s for standby to connect] ***********************************
+ok: [pg-primary]
+
+TASK [Show pg_stat_replication] ************************************************
+ok: [pg-primary]
+
+TASK [Print pg_stat_replication] ***********************************************
+ok: [pg-primary] => {
+    "msg": " client_addr |   state   | sync_state | sent_lsn  | replay_lsn \n-------------+-----------+------------+-----------+------------\n 10.0.96.14  | streaming | async      | 0/3000A98 | 0/3000A98\n(1 row)"
+}
+
+TASK [Assert standby is connected] *********************************************
+ok: [pg-primary]
+
+PLAY [Deploy Keepalived VIP] ***************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [pg-primary]
+ok: [pg-standby]
+
+TASK [keepalived : Install keepalived] *****************************************
+changed: [pg-primary]
+changed: [pg-standby]
+
+TASK [keepalived : Deploy keepalived.conf] *************************************
+changed: [pg-primary]
+changed: [pg-standby]
+
+TASK [keepalived : Enable and start keepalived] ********************************
+changed: [pg-primary]
+changed: [pg-standby]
+
+TASK [keepalived : Check keepalived status] ************************************
+ok: [pg-primary]
+ok: [pg-standby]
+
+TASK [keepalived : Show keepalived state] **************************************
+ok: [pg-primary] => {
+    "msg": "keepalived on pg-primary: active"
+}
+ok: [pg-standby] => {
+    "msg": "keepalived on pg-standby: active"
+}
+
+RUNNING HANDLER [keepalived : restart keepalived] ******************************
+changed: [pg-primary]
+changed: [pg-standby]
+
+PLAY [Final HA status summary] *************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [pg-primary]
+ok: [pg-standby]
+
+TASK [Show current IPs (check VIP assignment)] *********************************
+ok: [pg-primary]
+ok: [pg-standby]
+
+TASK [Print IP info] ***********************************************************
+ok: [pg-primary] => {
+    "msg": "pg-primary: ['    inet 10.0.96.11/16 brd 10.0.255.255 scope global eth0']"
+}
+ok: [pg-standby] => {
+    "msg": "pg-standby: ['    inet 10.0.96.14/16 brd 10.0.255.255 scope global eth0']"
+}
+
+TASK [Show keepalived state] ***************************************************
+ok: [pg-primary]
+ok: [pg-standby]
+
+TASK [Print keepalived state] **************************************************
+ok: [pg-primary] => {
+    "msg": "pg-primary keepalived: ['     Active: active (running) since Tue 2026-03-10 13:14:21 UTC; 3s ago', 'Mar 10 13:14:21 pg-primary Keepalived_vrrp[13332]: (pg_ha) Warning - nopreempt will not work with initial state MASTER - clearing', 'Mar 10 13:14:21 pg-primary Keepalived_vrrp[13332]: (pg_ha) Entering BACKUP STATE (init)', 'Mar 10 13:14:25 pg-primary Keepalived_vrrp[13332]: (pg_ha) Entering MASTER STATE']"
+}
+ok: [pg-standby] => {
+    "msg": "pg-standby keepalived: ['     Active: active (running) since Tue 2026-03-10 13:14:21 UTC; 3s ago', 'Mar 10 13:14:21 pg-standby Keepalived_vrrp[11204]: (pg_ha) Entering BACKUP STATE (init)']"
+}
+
+PLAY RECAP *********************************************************************
+pg-primary                 : ok=32   changed=5    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
+pg-standby                 : ok=29   changed=4    unreachable=0    failed=0    skipped=4    rescued=0    ignored=0   
+

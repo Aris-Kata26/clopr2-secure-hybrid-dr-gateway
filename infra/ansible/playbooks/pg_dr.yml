@@ -1,0 +1,172 @@
+---
+# ============================================================
+# pg_dr.yml — Azure DR PostgreSQL replica bootstrap
+# ============================================================
+# Bootstraps the DR VM (vm-pg-dr-fce) as a hot-standby replica
+# of the on-prem pg-primary, connected via WireGuard tunnel.
+#
+# Prerequisites:
+#   - WireGuard tunnel is UP (wg_tunnel.yml passed)
+#   - Phase 2 inventory active (ansible_host=10.200.0.2)
+#   - pg-primary is running with replicator user
+#
+# Execution order:
+#   1. pg_primary  — patch pg_hba to allow WireGuard tunnel (10.200.0.0/30)
+#   2. pg_dr       — install PostgreSQL 16 (postgres role)
+#   3. pg_dr       — bootstrap standby via pg_basebackup (postgres_standby role)
+#   4. pg_dr       — patch pg_hba post-basebackup (basebackup copies primary's config)
+#   5. pg_dr       — verify pg_is_in_recovery() = t
+#   6. pg_primary  — verify pg_stat_replication shows DR VM connected
+# ============================================================
+
+# ---- Play 1: Allow WireGuard tunnel in pg_hba on pg-primary ----
+- name: "pg_primary | Patch pg_hba to allow WireGuard tunnel replication"
+  hosts: pg_primary
+  become: true
+  vars:
+    pg_conf_dir: "/etc/postgresql/16/main"
+  tasks:
+    - name: Add WireGuard tunnel CIDR to pg_hba.conf on pg-primary
+      blockinfile:
+        path: "{{ pg_conf_dir }}/pg_hba.conf"
+        marker: "# {mark} ANSIBLE MANAGED — DR WireGuard replication"
+        block: |
+          host    replication     replicator      10.200.0.0/30       scram-sha-256
+          host    all             all             10.200.0.0/30       scram-sha-256
+      notify: reload postgresql
+
+    - name: Ensure pg-primary is listening and up to date
+      shell: "sudo -u postgres psql -c \"SELECT VERSION(), inet_server_addr(), pg_current_wal_lsn();\""
+      register: primary_status
+      changed_when: false
+
+    - name: Print pg-primary status
+      debug:
+        msg: "{{ primary_status.stdout }}"
+
+  handlers:
+    - name: reload postgresql
+      systemd:
+        name: postgresql
+        state: reloaded
+
+# ---- Play 2: Install PostgreSQL on DR VM ----
+- name: "pg_dr | Install PostgreSQL 16"
+  hosts: pg_dr
+  become: true
+  roles:
+    - postgres
+
+# ---- Play 3: Bootstrap standby via pg_basebackup ----
+# NOTE: pg_basebackup -Fp -R copies pg_hba.conf FROM primary.
+# After this play, pg_hba on DR = copy of pg_primary's pg_hba.
+# That is acceptable — DR VM listens on WireGuard IP (10.200.0.2)
+# and only accepts connections from tunnel; pg_hba from primary
+# already allows 10.200.0.0/30 after Play 1.
+- name: "pg_dr | Bootstrap standby via pg_basebackup from tunnel IP"
+  hosts: pg_dr
+  become: true
+  vars:
+    pg_primary_host: "10.200.0.1"
+    pg_primary_port: 5432
+    pg_version: 16
+    pg_data_dir: "/var/lib/postgresql/16/main"
+    pg_replication_user: replicator
+    pg_replication_password: "REMOVED_SECRET"
+  roles:
+    - postgres_standby
+
+# ---- Play 4: Post-basebackup pg_hba fixup on DR VM ----
+# pg_basebackup copies pg_hba.conf from primary — ensure tunnel CIDR
+# is present on DR side as well (for monitoring/admin from tunnel).
+- name: "pg_dr | Ensure WireGuard tunnel CIDR in pg_hba post-basebackup"
+  hosts: pg_dr
+  become: true
+  tasks:
+    - name: Add WireGuard tunnel CIDR to pg_hba.conf on DR VM
+      blockinfile:
+        path: "/etc/postgresql/16/main/pg_hba.conf"
+        marker: "# {mark} ANSIBLE MANAGED — DR WireGuard replication"
+        block: |
+          host    replication     replicator      10.200.0.0/30       scram-sha-256
+          host    all             all             10.200.0.0/30       scram-sha-256
+      notify: reload postgresql
+
+  handlers:
+    - name: reload postgresql
+      systemd:
+        name: postgresql
+        state: reloaded
+
+# ---- Play 5: Verify DR replica is in recovery ----
+- name: "pg_dr | Verify streaming replication is active"
+  hosts: pg_dr
+  become: true
+  tasks:
+    - name: Check pg_is_in_recovery()
+      shell: "sudo -u postgres psql -tc \"SELECT pg_is_in_recovery();\" | tr -d ' \\n'"
+      register: recovery_status
+      changed_when: false
+
+    - name: Print recovery status
+      debug:
+        msg: "DR VM pg_is_in_recovery() = {{ recovery_status.stdout | trim }}"
+
+    - name: Assert pg_is_in_recovery() is true
+      assert:
+        that:
+          - "'t' in recovery_status.stdout"
+        fail_msg: "DR VM is NOT in recovery — standby setup may have failed"
+        success_msg: "pg_is_in_recovery() = t — DR standby is active"
+
+    - name: Show WAL receiver status
+      shell: >
+        sudo -u postgres psql -c
+        "SELECT status, received_lsn, last_msg_receive_time,
+                sender_host, sender_port
+         FROM pg_stat_wal_receiver;"
+      register: wal_receiver
+      changed_when: false
+      ignore_errors: true
+
+    - name: Print WAL receiver status
+      debug:
+        msg: "{{ wal_receiver.stdout | default('WAL receiver info not available') }}"
+
+# ---- Play 6: Verify replication from pg-primary ----
+- name: "pg_primary | Verify DR replica appears in pg_stat_replication"
+  hosts: pg_primary
+  become: true
+  tasks:
+    - name: Wait up to 60s for DR replica to connect
+      shell: |
+        for i in $(seq 1 30); do
+          count=$(sudo -u postgres psql -tc "SELECT count(*) FROM pg_stat_replication;" 2>/dev/null | tr -d ' \n')
+          [ "${count:-0}" -ge "1" ] && break
+          sleep 2
+        done
+        echo "${count:-0}"
+      register: wait_result
+      changed_when: false
+
+    - name: Show pg_stat_replication
+      shell: >
+        sudo -u postgres psql -c
+        "SELECT client_addr, application_name, state, sync_state,
+                sent_lsn, write_lsn, flush_lsn, replay_lsn
+         FROM pg_stat_replication;"
+      register: stat_repl
+      changed_when: false
+
+    - name: Print pg_stat_replication
+      debug:
+        msg: "{{ stat_repl.stdout }}"
+
+    - name: Assert at least one replica is connected
+      assert:
+        that:
+          - wait_result.stdout | trim | int >= 1
+        fail_msg: >
+          No replicas in pg_stat_replication after 60s wait —
+          check that DR VM WireGuard tunnel is up and pg_basebackup completed.
+        success_msg: "pg_stat_replication shows {{ wait_result.stdout | trim }} replica(s) connected"

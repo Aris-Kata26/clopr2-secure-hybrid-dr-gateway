@@ -1,0 +1,5 @@
+---
+- name: restart wireguard
+  systemd:
+    name: "wg-quick@{{ wg_iface }}"
+    state: restarted

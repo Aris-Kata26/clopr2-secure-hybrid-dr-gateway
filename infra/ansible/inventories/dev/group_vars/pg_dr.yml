@@ -1,0 +1,27 @@
+---
+# Azure DR VM — France Central — vm-pg-dr-fce
+# WireGuard: listener/server side (cloud-init bootstrapped at first boot)
+# Ansible only re-runs the role if changes are needed (idempotent).
+
+# --- WireGuard ---
+wg_tunnel_ip: "10.200.0.2"
+wg_is_listener: true
+wg_peer_tunnel_ip: "10.200.0.1"
+wg_peer_allowed_ips: "10.200.0.1/32, 10.0.96.0/24"
+# wg_peer_endpoint: NOT set — on-prem pg-primary initiates the connection
+wg_peer_pubkey: "Eux0XtJyGX6tdI+5J0ePgU+cgA2OZuuMUbBNG1wksjQ="
+wg_privkey: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          63353336393636626435633664333365616461383934336366333135653433623731643933366639
+          6264373739303964633336663230623633326464313265340a306237326264613333383534366261
+          62356232363663356430663339643763396364306532303264626633613830613461326137666335
+          3930623762376535300a633336303333653962366438396433353065623664333835316138653533
+          31623233633837333530663966386566613034343963386163386132366533333037346631363332
+          3437393835613632383339316133643635626233376439346165
+
+# --- PostgreSQL DR replica ---
+pg_primary_host: "10.200.0.1"
+pg_primary_port: 5432
+
+# --- Ansible connection (SSH via ProxyJump through pg-primary over WireGuard tunnel) ---
+# See hosts.ini for ansible_ssh_common_args ProxyJump setting

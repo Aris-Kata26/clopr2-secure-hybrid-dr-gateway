@@ -1,0 +1,26 @@
+# Proxmox API endpoint (note: no /api2/json)
+endpoint = "https://10.0.10.161:8006/"
+
+# bpg token format is a single string: user@realm!tokenname=SECRET
+# NEVER commit real secrets. Put real secret only in terraform.tfvars (ignored).
+# Proxmox token secrets are UUID-like. Replace this with your real token secret.
+api_token = "katar711@pve!terraform=00000000-0000-0000-0000-000000000000"
+
+# self-signed TLS certs (typical in labs)
+insecure = true
+
+# Target placement
+node_name = "TheBetterBTS"
+pool_id   = "katar711"
+
+# VM identity
+vm_id = 210
+name  = "smoke-test-vm"
+
+# Storage + networking
+vm_storage = "Slightly-Big-Data"
+vm_bridge  = "vmbr0"
+
+# Sizing
+cores     = 1
+memory_mb = 1024

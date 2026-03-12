@@ -1,0 +1,38 @@
+=== ip addr ===
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether bc:24:11:55:1d:5e brd ff:ff:ff:ff:ff:ff
+    inet 10.0.96.14/16 brd 10.0.255.255 scope global eth0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::be24:11ff:fe55:1d5e/64 scope link 
+       valid_lft forever preferred_lft forever
+
+=== pg_is_in_recovery() on standby ===
+ t
+
+
+=== keepalived status ===
+● keepalived.service - Keepalive Daemon (LVS and VRRP)
+     Loaded: loaded (/usr/lib/systemd/system/keepalived.service; enabled; preset: enabled)
+     Active: active (running) since Tue 2026-03-10 13:14:21 UTC; 1min 41s ago
+       Docs: man:keepalived(8)
+             man:keepalived.conf(5)
+             man:genhash(1)
+             https://keepalived.org
+   Main PID: 11203 (keepalived)
+      Tasks: 2 (limit: 1081)
+     Memory: 1.8M (peak: 6.3M)
+        CPU: 3.461s
+     CGroup: /system.slice/keepalived.service
+             ├─11203 /usr/sbin/keepalived --dont-fork
+             └─11204 /usr/sbin/keepalived --dont-fork
+
+Mar 10 13:14:21 pg-standby Keepalived[11203]: Running on Linux 6.8.0-101-generic #101-Ubuntu SMP PREEMPT_DYNAMIC Mon Feb  9 10:15:05 UTC 2026 (built for Linux 6.8.0)
+Mar 10 13:14:21 pg-standby Keepalived[11203]: Command line: '/usr/sbin/keepalived' '--dont-fork'
+Mar 10 13:14:21 pg-standby Keepalived[11203]: Configuration file /etc/keepalived/keepalived.conf
+Mar 10 13:14:21 pg-standby Keepalived[11203]: NOTICE: setting config option max_auto_priority should result in better keepalived performance
+Mar 10 13:14:21 pg-standby Keepalived[11203]: Starting VRRP child process, pid=11204
+Mar 10 13:14:21 pg-standby Keepalived_vrrp[11204]: (/etc/keepalived/keepalived.conf: Line 28) Truncating auth_pass to 8 characters
+Mar 10 13:14:21 pg-standby Keepalived_vrrp[11204]: (pg_ha) Entering BACKUP STATE (init)
+Mar 10 13:14:21 pg-standby Keepalived[11203]: Startup complete
+Mar 10 13:14:21 pg-standby systemd[1]: Started keepalived.service - Keepalive Daemon (LVS and VRRP).
+Mar 10 13:14:21 pg-standby Keepalived_vrrp[11204]: VRRP_Script(chk_postgresql) succeeded

@@ -1,0 +1,16 @@
+-- Evidence: pg_is_in_recovery() on Azure DR replica
+-- Host:     vm-pg-dr-fce (WireGuard IP: 10.200.0.2, Azure France Central)
+-- Captured: 2026-03-10 ~16:49 UTC
+-- Source:   ansible-pg-dr-bootstrap-20260310.txt (Ansible task: postgres_standby : Verify pg_is_in_recovery() on standby)
+-- Command:  sudo -u postgres psql -c "SELECT pg_is_in_recovery();"
+
+ pg_is_in_recovery
+-------------------
+ t
+(1 row)
+
+-- Subsequent Ansible assertion (task: Assert pg_is_in_recovery() is true):
+--   "msg": "pg_is_in_recovery() = t — DR standby is active"
+--   "changed": false
+
+-- Result: PASS — DR VM is a hot standby, in recovery mode, receiving WAL from pg-primary (10.200.0.1)

@@ -1,0 +1,32 @@
+---
+# All psql commands use 'sudo -u postgres' to avoid Ansible become_user ACL issues
+
+- name: Check if replication user exists
+  shell: "sudo -u postgres psql -tc \"SELECT 1 FROM pg_roles WHERE rolname='{{ pg_replication_user }}'\" | tr -d ' \\n'"
+  register: repl_exists
+  changed_when: false
+
+- name: Create replication user (first run only)
+  shell: "sudo -u postgres psql -c \"CREATE ROLE {{ pg_replication_user }} WITH REPLICATION LOGIN\""
+  when: "'1' not in repl_exists.stdout"
+  changed_when: true
+
+- name: Set replication user password
+  shell: "sudo -u postgres psql -c \"ALTER ROLE {{ pg_replication_user }} PASSWORD '{{ pg_replication_password }}'\""
+  changed_when: true
+  no_log: true
+
+- name: Verify replication user has REPLICATION privilege
+  shell: "sudo -u postgres psql -tc \"SELECT userepl FROM pg_user WHERE usename='{{ pg_replication_user }}'\" | tr -d ' \\n'"
+  register: repl_check
+  changed_when: false
+  failed_when: "'t' not in repl_check.stdout"
+
+- name: Show pg_stat_replication
+  shell: "sudo -u postgres psql -c \"SELECT client_addr, state, sync_state, sent_lsn, write_lsn, flush_lsn, replay_lsn FROM pg_stat_replication;\""
+  register: stat_replication
+  changed_when: false
+
+- name: Print pg_stat_replication
+  debug:
+    msg: "{{ stat_replication.stdout }}"

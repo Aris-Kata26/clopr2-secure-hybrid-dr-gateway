@@ -1,0 +1,332 @@
+[WARNING]: Ansible is being run in a world writable directory
+(/mnt/c/Users/akata/Documents/Projects/CLOPR2/clopr2-secure-hybrid-dr-
+gateway/infra/ansible), ignoring it as an ansible.cfg source. For more
+information see
+https://docs.ansible.com/ansible/devel/reference_appendices/config.html#cfg-in-
+world-writable-dir
+pg-primary | CHANGED | rc=0 >>
+Using 'curl' for downloads
+Total physical memory: 962716 kB
+Platform type:  x86_64:Linux
+Retrieving distro info from /etc/os-release...
+Configuring for Ubuntu 24.04...
+
+WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+
+Hit:1 http://security.ubuntu.com/ubuntu noble-security InRelease
+Hit:2 http://archive.ubuntu.com/ubuntu noble InRelease
+Hit:3 http://archive.ubuntu.com/ubuntu noble-updates InRelease
+Hit:4 http://archive.ubuntu.com/ubuntu noble-backports InRelease
+Reading package lists...
+Building dependency tree...
+Reading state information...
+6 packages can be upgraded. Run 'apt list --upgradable' to see them.
+
+WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+
+Reading package lists...
+Building dependency tree...
+Reading state information...
+E: Unable to locate package packages-microsoft-prod
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100  4288  100  4288    0     0  43594      0 --:--:-- --:--:-- --:--:-- 43313
+Selecting previously unselected package packages-microsoft-prod.
+(Reading database ... 77473 files and directories currently installed.)
+Preparing to unpack .../packages-microsoft-prod.deb ...
+Unpacking packages-microsoft-prod (1.2-ubuntu24.04) ...
+Setting up packages-microsoft-prod (1.2-ubuntu24.04) ...
+Hit:1 http://security.ubuntu.com/ubuntu noble-security InRelease
+Get:2 https://packages.microsoft.com/ubuntu/24.04/prod noble InRelease [3600 B]
+Hit:3 http://archive.ubuntu.com/ubuntu noble InRelease
+Hit:4 http://archive.ubuntu.com/ubuntu noble-updates InRelease
+Hit:5 http://archive.ubuntu.com/ubuntu noble-backports InRelease
+Get:6 https://packages.microsoft.com/ubuntu/24.04/prod noble/main armhf Packages [11.4 kB]
+Get:7 https://packages.microsoft.com/ubuntu/24.04/prod noble/main amd64 Packages [101 kB]
+Get:8 https://packages.microsoft.com/ubuntu/24.04/prod noble/main arm64 Packages [79.3 kB]
+Get:9 https://packages.microsoft.com/ubuntu/24.04/prod noble/main all Packages [643 B]
+Fetched 196 kB in 1s (346 kB/s)
+Reading package lists...
+
+WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+
+Reading package lists...
+Building dependency tree...
+Reading state information...
+The following NEW packages will be installed:
+  azcmagent
+0 upgraded, 1 newly installed, 0 to remove and 6 not upgraded.
+Need to get 86.5 MB of archives.
+After this operation, 0 B of additional disk space will be used.
+Get:1 https://packages.microsoft.com/ubuntu/24.04/prod noble/main amd64 azcmagent amd64 1.61.03319.859 [86.5 MB]
+Fetched 86.5 MB in 6s (13.9 MB/s)
+Selecting previously unselected package azcmagent.
+(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 77490 files and directories currently installed.)
+Preparing to unpack .../azcmagent_1.61.03319.859_amd64.deb ...
+Preinstall...install
+Creating himds group ...
+Creating himds account ...
+Creating arcproxy account ...
+Applying udev rule to access TPM...
+No TPM device detected
+Unpacking azcmagent (1.61.03319.859) ...
+Setting up azcmagent (1.61.03319.859) ...
+Postinstall...configure
+Creating new /var/opt/azcmagent/agentconfig.json
+Creating new /etc/cron.d/azcmagent_autoupgrade
+Netstat not installed.  Skipping IP port checking. The service needs to listen on 40342
+Created symlink /etc/systemd/system/multi-user.target.wants/himdsd.service → /usr/lib/systemd/system/himdsd.service.
+Checked guest config disabled: 
+Checked ext service disabled: 
+Checked arc proxy enabled: 0
+Enabling arcproxyd
+Created symlink /etc/systemd/system/multi-user.target.wants/arcproxyd.service → /usr/lib/systemd/system/arcproxyd.service.
+Getting status via systemd
+Arc GC service is not running.
+Configuring Arc GC service ...
+Found systemd service controller...for Arc GC Service
+Created symlink /etc/systemd/system/multi-user.target.wants/gcad.service → /usr/lib/systemd/system/gcad.service.
+Service configured through systemd service controller. Gc Service
+Enabling gcad
+Getting status via systemd
+Arc GC service is not running.
+STARTING Arc GC
+Getting status via systemd
+EXT service is not running.
+Configuring EXT service ...
+Found systemd service controller...for Extension Service
+Created symlink /etc/systemd/system/multi-user.target.wants/extd.service → /usr/lib/systemd/system/extd.service.
+Created symlink /etc/systemd/system/himdsd.service.wants/extd.service → /usr/lib/systemd/system/extd.service.
+Service configured through systemd service controller. Extension Service
+Enabling extd
+STARTING EXT
+
+Running kernel seems to be up-to-date.
+
+No services need to be restarted.
+
+No containers need to be restarted.
+
+No user sessions are running outdated binaries.
+
+No VM guests are running outdated hypervisor (qemu) binaries on this host.
+Latest version of azcmagent is installed.
+EXIT_CODE:0
+app-onprem | CHANGED | rc=0 >>
+Using 'curl' for downloads
+Total physical memory: 962720 kB
+Platform type:  x86_64:Linux
+Retrieving distro info from /etc/os-release...
+Configuring for Ubuntu 24.04...
+
+WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+
+Hit:1 http://archive.ubuntu.com/ubuntu noble InRelease
+Hit:2 http://archive.ubuntu.com/ubuntu noble-updates InRelease
+Hit:3 http://security.ubuntu.com/ubuntu noble-security InRelease
+Hit:4 http://archive.ubuntu.com/ubuntu noble-backports InRelease
+Hit:5 https://download.docker.com/linux/ubuntu noble InRelease
+Reading package lists...
+Building dependency tree...
+Reading state information...
+3 packages can be upgraded. Run 'apt list --upgradable' to see them.
+
+WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+
+Reading package lists...
+Building dependency tree...
+Reading state information...
+E: Unable to locate package packages-microsoft-prod
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100  4288  100  4288    0     0  41526      0 --:--:-- --:--:-- --:--:-- 41631
+Selecting previously unselected package packages-microsoft-prod.
+(Reading database ... 75467 files and directories currently installed.)
+Preparing to unpack .../packages-microsoft-prod.deb ...
+Unpacking packages-microsoft-prod (1.2-ubuntu24.04) ...
+Setting up packages-microsoft-prod (1.2-ubuntu24.04) ...
+Hit:1 http://security.ubuntu.com/ubuntu noble-security InRelease
+Hit:2 https://download.docker.com/linux/ubuntu noble InRelease
+Get:3 https://packages.microsoft.com/ubuntu/24.04/prod noble InRelease [3600 B]
+Hit:4 http://archive.ubuntu.com/ubuntu noble InRelease
+Hit:5 http://archive.ubuntu.com/ubuntu noble-updates InRelease
+Hit:6 http://archive.ubuntu.com/ubuntu noble-backports InRelease
+Get:7 https://packages.microsoft.com/ubuntu/24.04/prod noble/main arm64 Packages [79.3 kB]
+Get:8 https://packages.microsoft.com/ubuntu/24.04/prod noble/main armhf Packages [11.4 kB]
+Get:9 https://packages.microsoft.com/ubuntu/24.04/prod noble/main amd64 Packages [101 kB]
+Get:10 https://packages.microsoft.com/ubuntu/24.04/prod noble/main all Packages [643 B]
+Fetched 196 kB in 2s (95.1 kB/s)
+Reading package lists...
+
+WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+
+Reading package lists...
+Building dependency tree...
+Reading state information...
+The following NEW packages will be installed:
+  azcmagent
+0 upgraded, 1 newly installed, 0 to remove and 3 not upgraded.
+Need to get 86.5 MB of archives.
+After this operation, 0 B of additional disk space will be used.
+Get:1 https://packages.microsoft.com/ubuntu/24.04/prod noble/main amd64 azcmagent amd64 1.61.03319.859 [86.5 MB]
+Fetched 86.5 MB in 4s (23.5 MB/s)
+Selecting previously unselected package azcmagent.
+(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 75484 files and directories currently installed.)
+Preparing to unpack .../azcmagent_1.61.03319.859_amd64.deb ...
+Preinstall...install
+Creating himds group ...
+Creating himds account ...
+Creating arcproxy account ...
+Applying udev rule to access TPM...
+No TPM device detected
+Unpacking azcmagent (1.61.03319.859) ...
+Setting up azcmagent (1.61.03319.859) ...
+Postinstall...configure
+Creating new /var/opt/azcmagent/agentconfig.json
+Creating new /etc/cron.d/azcmagent_autoupgrade
+Netstat not installed.  Skipping IP port checking. The service needs to listen on 40342
+Created symlink /etc/systemd/system/multi-user.target.wants/himdsd.service → /usr/lib/systemd/system/himdsd.service.
+Checked guest config disabled: 
+Checked ext service disabled: 
+Checked arc proxy enabled: 0
+Enabling arcproxyd
+Created symlink /etc/systemd/system/multi-user.target.wants/arcproxyd.service → /usr/lib/systemd/system/arcproxyd.service.
+Getting status via systemd
+Arc GC service is not running.
+Configuring Arc GC service ...
+Found systemd service controller...for Arc GC Service
+Created symlink /etc/systemd/system/multi-user.target.wants/gcad.service → /usr/lib/systemd/system/gcad.service.
+Service configured through systemd service controller. Gc Service
+Enabling gcad
+Getting status via systemd
+Arc GC service is not running.
+STARTING Arc GC
+Getting status via systemd
+EXT service is not running.
+Configuring EXT service ...
+Found systemd service controller...for Extension Service
+Created symlink /etc/systemd/system/multi-user.target.wants/extd.service → /usr/lib/systemd/system/extd.service.
+Created symlink /etc/systemd/system/himdsd.service.wants/extd.service → /usr/lib/systemd/system/extd.service.
+Service configured through systemd service controller. Extension Service
+Enabling extd
+STARTING EXT
+
+Running kernel seems to be up-to-date.
+
+No services need to be restarted.
+
+No containers need to be restarted.
+
+No user sessions are running outdated binaries.
+
+No VM guests are running outdated hypervisor (qemu) binaries on this host.
+Latest version of azcmagent is installed.
+EXIT_CODE:0
+pg-standby | CHANGED | rc=0 >>
+Using 'curl' for downloads
+Total physical memory: 962720 kB
+Platform type:  x86_64:Linux
+Retrieving distro info from /etc/os-release...
+Configuring for Ubuntu 24.04...
+
+WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+
+Hit:1 http://security.ubuntu.com/ubuntu noble-security InRelease
+Hit:2 http://archive.ubuntu.com/ubuntu noble InRelease
+Hit:3 http://archive.ubuntu.com/ubuntu noble-updates InRelease
+Hit:4 http://archive.ubuntu.com/ubuntu noble-backports InRelease
+Reading package lists...
+Building dependency tree...
+Reading state information...
+6 packages can be upgraded. Run 'apt list --upgradable' to see them.
+
+WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+
+Reading package lists...
+Building dependency tree...
+Reading state information...
+E: Unable to locate package packages-microsoft-prod
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100  4288  100  4288    0     0  41111      0 --:--:-- --:--:-- --:--:-- 41230
+Selecting previously unselected package packages-microsoft-prod.
+(Reading database ... 77393 files and directories currently installed.)
+Preparing to unpack .../packages-microsoft-prod.deb ...
+Unpacking packages-microsoft-prod (1.2-ubuntu24.04) ...
+Setting up packages-microsoft-prod (1.2-ubuntu24.04) ...
+Hit:1 http://security.ubuntu.com/ubuntu noble-security InRelease
+Get:2 https://packages.microsoft.com/ubuntu/24.04/prod noble InRelease [3600 B]
+Hit:3 http://archive.ubuntu.com/ubuntu noble InRelease
+Hit:4 http://archive.ubuntu.com/ubuntu noble-updates InRelease
+Hit:5 http://archive.ubuntu.com/ubuntu noble-backports InRelease
+Get:6 https://packages.microsoft.com/ubuntu/24.04/prod noble/main arm64 Packages [79.3 kB]
+Get:7 https://packages.microsoft.com/ubuntu/24.04/prod noble/main all Packages [643 B]
+Get:8 https://packages.microsoft.com/ubuntu/24.04/prod noble/main amd64 Packages [101 kB]
+Get:9 https://packages.microsoft.com/ubuntu/24.04/prod noble/main armhf Packages [11.4 kB]
+Fetched 196 kB in 1s (184 kB/s)
+Reading package lists...
+
+WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+
+Reading package lists...
+Building dependency tree...
+Reading state information...
+The following NEW packages will be installed:
+  azcmagent
+0 upgraded, 1 newly installed, 0 to remove and 6 not upgraded.
+Need to get 86.5 MB of archives.
+After this operation, 0 B of additional disk space will be used.
+Get:1 https://packages.microsoft.com/ubuntu/24.04/prod noble/main amd64 azcmagent amd64 1.61.03319.859 [86.5 MB]
+Fetched 86.5 MB in 19s (4612 kB/s)
+Selecting previously unselected package azcmagent.
+(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 77410 files and directories currently installed.)
+Preparing to unpack .../azcmagent_1.61.03319.859_amd64.deb ...
+Preinstall...install
+Creating himds group ...
+Creating himds account ...
+Creating arcproxy account ...
+Applying udev rule to access TPM...
+No TPM device detected
+Unpacking azcmagent (1.61.03319.859) ...
+Setting up azcmagent (1.61.03319.859) ...
+Postinstall...configure
+Creating new /var/opt/azcmagent/agentconfig.json
+Creating new /etc/cron.d/azcmagent_autoupgrade
+Netstat not installed.  Skipping IP port checking. The service needs to listen on 40342
+Created symlink /etc/systemd/system/multi-user.target.wants/himdsd.service → /usr/lib/systemd/system/himdsd.service.
+Checked guest config disabled: 
+Checked ext service disabled: 
+Checked arc proxy enabled: 0
+Enabling arcproxyd
+Created symlink /etc/systemd/system/multi-user.target.wants/arcproxyd.service → /usr/lib/systemd/system/arcproxyd.service.
+Getting status via systemd
+Arc GC service is not running.
+Configuring Arc GC service ...
+Found systemd service controller...for Arc GC Service
+Created symlink /etc/systemd/system/multi-user.target.wants/gcad.service → /usr/lib/systemd/system/gcad.service.
+Service configured through systemd service controller. Gc Service
+Enabling gcad
+Getting status via systemd
+Arc GC service is not running.
+STARTING Arc GC
+Getting status via systemd
+EXT service is not running.
+Configuring EXT service ...
+Found systemd service controller...for Extension Service
+Created symlink /etc/systemd/system/multi-user.target.wants/extd.service → /usr/lib/systemd/system/extd.service.
+Created symlink /etc/systemd/system/himdsd.service.wants/extd.service → /usr/lib/systemd/system/extd.service.
+Service configured through systemd service controller. Extension Service
+Enabling extd
+STARTING EXT
+
+Running kernel seems to be up-to-date.
+
+No services need to be restarted.
+
+No containers need to be restarted.
+
+No user sessions are running outdated binaries.
+
+No VM guests are running outdated hypervisor (qemu) binaries on this host.
+Latest version of azcmagent is installed.
+EXIT_CODE:0

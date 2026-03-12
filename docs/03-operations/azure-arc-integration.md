@@ -301,9 +301,76 @@ Rollback is clean and complete:
 
 ---
 
+## DR Terraform Freeze Decision (2026-03-12)
+
+> **Decision: `terraform apply` was NOT executed for `infra/terraform/envs/dr-fce`.**
+
+### Background
+
+On 2026-03-12, a `terraform plan` was run against the DR environment (`envs/dr-fce`) as part of a
+pre-Arc infrastructure audit. The plan succeeded with no errors, but proposed the following
+destructive change:
+
+```
+# azurerm_linux_virtual_machine.pg_dr must be replaced   (-/+)
+  ~ custom_data = (sensitive value)  # forces replacement
+```
+
+The VM replacement cascade included:
+- `azurerm_linux_virtual_machine.pg_dr` — destroy + recreate
+- `azurerm_dev_test_global_vm_shutdown_schedule.pg_dr[0]` — cascades from VM ID change
+- `azurerm_monitor_data_collection_rule_association.pg_dr` — cascades from VM ID change
+- `azurerm_virtual_machine_extension.pg_dr_ama` — cascades from VM ID change
+- `azurerm_role_assignment.pg_dr_kv_secrets_user` — cascades from managed identity change
+
+### Root Cause
+
+The `custom_data` field on `azurerm_linux_virtual_machine` contains the cloud-init WireGuard
+bootstrap script rendered from `cloud_init.tftpl`, which includes the sensitive `wg_azure_privkey`
+variable. Terraform hashes `custom_data` as a base64-encoded sensitive value and cannot diff it
+against the live state — any supply of `TF_VAR_wg_azure_privkey` causes it to appear changed,
+triggering a forced VM replacement.
+
+This is **expected Terraform behavior** for cloud-init/bootstrap data on existing VMs. The live
+value in `terraform.tfstate` (serial 34) was already applied when the DR VM was provisioned. The
+tfvars values (`location=francecentral`, `pg_dr_vm_size=Standard_B2ats_v2`,
+`pg_dr_allowed_ssh_cidrs=["10.200.0.1/32"]`, `pg_dr_onprem_cidrs=["10.200.0.1/32"]`) are all
+correct and match the deployed state exactly. There is no misconfiguration.
+
+### Decision
+
+The DR VM (`vm-pg-dr-fce`) is **operational and stable**:
+- WireGuard tunnel between `10.200.0.1` (pg-primary) and `10.200.0.2` (DR VM) is active
+- PostgreSQL streaming replication (`10.0.96.14` + `10.200.0.2`) is confirmed running
+- Azure Monitor Agent extension is deployed and sending telemetry
+
+Recreating the VM would:
+- Drop WireGuard connectivity during the rebuild window
+- Interrupt streaming replication (requiring standby re-sync)
+- Introduce unnecessary risk to the demo-ready environment
+- Produce a new managed identity principal_id, requiring KV role-assignment recreation
+
+**The team intentionally chose not to apply the Terraform plan.** The plan binary was saved at
+`/tmp/tfplan-dr-fce-20260312.bin` as reference evidence only.
+
+### Action Required Before Any Future Apply
+
+If the DR VM must be recreated in future, the correct sequence is:
+
+1. Stop `pg_receivewal` / pause streaming replication gracefully
+2. Export `TF_VAR_wg_azure_privkey=$(cat /path/to/azure-wg-privkey)` from the stored key
+3. Promote pg-standby (Keepalived failover) before VIP loss
+4. Run `terraform apply` during a planned maintenance window
+5. Re-run Ansible WireGuard setup against new VM IP (public IP may change)
+6. Confirm replication resumes and re-validate with `--tags postcheck`
+
+---
+
 ## References
 
 - Assessment and planning doc: `docs/99-ai-appendix/azure-arc-assessment.md`
 - Ansible playbook: `infra/ansible/playbooks/arc-onboard-servers.yml`
 - Evidence index entry: `docs/05-evidence/evidence-index.md` → Arc row
 - Architecture diagram: `docs/01-architecture/architecture-diagram.md`
+- DR Terraform plan audit: `/tmp/tfplan-dr-fce-20260312.bin` (reference only — not applied)
+- Terraform plan output: `docs/05-evidence/outputs/dr-fce-terraform-plan-20260312.txt`

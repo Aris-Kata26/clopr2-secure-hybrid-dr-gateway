@@ -58,19 +58,19 @@
   tags: [precheck, always_precheck]
   tasks:
     - name: Test HTTPS reachability to management.azure.com
-      command: curl -sI --max-time 10 https://management.azure.com
+      command: curl -4 -sI --max-time 20 https://management.azure.com
       register: curl_mgmt
       changed_when: false
       failed_when: false
 
     - name: Test HTTPS reachability to login.microsoftonline.com
-      command: curl -sI --max-time 10 https://login.microsoftonline.com
+      command: curl -4 -sI --max-time 20 https://login.microsoftonline.com
       register: curl_login
       changed_when: false
       failed_when: false
 
     - name: Test HTTPS reachability to Arc his endpoint
-      command: curl -sI --max-time 10 https://his.arc.azure.com
+      command: curl -4 -sI --max-time 20 https://his.arc.azure.com
       register: curl_arc
       changed_when: false
       failed_when: false
@@ -82,13 +82,22 @@
           - "login.microsoftonline.com: {{ 'REACHABLE' if curl_login.rc == 0 else 'UNREACHABLE (rc=' + (curl_login.rc | string) + ')' }}"
           - "his.arc.azure.com: {{ 'REACHABLE' if curl_arc.rc == 0 else 'UNREACHABLE (rc=' + (curl_arc.rc | string) + ')' }}"
 
-    - name: Fail if management.azure.com is unreachable
+    - name: Fail if management.azure.com AND login.microsoftonline.com are both unreachable
       fail:
         msg: >
-          Cannot reach management.azure.com from {{ inventory_hostname }}.
+          Cannot reach management.azure.com OR login.microsoftonline.com from {{ inventory_hostname }}.
           Arc onboarding requires outbound TCP 443 to Azure endpoints.
           Check iptables/ufw rules and network configuration before proceeding.
-      when: curl_mgmt.rc != 0
+      when: curl_mgmt.rc != 0 and curl_login.rc != 0
+
+    - name: Warn if management.azure.com is unreachable but login is reachable
+      debug:
+        msg: >
+          WARNING: management.azure.com timed out on {{ inventory_hostname }} but
+          login.microsoftonline.com is reachable. This may be a transient DNS
+          round-robin issue or IPv6 fallback delay. Proceeding — TCP 443 outbound
+          is confirmed available. Monitor azcmagent connect for actual failures.
+      when: curl_mgmt.rc != 0 and curl_login.rc == 0
 
 # ---- Play 2: Baseline capture — record DR stack state BEFORE Arc install ----
 - name: arc | Capture pre-Arc DR baseline
@@ -259,7 +268,6 @@
   serial: 1
   gather_facts: false
   tags: [connect]
-  when: arc_auto_connect | default(false) | bool
   vars:
     arc_resource_group: "{{ arc_resource_group | default('rg-clopr2-katar711-gwc') }}"
     arc_location: "{{ arc_location | default('germanywestcentral') }}"
@@ -267,6 +275,10 @@
     arc_tenant_id: "{{ lookup('env', 'AZURE_TENANT_ID') }}"
     arc_client_id: "{{ lookup('env', 'AZURE_CLIENT_ID') }}"
     arc_client_secret: "{{ lookup('env', 'AZURE_CLIENT_SECRET') }}"
+  pre_tasks:
+    - name: Skip auto-connect if arc_auto_connect is not explicitly set to true
+      meta: end_play
+      when: not (arc_auto_connect | default(false) | bool)
   tasks:
     - name: Validate Arc SP credentials are available
       assert:

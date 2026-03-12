@@ -1,0 +1,177 @@
+nohup: ignoring input
+[WARNING]: Ansible is being run in a world writable directory
+(/mnt/c/Users/akata/Documents/Projects/CLOPR2/clopr2-secure-hybrid-dr-
+gateway/infra/ansible), ignoring it as an ansible.cfg source. For more
+information see
+https://docs.ansible.com/ansible/devel/reference_appendices/config.html#cfg-in-
+world-writable-dir
+
+PLAY [pg_primary | Patch pg_hba to allow WireGuard tunnel replication] *********
+
+TASK [Gathering Facts] *********************************************************
+ok: [pg-primary]
+
+TASK [Add WireGuard tunnel CIDR to pg_hba.conf on pg-primary] ******************
+ok: [pg-primary]
+
+TASK [Ensure pg-primary is listening and up to date] ***************************
+ok: [pg-primary]
+
+TASK [Print pg-primary status] *************************************************
+ok: [pg-primary] => {
+    "msg": "                                                                 version                                                                  | inet_server_addr | pg_current_wal_lsn \n------------------------------------------------------------------------------------------------------------------------------------------+------------------+--------------------\n PostgreSQL 16.13 (Ubuntu 16.13-0ubuntu0.24.04.1) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, 64-bit |                  | 0/3000B80\n(1 row)"
+}
+
+PLAY [pg_dr | Install PostgreSQL 16] *******************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [vm-pg-dr]
+
+TASK [postgres : Install prerequisite packages for PGDG apt repository] ********
+ok: [vm-pg-dr]
+
+TASK [postgres : Create /usr/share/postgresql-common/pgdg directory] ***********
+ok: [vm-pg-dr]
+
+TASK [postgres : Download PGDG apt signing key] ********************************
+ok: [vm-pg-dr]
+
+TASK [postgres : Add PGDG apt repository] **************************************
+ok: [vm-pg-dr]
+
+TASK [postgres : Install PostgreSQL 16] ****************************************
+ok: [vm-pg-dr]
+
+TASK [postgres : Ensure PostgreSQL service is started and enabled] *************
+ok: [vm-pg-dr]
+
+TASK [postgres : Set listen_addresses to *] ************************************
+ok: [vm-pg-dr]
+
+TASK [postgres : Set wal_level = replica] **************************************
+ok: [vm-pg-dr]
+
+TASK [postgres : Set max_wal_senders = 10] *************************************
+ok: [vm-pg-dr]
+
+TASK [postgres : Set wal_keep_size = 1024] *************************************
+ok: [vm-pg-dr]
+
+TASK [postgres : Set hot_standby = on] *****************************************
+ok: [vm-pg-dr]
+
+TASK [postgres : Allow replication connections in pg_hba.conf] *****************
+ok: [vm-pg-dr]
+
+TASK [postgres : Flush handlers to apply config before primary/standby roles] ***
+
+PLAY [pg_dr | Bootstrap standby via pg_basebackup from tunnel IP] **************
+
+TASK [Gathering Facts] *********************************************************
+ok: [vm-pg-dr]
+
+TASK [postgres_standby : Check if standby is already configured (standby.signal exists)] ***
+ok: [vm-pg-dr]
+
+TASK [postgres_standby : Stop PostgreSQL before base backup (only if standby not yet set up)] ***
+changed: [vm-pg-dr]
+
+TASK [postgres_standby : Remove existing data directory contents before base backup] ***
+changed: [vm-pg-dr]
+
+TASK [postgres_standby : Run pg_basebackup from primary] ***********************
+changed: [vm-pg-dr]
+
+TASK [postgres_standby : Print pg_basebackup output] ***************************
+ok: [vm-pg-dr] => {
+    "msg": ""
+}
+
+TASK [postgres_standby : Start PostgreSQL on standby] **************************
+changed: [vm-pg-dr]
+
+TASK [postgres_standby : Wait for PostgreSQL to be ready on standby] ***********
+ok: [vm-pg-dr]
+
+TASK [postgres_standby : Re-check standby.signal after setup] ******************
+ok: [vm-pg-dr]
+
+TASK [postgres_standby : Assert standby.signal exists] *************************
+ok: [vm-pg-dr] => {
+    "changed": false,
+    "msg": "standby.signal confirmed — standby is set up"
+}
+
+TASK [postgres_standby : Verify pg_is_in_recovery() on standby] ****************
+ok: [vm-pg-dr]
+
+TASK [postgres_standby : Show pg_is_in_recovery() result] **********************
+ok: [vm-pg-dr] => {
+    "msg": "pg_is_in_recovery() = t"
+}
+
+PLAY [pg_dr | Ensure WireGuard tunnel CIDR in pg_hba post-basebackup] **********
+
+TASK [Gathering Facts] *********************************************************
+ok: [vm-pg-dr]
+
+TASK [Add WireGuard tunnel CIDR to pg_hba.conf on DR VM] ***********************
+changed: [vm-pg-dr]
+
+RUNNING HANDLER [reload postgresql] ********************************************
+changed: [vm-pg-dr]
+
+PLAY [pg_dr | Verify streaming replication is active] **************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [vm-pg-dr]
+
+TASK [Check pg_is_in_recovery()] ***********************************************
+ok: [vm-pg-dr]
+
+TASK [Print recovery status] ***************************************************
+ok: [vm-pg-dr] => {
+    "msg": "DR VM pg_is_in_recovery() = t"
+}
+
+TASK [Assert pg_is_in_recovery() is true] **************************************
+ok: [vm-pg-dr] => {
+    "changed": false,
+    "msg": "pg_is_in_recovery() = t — DR standby is active"
+}
+
+TASK [Show WAL receiver status] ************************************************
+fatal: [vm-pg-dr]: FAILED! => {"changed": false, "cmd": "sudo -u postgres psql -c \"SELECT status, received_lsn, last_msg_receive_time,\n        sender_host, sender_port\n FROM pg_stat_wal_receiver;\"\n", "delta": "0:00:00.055791", "end": "2026-03-10 16:49:30.098629", "msg": "non-zero return code", "rc": 1, "start": "2026-03-10 16:49:30.042838", "stderr": "ERROR:  column \"received_lsn\" does not exist\nLINE 1: SELECT status, received_lsn, last_msg_receive_time,\n                       ^\nHINT:  Perhaps you meant to reference the column \"pg_stat_wal_receiver.received_tli\".", "stderr_lines": ["ERROR:  column \"received_lsn\" does not exist", "LINE 1: SELECT status, received_lsn, last_msg_receive_time,", "                       ^", "HINT:  Perhaps you meant to reference the column \"pg_stat_wal_receiver.received_tli\"."], "stdout": "", "stdout_lines": []}
+...ignoring
+
+TASK [Print WAL receiver status] ***********************************************
+ok: [vm-pg-dr] => {
+    "msg": ""
+}
+
+PLAY [pg_primary | Verify DR replica appears in pg_stat_replication] ***********
+
+TASK [Gathering Facts] *********************************************************
+ok: [pg-primary]
+
+TASK [Wait up to 60s for DR replica to connect] ********************************
+ok: [pg-primary]
+
+TASK [Show pg_stat_replication] ************************************************
+ok: [pg-primary]
+
+TASK [Print pg_stat_replication] ***********************************************
+ok: [pg-primary] => {
+    "msg": " client_addr | application_name |   state   | sync_state | sent_lsn  | write_lsn | flush_lsn | replay_lsn \n-------------+------------------+-----------+------------+-----------+-----------+-----------+------------\n 10.0.96.14  | 16/main          | streaming | async      | 0/5000060 | 0/5000060 | 0/5000060 | 0/5000060\n 10.200.0.2  | 16/main          | streaming | async      | 0/5000060 | 0/5000060 | 0/5000060 | 0/5000060\n(2 rows)"
+}
+
+TASK [Assert at least one replica is connected] ********************************
+ok: [pg-primary] => {
+    "changed": false,
+    "msg": "pg_stat_replication shows 2 replica(s) connected"
+}
+
+PLAY RECAP *********************************************************************
+pg-primary                 : ok=9    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+vm-pg-dr                   : ok=34   changed=6    unreachable=0    failed=0    skipped=0    rescued=0    ignored=1   
+

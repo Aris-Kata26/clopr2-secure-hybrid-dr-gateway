@@ -1,0 +1,146 @@
+[0m[1mazurerm_resource_group.dr: Refreshing state... [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-fce][0m
+[0m[1mdata.azurerm_client_config.current: Reading...[0m[0m
+[0m[1mdata.azurerm_client_config.current: Read complete after 0s [id=Y2xpZW50Q29uZmlncy9jbGllbnRJZD0wNGIwNzc5NS04ZGRiLTQ2MWEtYmJlZS0wMmY5ZTFiZjdiNDY7b2JqZWN0SWQ9ZTI1NzRlNDItMTA2MS00ZjE3LWFjNTctMjg3MjY3N2U3MzhlO3N1YnNjcmlwdGlvbklkPTk0ZTU3MDRhLWI0MTEtNDAyYi1hOGYzLWVmNDYzMDlmZTVmYjt0ZW5hbnRJZD01MzM4ZTBiYy1jOWEzLTQ3YmEtOGRkNS00Y2Y4YWUxOTFkOTk=][0m
+[0m[1mazurerm_key_vault.dr: Refreshing state... [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-fce/providers/Microsoft.KeyVault/vaults/kvclopr2katar711drfce][0m
+[0m[1mazurerm_consumption_budget_resource_group.dr: Refreshing state... [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-fce/providers/Microsoft.Consumption/budgets/budget-dr-fce][0m
+[0m[1mazurerm_public_ip.pg_dr_wg: Refreshing state... [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-fce/providers/Microsoft.Network/publicIPAddresses/vm-pg-dr-fce-wg-pip][0m
+[0m[1mazurerm_virtual_network.dr: Refreshing state... [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-fce/providers/Microsoft.Network/virtualNetworks/vnet-clopr2-dr-fce][0m
+[0m[1mazurerm_network_security_group.dr: Refreshing state... [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-fce/providers/Microsoft.Network/networkSecurityGroups/nsg-clopr2-dr-fce][0m
+[0m[1mazurerm_log_analytics_workspace.dr: Refreshing state... [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-fce/providers/Microsoft.OperationalInsights/workspaces/log-clopr2-dr-fce][0m
+[0m[1mazurerm_subnet.dr_mgmt: Refreshing state... [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-fce/providers/Microsoft.Network/virtualNetworks/vnet-clopr2-dr-fce/subnets/dr-mgmt-subnet][0m
+[0m[1mazurerm_key_vault_secret.pg_replication_password: Refreshing state... [id=https://kvclopr2katar711drfce.vault.azure.net/secrets/pg-replication-password/c611acae1eff4125b3f50728d9a80a5d][0m
+[0m[1mazurerm_network_security_rule.dr_wireguard: Refreshing state... [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-fce/providers/Microsoft.Network/networkSecurityGroups/nsg-clopr2-dr-fce/securityRules/allow-wireguard][0m
+[0m[1mazurerm_network_security_rule.dr_ssh[0]: Refreshing state... [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-fce/providers/Microsoft.Network/networkSecurityGroups/nsg-clopr2-dr-fce/securityRules/allow-ssh][0m
+[0m[1mazurerm_network_security_rule.dr_postgres[0]: Refreshing state... [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-fce/providers/Microsoft.Network/networkSecurityGroups/nsg-clopr2-dr-fce/securityRules/allow-postgres][0m
+[0m[1mazurerm_monitor_data_collection_rule.pg_dr: Refreshing state... [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-fce/providers/Microsoft.Insights/dataCollectionRules/dcr-vm-pg-dr-fce][0m
+[0m[1mazurerm_subnet_network_security_group_association.dr_mgmt: Refreshing state... [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-fce/providers/Microsoft.Network/virtualNetworks/vnet-clopr2-dr-fce/subnets/dr-mgmt-subnet][0m
+[0m[1mazurerm_network_interface.pg_dr: Refreshing state... [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-fce/providers/Microsoft.Network/networkInterfaces/vm-pg-dr-fce-nic][0m
+[0m[1mazurerm_linux_virtual_machine.pg_dr: Refreshing state... [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-fce/providers/Microsoft.Compute/virtualMachines/vm-pg-dr-fce][0m
+[0m[1mazurerm_monitor_data_collection_rule_association.pg_dr: Refreshing state... [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-fce/providers/Microsoft.Compute/virtualMachines/vm-pg-dr-fce/providers/Microsoft.Insights/dataCollectionRuleAssociations/dcr-vm-pg-dr-fce][0m
+[0m[1mazurerm_dev_test_global_vm_shutdown_schedule.pg_dr[0]: Refreshing state... [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-fce/providers/Microsoft.DevTestLab/schedules/shutdown-computevm-vm-pg-dr-fce][0m
+[0m[1mazurerm_virtual_machine_extension.pg_dr_ama: Refreshing state... [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-fce/providers/Microsoft.Compute/virtualMachines/vm-pg-dr-fce/extensions/AzureMonitorLinuxAgent][0m
+[0m[1mazurerm_role_assignment.pg_dr_kv_secrets_user: Refreshing state... [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-fce/providers/Microsoft.KeyVault/vaults/kvclopr2katar711drfce/providers/Microsoft.Authorization/roleAssignments/a41b5adb-e0ad-1b9f-a31a-5b3a4ac435ed][0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [33m~[0m update in-place[0m
+[31m-[0m/[32m+[0m destroy and then create replacement[0m
+
+Terraform will perform the following actions:
+
+[1m  # azurerm_dev_test_global_vm_shutdown_schedule.pg_dr[0][0m must be [1m[31mreplaced[0m
+[0m[31m-[0m/[32m+[0m[0m resource "azurerm_dev_test_global_vm_shutdown_schedule" "pg_dr" {
+      [33m~[0m[0m id                    = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-fce/providers/Microsoft.DevTestLab/schedules/shutdown-computevm-vm-pg-dr-fce" -> (known after apply)
+      [31m-[0m[0m tags                  = {} [90m-> null[0m[0m
+      [33m~[0m[0m virtual_machine_id    = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-fce/providers/Microsoft.Compute/virtualMachines/vm-pg-dr-fce" -> (known after apply) [31m# forces replacement[0m[0m
+        [90m# (4 unchanged attributes hidden)[0m[0m
+
+        [90m# (1 unchanged block hidden)[0m[0m
+    }
+
+[1m  # azurerm_linux_virtual_machine.pg_dr[0m must be [1m[31mreplaced[0m
+[0m[31m-[0m/[32m+[0m[0m resource "azurerm_linux_virtual_machine" "pg_dr" {
+      [33m~[0m[0m allow_extension_operations                             = true -> (known after apply)
+      [33m~[0m[0m computer_name                                          = "vm-pg-dr-fce" -> (known after apply)
+      [33m~[0m[0m custom_data                                            = (sensitive value) [31m# forces replacement[0m[0m
+      [32m+[0m[0m disk_controller_type                                   = (known after apply)
+      [31m-[0m[0m encryption_at_host_enabled                             = false [90m-> null[0m[0m
+      [33m~[0m[0m id                                                     = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-fce/providers/Microsoft.Compute/virtualMachines/vm-pg-dr-fce" -> (known after apply)
+        name                                                   = "vm-pg-dr-fce"
+      [33m~[0m[0m os_managed_disk_id                                     = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/RG-CLOPR2-KATAR711-FCE/providers/Microsoft.Compute/disks/vm-pg-dr-fce_OsDisk_1_90c43901e01d4bc19fa29640bb499b9a" -> (known after apply)
+      [33m~[0m[0m patch_assessment_mode                                  = "ImageDefault" -> (known after apply)
+      [33m~[0m[0m patch_mode                                             = "ImageDefault" -> (known after apply)
+      [33m~[0m[0m private_ip_address                                     = "10.20.2.4" -> (known after apply)
+      [33m~[0m[0m private_ip_addresses                                   = [
+          [31m-[0m[0m "10.20.2.4",
+        ] -> (known after apply)
+      [33m~[0m[0m provision_vm_agent                                     = true -> (known after apply)
+      [33m~[0m[0m public_ip_address                                      = "20.216.128.32" -> (known after apply)
+      [33m~[0m[0m public_ip_addresses                                    = [
+          [31m-[0m[0m "20.216.128.32",
+        ] -> (known after apply)
+      [31m-[0m[0m secure_boot_enabled                                    = false [90m-> null[0m[0m
+        tags                                                   = {
+            "Environment" = "dev"
+            "Owner"       = "KATAR711"
+            "Team"        = "BCLC24"
+        }
+      [33m~[0m[0m virtual_machine_id                                     = "cff5c9c5-cac6-44ec-9439-fdec2fb3daeb" -> (known after apply)
+      [33m~[0m[0m vm_agent_platform_updates_enabled                      = false -> (known after apply)
+      [31m-[0m[0m vtpm_enabled                                           = false [90m-> null[0m[0m
+        [90m# (24 unchanged attributes hidden)[0m[0m
+
+      [33m~[0m[0m identity {
+          [31m-[0m[0m identity_ids = [] [90m-> null[0m[0m
+          [33m~[0m[0m principal_id = "d4597344-8f0e-446f-b4ae-160d6842bf5e" -> (known after apply)
+          [33m~[0m[0m tenant_id    = "5338e0bc-c9a3-47ba-8dd5-4cf8ae191d99" -> (known after apply)
+            [90m# (1 unchanged attribute hidden)[0m[0m
+        }
+
+      [33m~[0m[0m os_disk {
+          [33m~[0m[0m id                               = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/RG-CLOPR2-KATAR711-FCE/providers/Microsoft.Compute/disks/vm-pg-dr-fce_OsDisk_1_90c43901e01d4bc19fa29640bb499b9a" -> (known after apply)
+          [33m~[0m[0m name                             = "vm-pg-dr-fce_OsDisk_1_90c43901e01d4bc19fa29640bb499b9a" -> (known after apply)
+            [90m# (7 unchanged attributes hidden)[0m[0m
+        }
+
+      [33m~[0m[0m termination_notification (known after apply)
+
+        [90m# (2 unchanged blocks hidden)[0m[0m
+    }
+
+[1m  # azurerm_monitor_data_collection_rule.pg_dr[0m will be updated in-place
+[0m  [33m~[0m[0m resource "azurerm_monitor_data_collection_rule" "pg_dr" {
+        id                          = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-fce/providers/Microsoft.Insights/dataCollectionRules/dcr-vm-pg-dr-fce"
+        name                        = "dcr-vm-pg-dr-fce"
+      [33m~[0m[0m tags                        = {
+          [31m-[0m[0m "Env"   = "Dev" [90m-> null[0m[0m
+          [31m-[0m[0m "Owner" = "KATAR711" [90m-> null[0m[0m
+          [31m-[0m[0m "Team"  = "BCLC24" [90m-> null[0m[0m
+        }
+        [90m# (6 unchanged attributes hidden)[0m[0m
+
+        [90m# (3 unchanged blocks hidden)[0m[0m
+    }
+
+[1m  # azurerm_monitor_data_collection_rule_association.pg_dr[0m must be [1m[31mreplaced[0m
+[0m[31m-[0m/[32m+[0m[0m resource "azurerm_monitor_data_collection_rule_association" "pg_dr" {
+      [33m~[0m[0m id                          = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-fce/providers/Microsoft.Compute/virtualMachines/vm-pg-dr-fce/providers/Microsoft.Insights/dataCollectionRuleAssociations/dcr-vm-pg-dr-fce" -> (known after apply)
+        name                        = "dcr-vm-pg-dr-fce"
+      [33m~[0m[0m target_resource_id          = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-fce/providers/Microsoft.Compute/virtualMachines/vm-pg-dr-fce" -> (known after apply) [31m# forces replacement[0m[0m
+        [90m# (3 unchanged attributes hidden)[0m[0m
+    }
+
+[1m  # azurerm_role_assignment.pg_dr_kv_secrets_user[0m must be [1m[31mreplaced[0m
+[0m[31m-[0m/[32m+[0m[0m resource "azurerm_role_assignment" "pg_dr_kv_secrets_user" {
+      [32m+[0m[0m condition_version                      = (known after apply)
+      [33m~[0m[0m id                                     = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-fce/providers/Microsoft.KeyVault/vaults/kvclopr2katar711drfce/providers/Microsoft.Authorization/roleAssignments/a41b5adb-e0ad-1b9f-a31a-5b3a4ac435ed" -> (known after apply)
+      [33m~[0m[0m name                                   = "a41b5adb-e0ad-1b9f-a31a-5b3a4ac435ed" -> (known after apply)
+      [33m~[0m[0m principal_id                           = "d4597344-8f0e-446f-b4ae-160d6842bf5e" -> (known after apply) [31m# forces replacement[0m[0m
+      [33m~[0m[0m principal_type                         = "ServicePrincipal" -> (known after apply)
+      [33m~[0m[0m role_definition_id                     = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/providers/Microsoft.Authorization/roleDefinitions/4633458b-17de-408a-b874-0445c86b69e6" -> (known after apply)
+      [32m+[0m[0m skip_service_principal_aad_check       = (known after apply)
+        [90m# (5 unchanged attributes hidden)[0m[0m
+    }
+
+[1m  # azurerm_virtual_machine_extension.pg_dr_ama[0m must be [1m[31mreplaced[0m
+[0m[31m-[0m/[32m+[0m[0m resource "azurerm_virtual_machine_extension" "pg_dr_ama" {
+      [31m-[0m[0m automatic_upgrade_enabled   = false [90m-> null[0m[0m
+      [33m~[0m[0m id                          = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-fce/providers/Microsoft.Compute/virtualMachines/vm-pg-dr-fce/extensions/AzureMonitorLinuxAgent" -> (known after apply)
+        name                        = "AzureMonitorLinuxAgent"
+      [31m-[0m[0m provision_after_extensions  = [] [90m-> null[0m[0m
+      [31m-[0m[0m tags                        = {} [90m-> null[0m[0m
+      [33m~[0m[0m virtual_machine_id          = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-fce/providers/Microsoft.Compute/virtualMachines/vm-pg-dr-fce" -> (known after apply) [31m# forces replacement[0m[0m
+        [90m# (5 unchanged attributes hidden)[0m[0m
+    }
+
+[1mPlan:[0m [0m5 to add, 1 to change, 5 to destroy.
+
+Changes to Outputs:
+  [33m~[0m[0m pg_dr_vm_id                 = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-fce/providers/Microsoft.Compute/virtualMachines/vm-pg-dr-fce" -> (known after apply)
+[90m
+─────────────────────────────────────────────────────────────────────────────[0m
+
+Saved the plan to: /tmp/tfplan-dr-fce-20260312.bin
+
+To perform exactly these actions, run the following command to apply:
+    terraform apply "/tmp/tfplan-dr-fce-20260312.bin"

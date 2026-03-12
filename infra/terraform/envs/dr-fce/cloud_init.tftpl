@@ -1,0 +1,33 @@
+#cloud-config
+# Bootstraps WireGuard on first boot so the tunnel is up before any Ansible runs.
+# SSH access to this VM is only allowed via the WireGuard tunnel (see NSG).
+
+packages:
+  - wireguard
+
+write_files:
+  - path: /etc/wireguard/privatekey
+    permissions: '0600'
+    owner: root:root
+    content: |
+      ${wg_azure_privkey}
+
+  - path: /etc/wireguard/wg0.conf
+    permissions: '0600'
+    owner: root:root
+    content: |
+      [Interface]
+      PrivateKey = ${wg_azure_privkey}
+      Address = ${wg_azure_tunnel_ip}/${wg_tunnel_prefix}
+      ListenPort = ${wg_listen_port}
+
+      [Peer]
+      # on-prem pg-primary
+      PublicKey = ${wg_onprem_pubkey}
+      AllowedIPs = ${wg_onprem_tunnel_ip}/32, 10.0.96.0/24
+
+runcmd:
+  - wg pubkey < /etc/wireguard/privatekey > /etc/wireguard/publickey
+  - chmod 644 /etc/wireguard/publickey
+  - systemctl enable wg-quick@wg0
+  - systemctl start wg-quick@wg0

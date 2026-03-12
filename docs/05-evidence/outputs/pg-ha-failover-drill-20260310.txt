@@ -1,0 +1,41 @@
+=== FAILOVER DRILL Tue Mar 10 13:16:24 UTC 2026 ===
+
+--- PRE-FAILOVER: VIP owner ---
+    inet 10.0.96.11/16 brd 10.0.255.255 scope global eth0
+    inet 10.0.96.10/16 scope global secondary eth0
+    inet6 fe80::be24:11ff:fe47:c333/64 scope link 
+    inet 10.0.96.14/16 brd 10.0.255.255 scope global eth0
+    inet6 fe80::be24:11ff:fe55:1d5e/64 scope link 
+
+--- STOPPING keepalived on pg-primary (simulate failure) ---
+--- POST-FAILOVER: VIP should now be on pg-standby ---
+    inet 10.0.96.11/16 brd 10.0.255.255 scope global eth0
+    inet6 fe80::be24:11ff:fe47:c333/64 scope link 
+    inet 10.0.96.14/16 brd 10.0.255.255 scope global eth0
+    inet 10.0.96.10/16 scope global secondary eth0
+    inet6 fe80::be24:11ff:fe55:1d5e/64 scope link 
+
+--- pg-standby keepalived state ---
+Mar 10 13:16:27 pg-standby Keepalived_vrrp[11204]: (pg_ha) Entering MASTER STATE
+
+=== FAILBACK: Restart keepalived on pg-primary ===
+--- POST-FAILBACK: VIP should return to pg-primary (MASTER, priority 100) ---
+    inet 10.0.96.11/16 brd 10.0.255.255 scope global eth0
+    inet 10.0.96.10/16 scope global secondary eth0
+    inet6 fe80::be24:11ff:fe47:c333/64 scope link 
+    inet 10.0.96.14/16 brd 10.0.255.255 scope global eth0
+    inet6 fe80::be24:11ff:fe55:1d5e/64 scope link 
+
+--- pg-primary keepalived state after failback ---
+Mar 10 13:16:33 pg-primary Keepalived_vrrp[13934]: (pg_ha) Warning - nopreempt will not work with initial state MASTER - clearing
+Mar 10 13:16:33 pg-primary Keepalived_vrrp[13934]: (pg_ha) Entering BACKUP STATE (init)
+Mar 10 13:16:33 pg-primary Keepalived[13933]: Startup complete
+Mar 10 13:16:33 pg-primary systemd[1]: Started keepalived.service - Keepalive Daemon (LVS and VRRP).
+Mar 10 13:16:33 pg-primary Keepalived_vrrp[13934]: VRRP_Script(chk_postgresql) succeeded
+Mar 10 13:16:34 pg-primary Keepalived_vrrp[13934]: (pg_ha) received lower priority (90) advert from 10.0.96.14 - discarding
+Mar 10 13:16:35 pg-primary Keepalived_vrrp[13934]: (pg_ha) received lower priority (90) advert from 10.0.96.14 - discarding
+Mar 10 13:16:36 pg-primary Keepalived_vrrp[13934]: (pg_ha) received lower priority (90) advert from 10.0.96.14 - discarding
+Mar 10 13:16:37 pg-primary Keepalived_vrrp[13934]: (pg_ha) received lower priority (90) advert from 10.0.96.14 - discarding
+Mar 10 13:16:37 pg-primary Keepalived_vrrp[13934]: (pg_ha) Entering MASTER STATE
+
+=== DRILL COMPLETE Tue Mar 10 13:16:40 UTC 2026 ===

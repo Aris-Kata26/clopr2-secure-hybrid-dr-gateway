@@ -1,0 +1,38 @@
+Resource Name                           : pg-primary
+Resource Group Name                     : rg-clopr2-katar711-gwc
+Resource Namespace                      : Microsoft.HybridCompute
+Resource Id                             : /subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.HybridCompute/machines/pg-primary
+Subscription ID                         : 94e5704a-b411-402b-a8f3-ef46309fe5fb
+Tenant ID                               : 5338e0bc-c9a3-47ba-8dd5-4cf8ae191d99
+VM ID                                   : 376427d7-0d9f-4486-8bbd-742930aad587
+Correlation ID                          : 4ae28776-2901-44f1-a00e-6773c8a12080
+VM UUID                                 : f0e9baa8-00c9-4bea-a9f9-1097ffa4af54
+Location                                : germanywestcentral
+Cloud                                   : AzureCloud
+Agent Version                           : 1.61.03319.859
+Agent Logfile                           : /var/opt/azcmagent/log/himds.log
+Agent Status                            : Connected
+Agent Last Heartbeat                    : 2026-03-12T12:50:57Z
+Agent Error Code                        : 
+Agent Error Details                     : 
+Agent Error Timestamp                   : 
+Using HTTPS Proxy                       : 
+Proxy Bypass List                       : 
+Upstream Proxy                          : 
+Gateway URL                             : 
+Cloud Provider                          : N/A
+Cloud Metadata
+Manufacturer                            : QEMU
+Model                                   : Standard PC (Q35 + ICH9, 2009)
+MSSQL Server Detected                   : false
+MySQL Server Detected                   : false
+PGSQL Server Detected                   : true
+Dependent Service Status
+  Agent Service (himdsd)                : active
+  Azure Arc Proxy (arcproxyd)           : active
+  Extension Service (extd)              : active
+  GC Service (gcad)                     : active
+Portal Page                             : https://portal.azure.com/#@5338e0bc-c9a3-47ba-8dd5-4cf8ae191d99/resource/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.HybridCompute/machines/pg-primary/overview
+Disabled Features                       : 
+Agent Auto Upgrade Task Status          : enabled, id: /etc/cron.d/azcmagent_autoupgrade
+

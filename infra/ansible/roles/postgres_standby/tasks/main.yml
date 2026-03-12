@@ -1,0 +1,70 @@
+---
+# All postgresql commands use 'sudo -u postgres' to avoid Ansible become_user ACL issues
+
+- name: Check if standby is already configured (standby.signal exists)
+  stat:
+    path: "{{ pg_data_dir }}/standby.signal"
+  register: standby_signal
+
+- name: Stop PostgreSQL before base backup (only if standby not yet set up)
+  systemd:
+    name: postgresql
+    state: stopped
+  when: not standby_signal.stat.exists
+
+- name: Remove existing data directory contents before base backup
+  shell: "rm -rf {{ pg_data_dir }}/*"
+  when: not standby_signal.stat.exists
+
+- name: Run pg_basebackup from primary
+  shell: >
+    sudo -u postgres env PGPASSWORD="{{ pg_replication_password }}"
+    pg_basebackup
+    -h {{ pg_primary_host }}
+    -p {{ pg_primary_port }}
+    -D {{ pg_data_dir }}
+    -U {{ pg_replication_user }}
+    -Fp -Xs -P -R
+    --checkpoint=fast
+  when: not standby_signal.stat.exists
+  register: basebackup_result
+  no_log: false
+
+- name: Print pg_basebackup output
+  debug:
+    msg: "{{ basebackup_result.stdout | default('pg_basebackup skipped (already configured)') }}"
+
+- name: Start PostgreSQL on standby
+  systemd:
+    name: postgresql
+    state: started
+  when: not standby_signal.stat.exists
+
+- name: Wait for PostgreSQL to be ready on standby
+  wait_for:
+    port: 5432
+    host: 127.0.0.1
+    timeout: 30
+
+- name: Re-check standby.signal after setup
+  stat:
+    path: "{{ pg_data_dir }}/standby.signal"
+  register: standby_signal_post
+
+- name: Assert standby.signal exists
+  assert:
+    that:
+      - standby_signal_post.stat.exists
+    fail_msg: "standby.signal not found — pg_basebackup may have failed"
+    success_msg: "standby.signal confirmed — standby is set up"
+
+- name: Verify pg_is_in_recovery() on standby
+  shell: "sudo -u postgres psql -tc \"SELECT pg_is_in_recovery();\" | tr -d ' \\n'"
+  register: recovery_check
+  changed_when: false
+  failed_when: "'t' not in recovery_check.stdout"
+
+- name: Show pg_is_in_recovery() result
+  debug:
+    msg: "pg_is_in_recovery() = {{ recovery_check.stdout | trim }}"
+

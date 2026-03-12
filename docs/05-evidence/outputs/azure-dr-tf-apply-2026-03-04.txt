@@ -1,0 +1,164 @@
+data.azurerm_client_config.current: Reading...
+azurerm_resource_group.this: Refreshing state... [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc]
+data.azurerm_client_config.current: Read complete after 0s [id=Y2xpZW50Q29uZmlncy9jbGllbnRJZD0wNGIwNzc5NS04ZGRiLTQ2MWEtYmJlZS0wMmY5ZTFiZjdiNDY7b2JqZWN0SWQ9ZTI1NzRlNDItMTA2MS00ZjE3LWFjNTctMjg3MjY3N2U3MzhlO3N1YnNjcmlwdGlvbklkPTk0ZTU3MDRhLWI0MTEtNDAyYi1hOGYzLWVmNDYzMDlmZTVmYjt0ZW5hbnRJZD01MzM4ZTBiYy1jOWEzLTQ3YmEtOGRkNS00Y2Y4YWUxOTFkOTk=]
+module.network.azurerm_network_security_group.this["aks-subnet"]: Refreshing state... [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/networkSecurityGroups/vnet-clopr2-dev-gwc-aks-nsg]
+azurerm_recovery_services_vault.pg_dr[0]: Refreshing state... [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.RecoveryServices/vaults/rsv-clopr2-dr]
+module.keyvault.azurerm_key_vault.this: Refreshing state... [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.KeyVault/vaults/kvclopr2katarweu01gwc]
+module.loganalytics.azurerm_log_analytics_workspace.this: Refreshing state... [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.OperationalInsights/workspaces/log-clopr2-dev-gwc]
+module.network.azurerm_virtual_network.this: Refreshing state... [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/virtualNetworks/vnet-clopr2-dev-gwc]
+module.network.azurerm_network_security_group.this["mgmt-subnet"]: Refreshing state... [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/networkSecurityGroups/vnet-clopr2-dev-gwc-mgmt-nsg]
+module.network.azurerm_subnet.this["aks-subnet"]: Refreshing state... [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/virtualNetworks/vnet-clopr2-dev-gwc/subnets/aks-subnet]
+module.network.azurerm_subnet.this["mgmt-subnet"]: Refreshing state... [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/virtualNetworks/vnet-clopr2-dev-gwc/subnets/mgmt-subnet]
+azurerm_network_security_rule.pg_dr_postgres[0]: Refreshing state... [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/networkSecurityGroups/vnet-clopr2-dev-gwc-mgmt-nsg/securityRules/allow-postgres]
+azurerm_network_security_rule.pg_dr_ssh[0]: Refreshing state... [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/networkSecurityGroups/vnet-clopr2-dev-gwc-mgmt-nsg/securityRules/allow-ssh]
+module.network.azurerm_subnet_network_security_group_association.this["mgmt-subnet"]: Refreshing state... [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/virtualNetworks/vnet-clopr2-dev-gwc/subnets/mgmt-subnet]
+module.network.azurerm_subnet_network_security_group_association.this["aks-subnet"]: Refreshing state... [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/virtualNetworks/vnet-clopr2-dev-gwc/subnets/aks-subnet]
+azurerm_network_interface.pg_dr: Refreshing state... [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/networkInterfaces/vm-pg-dr-nic]
+azurerm_monitor_data_collection_rule.pg_dr: Refreshing state... [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Insights/dataCollectionRules/dcr-vm-pg-dr]
+azurerm_backup_policy_vm.pg_dr[0]: Refreshing state... [id=/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.RecoveryServices/vaults/rsv-clopr2-dr/backupPolicies/policy-pg-dr]
+azurerm_key_vault_secret.pg_replication_password: Refreshing state... [id=https://kvclopr2katarweu01gwc.vault.azure.net/secrets/pg-replication-password/540314650cda4c5aa6308efe0739ed6f]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # azurerm_backup_protected_vm.pg_dr[0] will be created
+  + resource "azurerm_backup_protected_vm" "pg_dr" {
+      + backup_policy_id    = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.RecoveryServices/vaults/rsv-clopr2-dr/backupPolicies/policy-pg-dr"
+      + id                  = (known after apply)
+      + protection_state    = (known after apply)
+      + recovery_vault_name = "rsv-clopr2-dr"
+      + resource_group_name = "rg-clopr2-katar711-gwc"
+      + source_vm_id        = (known after apply)
+    }
+
+  # azurerm_dev_test_global_vm_shutdown_schedule.pg_dr[0] will be created
+  + resource "azurerm_dev_test_global_vm_shutdown_schedule" "pg_dr" {
+      + daily_recurrence_time = "2300"
+      + enabled               = true
+      + id                    = (known after apply)
+      + location              = "germanywestcentral"
+      + timezone              = "W. Europe Standard Time"
+      + virtual_machine_id    = (known after apply)
+
+      + notification_settings {
+          + enabled         = false
+          + time_in_minutes = 30
+        }
+    }
+
+  # azurerm_linux_virtual_machine.pg_dr will be created
+  + resource "azurerm_linux_virtual_machine" "pg_dr" {
+      + admin_username                                         = "azureuser"
+      + allow_extension_operations                             = (known after apply)
+      + bypass_platform_safety_checks_on_user_schedule_enabled = false
+      + computer_name                                          = (known after apply)
+      + disable_password_authentication                        = true
+      + disk_controller_type                                   = (known after apply)
+      + extensions_time_budget                                 = "PT1H30M"
+      + id                                                     = (known after apply)
+      + location                                               = "germanywestcentral"
+      + max_bid_price                                          = -1
+      + name                                                   = "vm-pg-dr"
+      + network_interface_ids                                  = [
+          + "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Network/networkInterfaces/vm-pg-dr-nic",
+        ]
+      + os_managed_disk_id                                     = (known after apply)
+      + patch_assessment_mode                                  = (known after apply)
+      + patch_mode                                             = (known after apply)
+      + platform_fault_domain                                  = -1
+      + priority                                               = "Regular"
+      + private_ip_address                                     = (known after apply)
+      + private_ip_addresses                                   = (known after apply)
+      + provision_vm_agent                                     = (known after apply)
+      + public_ip_address                                      = (known after apply)
+      + public_ip_addresses                                    = (known after apply)
+      + resource_group_name                                    = "rg-clopr2-katar711-gwc"
+      + size                                                   = "Standard_B1s"
+      + tags                                                   = {
+          + "Environment" = "dev"
+          + "Owner"       = "KATAR711"
+          + "Team"        = "BCLC24"
+        }
+      + virtual_machine_id                                     = (known after apply)
+      + vm_agent_platform_updates_enabled                      = (known after apply)
+
+      + admin_ssh_key {
+          + public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE0wgUwPk532ofKDeivuPL6wzp6cupTyx1Ci873ieQpj katar711@school"
+          + username   = "azureuser"
+        }
+
+      + identity {
+          + principal_id = (known after apply)
+          + tenant_id    = (known after apply)
+          + type         = "SystemAssigned"
+        }
+
+      + os_disk {
+          + caching                   = "ReadWrite"
+          + disk_size_gb              = (known after apply)
+          + id                        = (known after apply)
+          + name                      = (known after apply)
+          + storage_account_type      = "StandardSSD_LRS"
+          + write_accelerator_enabled = false
+        }
+
+      + source_image_reference {
+          + offer     = "0001-com-ubuntu-server-jammy"
+          + publisher = "Canonical"
+          + sku       = "22_04-lts"
+          + version   = "latest"
+        }
+
+      + termination_notification (known after apply)
+    }
+
+  # azurerm_monitor_data_collection_rule_association.pg_dr will be created
+  + resource "azurerm_monitor_data_collection_rule_association" "pg_dr" {
+      + data_collection_rule_id = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Insights/dataCollectionRules/dcr-vm-pg-dr"
+      + id                      = (known after apply)
+      + name                    = "dcr-vm-pg-dr"
+      + target_resource_id      = (known after apply)
+    }
+
+  # azurerm_role_assignment.pg_dr_kv_secrets_user will be created
+  + resource "azurerm_role_assignment" "pg_dr_kv_secrets_user" {
+      + condition_version                = (known after apply)
+      + id                               = (known after apply)
+      + name                             = (known after apply)
+      + principal_id                     = (known after apply)
+      + principal_type                   = (known after apply)
+      + role_definition_id               = (known after apply)
+      + role_definition_name             = "Key Vault Secrets User"
+      + scope                            = "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.KeyVault/vaults/kvclopr2katarweu01gwc"
+      + skip_service_principal_aad_check = (known after apply)
+    }
+
+  # azurerm_virtual_machine_extension.pg_dr_ama will be created
+  + resource "azurerm_virtual_machine_extension" "pg_dr_ama" {
+      + auto_upgrade_minor_version  = true
+      + failure_suppression_enabled = false
+      + id                          = (known after apply)
+      + name                        = "AzureMonitorLinuxAgent"
+      + publisher                   = "Microsoft.Azure.Monitor"
+      + type                        = "AzureMonitorLinuxAgent"
+      + type_handler_version        = "1.0"
+      + virtual_machine_id          = (known after apply)
+    }
+
+Plan: 6 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  + pg_dr_vm_id               = (known after apply)
+azurerm_linux_virtual_machine.pg_dr: Creating...
+
+Error: creating Linux Virtual Machine (Subscription: "94e5704a-b411-402b-a8f3-ef46309fe5fb"
+Resource Group Name: "rg-clopr2-katar711-gwc"
+Virtual Machine Name: "vm-pg-dr"): performing CreateOrUpdate: unexpected status 409 (409 Conflict) with error: SkuNotAvailable: The requested VM size for resource 'Following SKUs have failed for Capacity Restrictions: Standard_B1s' is currently not available in location 'GermanyWestCentral'. Please try another size or deploy to a different location or different zone. See https://aka.ms/azureskunotavailable for details.
+
+  with azurerm_linux_virtual_machine.pg_dr,
+  on main.tf line 113, in resource "azurerm_linux_virtual_machine" "pg_dr":
+ 113: resource "azurerm_linux_virtual_machine" "pg_dr" {
+

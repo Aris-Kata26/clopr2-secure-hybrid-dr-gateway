@@ -1,0 +1,22 @@
+---
+# WireGuard role defaults
+# Override per-host in group_vars or host_vars
+
+wg_iface: wg0
+wg_listen_port: 51820
+wg_tunnel_prefix: 30
+wg_key_dir: /etc/wireguard
+
+# wg_is_listener: true on the Azure DR VM (has public IP, accepts inbound)
+#                 false on pg-primary (behind NAT, initiates outbound)
+wg_is_listener: false
+
+# These MUST be set per host (see group_vars/<host>.yml):
+#   wg_tunnel_ip        — this host's tunnel IP (e.g. 10.200.0.1 or 10.200.0.2)
+#   wg_peer_tunnel_ip   — peer's tunnel IP
+#   wg_peer_allowed_ips — CIDR(s) routed through the tunnel to the peer
+#   wg_privkey          — this host's WireGuard private key (sensitive, ansible-vault)
+#   wg_peer_pubkey      — peer's WireGuard public key (not sensitive)
+#
+# Only on the client side (wg_is_listener: false):
+#   wg_peer_endpoint    — peer's public IP (Azure WireGuard pip after terraform apply)

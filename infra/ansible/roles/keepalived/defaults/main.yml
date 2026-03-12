@@ -1,0 +1,9 @@
+---
+keepalived_vip: "10.0.96.10"
+keepalived_vip_prefix: "16"
+keepalived_interface: "eth0"
+keepalived_vrid: 51
+keepalived_auth_pass: "REMOVED_SECRET"
+keepalived_check_interval: 2
+keepalived_check_rise: 2
+keepalived_check_fall: 3

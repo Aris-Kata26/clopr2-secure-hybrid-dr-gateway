@@ -1,0 +1,9 @@
+---
+# Shared WireGuard defaults for all wg_nodes group members.
+# Per-host identity vars (wg_tunnel_ip, wg_is_listener, wg_peer_*, wg_privkey, wg_peer_pubkey)
+# are set in each host's own group_vars file (pg_primary.yml, vm_pg_dr.yml).
+
+wg_iface: wg0
+wg_listen_port: 51820
+wg_tunnel_prefix: 30
+wg_key_dir: /etc/wireguard

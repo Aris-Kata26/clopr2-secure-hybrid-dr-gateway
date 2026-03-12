@@ -1,0 +1,6 @@
+WARNING: The command requires the extension connectedmachine. It will be installed first.
+Name        ResourceGroup           Location
+----------  ----------------------  ------------------
+pg-primary  rg-clopr2-katar711-gwc  germanywestcentral
+pg-standby  rg-clopr2-katar711-gwc  germanywestcentral
+app-onprem  rg-clopr2-katar711-gwc  germanywestcentral

@@ -1,0 +1,38 @@
+Resource Name                           : app-onprem
+Resource Group Name                     : rg-clopr2-katar711-gwc
+Resource Namespace                      : Microsoft.HybridCompute
+Resource Id                             : /subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.HybridCompute/machines/app-onprem
+Subscription ID                         : 94e5704a-b411-402b-a8f3-ef46309fe5fb
+Tenant ID                               : 5338e0bc-c9a3-47ba-8dd5-4cf8ae191d99
+VM ID                                   : f1983f8c-66dd-4585-9d14-ffebd289fbd2
+Correlation ID                          : 3581ff4e-fd08-42b2-b83e-92d63ea9e962
+VM UUID                                 : 20ea0cac-6ddb-40e6-998c-62f8fec12774
+Location                                : germanywestcentral
+Cloud                                   : AzureCloud
+Agent Version                           : 1.61.03319.859
+Agent Logfile                           : /var/opt/azcmagent/log/himds.log
+Agent Status                            : Connected
+Agent Last Heartbeat                    : 2026-03-12T13:11:42Z
+Agent Error Code                        : 
+Agent Error Details                     : 
+Agent Error Timestamp                   : 
+Using HTTPS Proxy                       : 
+Proxy Bypass List                       : 
+Upstream Proxy                          : 
+Gateway URL                             : 
+Cloud Provider                          : N/A
+Cloud Metadata
+Manufacturer                            : QEMU
+Model                                   : Standard PC (Q35 + ICH9, 2009)
+MSSQL Server Detected                   : false
+MySQL Server Detected                   : false
+PGSQL Server Detected                   : false
+Dependent Service Status
+  Agent Service (himdsd)                : active
+  Azure Arc Proxy (arcproxyd)           : active
+  Extension Service (extd)              : active
+  GC Service (gcad)                     : active
+Portal Page                             : https://portal.azure.com/#@5338e0bc-c9a3-47ba-8dd5-4cf8ae191d99/resource/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.HybridCompute/machines/app-onprem/overview
+Disabled Features                       : 
+Agent Auto Upgrade Task Status          : enabled, id: /etc/cron.d/azcmagent_autoupgrade
+

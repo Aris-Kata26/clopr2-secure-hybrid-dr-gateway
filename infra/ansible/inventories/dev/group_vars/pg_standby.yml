@@ -1,0 +1,4 @@
+---
+# Keepalived VRRP state for pg-standby
+keepalived_state: BACKUP
+keepalived_priority: 90

@@ -1,0 +1,24 @@
+---
+# Shared PostgreSQL HA variables — apply to both pg_primary and pg_standby
+pg_version: 16
+pg_data_dir: "/var/lib/postgresql/{{ pg_version }}/main"
+pg_conf_dir: "/etc/postgresql/{{ pg_version }}/main"
+
+pg_replication_user: replicator
+# NOTE: vault this in production — plain var for bootstrap
+pg_replication_password: "REMOVED_SECRET"
+
+pg_primary_host: "10.0.96.11"
+pg_primary_port: 5432
+
+pg_vip: "10.0.96.10"
+
+# Keepalived VIP settings
+keepalived_vip: "10.0.96.10"
+keepalived_vip_prefix: "16"
+keepalived_interface: "eth0"
+keepalived_vrid: 51
+keepalived_auth_pass: "REMOVED_SECRET"
+keepalived_check_interval: 2
+keepalived_check_rise: 2
+keepalived_check_fall: 3

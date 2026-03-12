@@ -1,0 +1,16 @@
+[Interface]
+PrivateKey = {{ wg_privkey }}
+Address = {{ wg_tunnel_ip }}/{{ wg_tunnel_prefix }}
+{% if wg_is_listener %}
+ListenPort = {{ wg_listen_port }}
+{% endif %}
+
+[Peer]
+# {{ wg_peer_host | default('peer') }}
+PublicKey = {{ wg_peer_pubkey }}
+AllowedIPs = {{ wg_peer_allowed_ips }}
+{% if not wg_is_listener and wg_peer_endpoint is defined and wg_peer_endpoint %}
+Endpoint = {{ wg_peer_endpoint }}:{{ wg_listen_port }}
+# PersistentKeepalive keeps the NAT mapping alive on the on-prem router
+PersistentKeepalive = 25
+{% endif %}

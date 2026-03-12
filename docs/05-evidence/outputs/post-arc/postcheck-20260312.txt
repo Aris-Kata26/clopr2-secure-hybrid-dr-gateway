@@ -1,0 +1,321 @@
+[WARNING]: Ansible is being run in a world writable directory
+(/mnt/c/Users/akata/Documents/Projects/CLOPR2/clopr2-secure-hybrid-dr-
+gateway/infra/ansible), ignoring it as an ansible.cfg source. For more
+information see
+https://docs.ansible.com/ansible/devel/reference_appendices/config.html#cfg-in-
+world-writable-dir
+
+PLAY [arc | Pre-check outbound connectivity to Azure endpoints] ****************
+
+PLAY [arc | Capture pre-Arc DR baseline] ***************************************
+
+PLAY [arc | Install Azure Connected Machine agent (azcmagent)] *****************
+
+PLAY [arc | Connect machines to Azure Arc (auto-connect with SP)] **************
+
+PLAY [arc | Connect machines to Azure Arc (auto-connect with SP)] **************
+
+PLAY [arc | Connect machines to Azure Arc (auto-connect with SP)] **************
+
+PLAY [arc | Post-Arc validation — confirm DR stack is unaffected] **************
+
+TASK [Get Arc agent status] ****************************************************
+ok: [app-onprem]
+ok: [pg-primary]
+ok: [pg-standby]
+
+TASK [Print Arc agent status] **************************************************
+ok: [pg-primary] => {
+    "arc_final_status.stdout_lines": [
+        "Resource Name                           : pg-primary",
+        "Resource Group Name                     : rg-clopr2-katar711-gwc",
+        "Resource Namespace                      : Microsoft.HybridCompute",
+        "Resource Id                             : /subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.HybridCompute/machines/pg-primary",
+        "Subscription ID                         : 94e5704a-b411-402b-a8f3-ef46309fe5fb",
+        "Tenant ID                               : 5338e0bc-c9a3-47ba-8dd5-4cf8ae191d99",
+        "VM ID                                   : 376427d7-0d9f-4486-8bbd-742930aad587",
+        "Correlation ID                          : 4ae28776-2901-44f1-a00e-6773c8a12080",
+        "VM UUID                                 : f0e9baa8-00c9-4bea-a9f9-1097ffa4af54",
+        "Location                                : germanywestcentral",
+        "Cloud                                   : AzureCloud",
+        "Agent Version                           : 1.61.03319.859",
+        "Agent Logfile                           : /var/opt/azcmagent/log/himds.log",
+        "Agent Status                            : Connected",
+        "Agent Last Heartbeat                    : 2026-03-12T13:15:58Z",
+        "Agent Error Code                        : ",
+        "Agent Error Details                     : ",
+        "Agent Error Timestamp                   : ",
+        "Using HTTPS Proxy                       : ",
+        "Proxy Bypass List                       : ",
+        "Upstream Proxy                          : ",
+        "Gateway URL                             : ",
+        "Cloud Provider                          : N/A",
+        "Cloud Metadata",
+        "Manufacturer                            : QEMU",
+        "Model                                   : Standard PC (Q35 + ICH9, 2009)",
+        "MSSQL Server Detected                   : false",
+        "MySQL Server Detected                   : false",
+        "PGSQL Server Detected                   : true",
+        "Dependent Service Status",
+        "  Agent Service (himdsd)                : active",
+        "  Azure Arc Proxy (arcproxyd)           : active",
+        "  Extension Service (extd)              : active",
+        "  GC Service (gcad)                     : active",
+        "Portal Page                             : https://portal.azure.com/#@5338e0bc-c9a3-47ba-8dd5-4cf8ae191d99/resource/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.HybridCompute/machines/pg-primary/overview",
+        "Disabled Features                       : ",
+        "Agent Auto Upgrade Task Status          : enabled, id: /etc/cron.d/azcmagent_autoupgrade"
+    ]
+}
+ok: [pg-standby] => {
+    "arc_final_status.stdout_lines": [
+        "Resource Name                           : pg-standby",
+        "Resource Group Name                     : rg-clopr2-katar711-gwc",
+        "Resource Namespace                      : Microsoft.HybridCompute",
+        "Resource Id                             : /subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.HybridCompute/machines/pg-standby",
+        "Subscription ID                         : 94e5704a-b411-402b-a8f3-ef46309fe5fb",
+        "Tenant ID                               : 5338e0bc-c9a3-47ba-8dd5-4cf8ae191d99",
+        "VM ID                                   : f3d2398b-ae0d-4f68-aebe-b10441ebff2d",
+        "Correlation ID                          : 272802d7-a313-4ded-8280-001db89075ab",
+        "VM UUID                                 : ad2bebaa-f064-4a5b-be1a-67947a3221f7",
+        "Location                                : germanywestcentral",
+        "Cloud                                   : AzureCloud",
+        "Agent Version                           : 1.61.03319.859",
+        "Agent Logfile                           : /var/opt/azcmagent/log/himds.log",
+        "Agent Status                            : Disconnected",
+        "Agent Last Heartbeat                    : 2026-03-12T13:10:16Z",
+        "Agent Error Code                        : Unable to communicate with service",
+        "Agent Error Details                     : Patch \"https://gbl.his.arc.azure.com/gwc/his/machine/f3d2398b-ae0d-4f68-aebe-b10441ebff2d/metadata?api-version=3.0-preview&location=germanywestcentral\": dial tcp: lookup gbl.his.arc.azure.com on 127.0.0.53:53: read udp 127.0.0.1:33670->127.0.0.53:53:",
+        "Agent Error Timestamp                   : 2026-03-12T13:15:32Z",
+        "Using HTTPS Proxy                       : ",
+        "Proxy Bypass List                       : ",
+        "Upstream Proxy                          : ",
+        "Gateway URL                             : ",
+        "Cloud Provider                          : N/A",
+        "Cloud Metadata",
+        "Manufacturer                            : QEMU",
+        "Model                                   : Standard PC (Q35 + ICH9, 2009)",
+        "MSSQL Server Detected                   : false",
+        "MySQL Server Detected                   : false",
+        "PGSQL Server Detected                   : true",
+        "Dependent Service Status",
+        "  Agent Service (himdsd)                : active",
+        "  Azure Arc Proxy (arcproxyd)           : active",
+        "  Extension Service (extd)              : active",
+        "  GC Service (gcad)                     : active",
+        "Portal Page                             : https://portal.azure.com/#@5338e0bc-c9a3-47ba-8dd5-4cf8ae191d99/resource/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.HybridCompute/machines/pg-standby/overview",
+        "Disabled Features                       : ",
+        "Agent Auto Upgrade Task Status          : enabled, id: /etc/cron.d/azcmagent_autoupgrade"
+    ]
+}
+ok: [app-onprem] => {
+    "arc_final_status.stdout_lines": [
+        "Resource Name                           : app-onprem",
+        "Resource Group Name                     : rg-clopr2-katar711-gwc",
+        "Resource Namespace                      : Microsoft.HybridCompute",
+        "Resource Id                             : /subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.HybridCompute/machines/app-onprem",
+        "Subscription ID                         : 94e5704a-b411-402b-a8f3-ef46309fe5fb",
+        "Tenant ID                               : 5338e0bc-c9a3-47ba-8dd5-4cf8ae191d99",
+        "VM ID                                   : f1983f8c-66dd-4585-9d14-ffebd289fbd2",
+        "Correlation ID                          : 3581ff4e-fd08-42b2-b83e-92d63ea9e962",
+        "VM UUID                                 : 20ea0cac-6ddb-40e6-998c-62f8fec12774",
+        "Location                                : germanywestcentral",
+        "Cloud                                   : AzureCloud",
+        "Agent Version                           : 1.61.03319.859",
+        "Agent Logfile                           : /var/opt/azcmagent/log/himds.log",
+        "Agent Status                            : Connected",
+        "Agent Last Heartbeat                    : 2026-03-12T13:11:42Z",
+        "Agent Error Code                        : ",
+        "Agent Error Details                     : ",
+        "Agent Error Timestamp                   : ",
+        "Using HTTPS Proxy                       : ",
+        "Proxy Bypass List                       : ",
+        "Upstream Proxy                          : ",
+        "Gateway URL                             : ",
+        "Cloud Provider                          : N/A",
+        "Cloud Metadata",
+        "Manufacturer                            : QEMU",
+        "Model                                   : Standard PC (Q35 + ICH9, 2009)",
+        "MSSQL Server Detected                   : false",
+        "MySQL Server Detected                   : false",
+        "PGSQL Server Detected                   : false",
+        "Dependent Service Status",
+        "  Agent Service (himdsd)                : active",
+        "  Azure Arc Proxy (arcproxyd)           : active",
+        "  Extension Service (extd)              : active",
+        "  GC Service (gcad)                     : active",
+        "Portal Page                             : https://portal.azure.com/#@5338e0bc-c9a3-47ba-8dd5-4cf8ae191d99/resource/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.HybridCompute/machines/app-onprem/overview",
+        "Disabled Features                       : ",
+        "Agent Auto Upgrade Task Status          : enabled, id: /etc/cron.d/azcmagent_autoupgrade"
+    ]
+}
+
+TASK [Confirm Arc Status is Connected] *****************************************
+ok: [pg-primary] => {
+    "msg": "Arc status on pg-primary: CONNECTED ✓\n"
+}
+ok: [pg-standby] => {
+    "msg": "Arc status on pg-standby: NOT YET CONNECTED — run azcmagent connect manually (see playbook header)\n"
+}
+ok: [app-onprem] => {
+    "msg": "Arc status on app-onprem: CONNECTED ✓\n"
+}
+
+TASK [Post-Arc — keepalived status check] **************************************
+skipping: [app-onprem]
+ok: [pg-primary]
+ok: [pg-standby]
+
+TASK [Assert keepalived still active post-Arc] *********************************
+ok: [pg-primary] => {
+    "changed": false,
+    "msg": "keepalived is active on pg-primary post-Arc install — VIP unaffected."
+}
+ok: [pg-standby] => {
+    "changed": false,
+    "msg": "keepalived is active on pg-standby post-Arc install — VIP unaffected."
+}
+skipping: [app-onprem]
+
+TASK [Post-Arc — WireGuard tunnel status (pg-primary only)] ********************
+skipping: [pg-standby]
+skipping: [app-onprem]
+ok: [pg-primary]
+
+TASK [Print WireGuard post-Arc status] *****************************************
+ok: [pg-primary] => {
+    "msg": [
+        "interface: wg0",
+        "  public key: Eux0XtJyGX6tdI+5J0ePgU+cgA2OZuuMUbBNG1wksjQ=",
+        "  private key: (hidden)",
+        "  listening port: 48533",
+        "",
+        "peer: aRTHX9qS0UbWgi/MKBw6UqE3KGSEpsrVhdt1cU+eIkQ=",
+        "  endpoint: 20.216.128.32:51820",
+        "  allowed ips: 10.200.0.2/32",
+        "  latest handshake: 21 hours, 43 minutes, 56 seconds ago",
+        "  transfer: 1.63 MiB received, 47.99 MiB sent",
+        "  persistent keepalive: every 25 seconds"
+    ]
+}
+ok: [pg-standby] => {
+    "msg": [
+        "(skipped)"
+    ]
+}
+ok: [app-onprem] => {
+    "msg": [
+        "(skipped)"
+    ]
+}
+
+TASK [Post-Arc — pg_stat_replication check (pg-primary only)] ******************
+skipping: [pg-standby]
+skipping: [app-onprem]
+ok: [pg-primary]
+
+TASK [Print pg_stat_replication post-Arc] **************************************
+ok: [pg-primary] => {
+    "msg": [
+        " client_addr |   state   | write_lag | replay_lag ",
+        "-------------+-----------+-----------+------------",
+        " 10.0.96.14  | streaming |           | ",
+        "(1 row)"
+    ]
+}
+ok: [pg-standby] => {
+    "msg": [
+        "(skipped)"
+    ]
+}
+ok: [app-onprem] => {
+    "msg": [
+        "(skipped)"
+    ]
+}
+
+TASK [Assert replication rows still present (pg-primary)] **********************
+skipping: [pg-standby]
+skipping: [app-onprem]
+ok: [pg-primary]
+
+TASK [Warn if replication count is 0 post-Arc] *********************************
+skipping: [pg-primary]
+skipping: [pg-standby]
+skipping: [app-onprem]
+
+TASK [Confirm replication intact post-Arc] *************************************
+skipping: [pg-standby]
+ok: [pg-primary] => {
+    "msg": "Replication confirmed — 1 replica(s) connected to pg-primary post-Arc install."
+}
+skipping: [app-onprem]
+
+TASK [Post-Arc — pg_is_in_recovery check (pg-standby only)] ********************
+skipping: [pg-primary]
+skipping: [app-onprem]
+ok: [pg-standby]
+
+TASK [Assert pg-standby still in recovery mode post-Arc] ***********************
+skipping: [pg-primary]
+ok: [pg-standby] => {
+    "changed": false,
+    "msg": "pg-standby correctly returns pg_is_in_recovery()=t post-Arc install."
+}
+skipping: [app-onprem]
+
+TASK [Check VIP still on pg-primary] *******************************************
+skipping: [pg-standby]
+skipping: [app-onprem]
+ok: [pg-primary]
+
+TASK [Assert VIP still active post-Arc] ****************************************
+ok: [pg-primary] => {
+    "changed": false,
+    "msg": "VIP 10.0.96.10 confirmed active on pg-primary post-Arc install."
+}
+skipping: [pg-standby]
+skipping: [app-onprem]
+
+TASK [Final summary] ***********************************************************
+ok: [pg-primary] => {
+    "msg": [
+        "=================================================",
+        "Arc onboarding status for pg-primary",
+        "=================================================",
+        "Arc connected: YES",
+        "keepalived: OK",
+        "VIP 10.0.96.10: PRESENT",
+        "WireGuard: UP",
+        "pg_stat_replication: 1 replica(s)"
+    ]
+}
+ok: [pg-standby] => {
+    "msg": [
+        "=================================================",
+        "Arc onboarding status for pg-standby",
+        "=================================================",
+        "Arc connected: NOT YET — run azcmagent connect manually",
+        "keepalived: OK",
+        "VIP 10.0.96.10: N/A (not pg-primary)",
+        "WireGuard: N/A (not pg-primary)",
+        "pg_stat_replication: N/A replica(s)"
+    ]
+}
+ok: [app-onprem] => {
+    "msg": [
+        "=================================================",
+        "Arc onboarding status for app-onprem",
+        "=================================================",
+        "Arc connected: YES",
+        "keepalived: N/A (not pg node)",
+        "VIP 10.0.96.10: N/A (not pg-primary)",
+        "WireGuard: N/A (not pg-primary)",
+        "pg_stat_replication: N/A replica(s)"
+    ]
+}
+
+PLAY RECAP *********************************************************************
+app-onprem                 : ok=6    changed=0    unreachable=0    failed=0    skipped=11   rescued=0    ignored=0   
+pg-primary                 : ok=14   changed=0    unreachable=0    failed=0    skipped=3    rescued=0    ignored=0   
+pg-standby                 : ok=10   changed=0    unreachable=0    failed=0    skipped=7    rescued=0    ignored=0   
+

@@ -1,0 +1,104 @@
+---
+# WireGuard tunnel setup — configures both peers and verifies connectivity
+# Usage:
+#   ansible-playbook playbooks/wg_tunnel.yml -i inventories/dev/hosts.ini --ask-vault-pass
+#
+# Pre-requisites:
+#   - wg_privkey and wg_peer_pubkey must be set via ansible-vault in each host's group_vars
+#   - pg-primary must already have a WireGuard keypair (see scripts/wg-keygen.sh)
+#   - Azure VM must be running (cloud-init bootstrapped WG at first boot)
+#   - pg_primary group_vars: wg_peer_endpoint must be filled with pg_dr_wg_public_ip from terraform output
+
+- name: Configure WireGuard on pg-primary (on-prem)
+  hosts: pg_primary
+  become: true
+  roles:
+    - wireguard
+
+- name: Configure WireGuard on pg-dr (Azure DR VM)
+  hosts: pg_dr
+  become: true
+  roles:
+    - wireguard
+
+# ── Verification Play A: on-prem pg-primary ──────────────────────────────────
+- name: Verify WireGuard from pg-primary (on-prem side)
+  hosts: pg_primary
+  become: true
+  tasks:
+    - name: wg show wg0 (must show latest handshake)
+      command: wg show wg0
+      register: wg_show_primary
+      changed_when: false
+      failed_when: wg_show_primary.rc != 0
+
+    - name: Print wg show (pg-primary)
+      debug:
+        var: wg_show_primary.stdout_lines
+
+    - name: ip route show dev wg0 (tunnel route must be present)
+      command: ip route show dev wg0
+      register: ip_route_primary
+      changed_when: false
+      failed_when: ip_route_primary.rc != 0
+
+    - name: Print ip route (pg-primary)
+      debug:
+        var: ip_route_primary.stdout_lines
+
+    - name: Ping Azure DR VM tunnel IP (10.200.0.2) from pg-primary
+      command: "ping -c 3 -W 5 {{ wg_peer_tunnel_ip }}"
+      register: ping_to_azure
+      changed_when: false
+      failed_when: ping_to_azure.rc != 0
+
+    - name: Print ping pg-primary → Azure
+      debug:
+        var: ping_to_azure.stdout_lines
+
+    # Run ONLY after PostgreSQL DR replica bootstrap is complete.
+    # Fails safely with ignore_errors during WireGuard-only verification.
+    - name: nc probe PostgreSQL port 5432 over WireGuard (post-PG-bootstrap only)
+      command: "nc -zv {{ wg_peer_tunnel_ip }} 5432"
+      register: nc_postgres
+      changed_when: false
+      ignore_errors: true
+
+    - name: Print nc result (expected failure before PG bootstrap)
+      debug:
+        msg: "nc 5432: {{ 'OPEN' if nc_postgres.rc == 0 else 'CLOSED/REFUSED (expected before PG bootstrap)' }}"
+
+# ── Verification Play B: Azure DR VM ─────────────────────────────────────────
+- name: Verify WireGuard from pg-dr (Azure side)
+  hosts: pg_dr
+  become: true
+  tasks:
+    - name: wg show wg0 (must show latest handshake)
+      command: wg show wg0
+      register: wg_show_azure
+      changed_when: false
+      failed_when: wg_show_azure.rc != 0
+
+    - name: Print wg show (pg-dr)
+      debug:
+        var: wg_show_azure.stdout_lines
+
+    - name: ip route show dev wg0 (tunnel route must be present)
+      command: ip route show dev wg0
+      register: ip_route_azure
+      changed_when: false
+      failed_when: ip_route_azure.rc != 0
+
+    - name: Print ip route (pg-dr)
+      debug:
+        var: ip_route_azure.stdout_lines
+
+    - name: Ping pg-primary tunnel IP (10.200.0.1) from Azure VM
+      command: "ping -c 3 -W 5 {{ wg_peer_tunnel_ip }}"
+      register: ping_to_onprem
+      changed_when: false
+      failed_when: ping_to_onprem.rc != 0
+
+    - name: Print ping Azure → pg-primary
+      debug:
+        var: ping_to_onprem.stdout_lines

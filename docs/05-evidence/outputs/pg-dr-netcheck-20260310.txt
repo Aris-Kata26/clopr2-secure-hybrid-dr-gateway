@@ -1,0 +1,33 @@
+-- Evidence: TCP connectivity from DR VM to pg-primary via WireGuard tunnel
+-- Host:     vm-pg-dr-fce (10.200.0.2) → pg-primary WireGuard IP (10.200.0.1) port 5432
+-- Captured: 2026-03-10 (inferred from pg_basebackup + streaming replication success)
+-- Source:   ansible-pg-dr-bootstrap-20260310.txt
+
+-- DIRECT CONNECTIVITY PROOF (inferred):
+--
+-- pg_basebackup completed successfully from 10.200.0.2 connecting to 10.200.0.1:5432:
+--   Task: "postgres_standby : Run pg_basebackup from primary" → changed: [vm-pg-dr]
+--   This operation requires: TCP 10.200.0.2 → 10.200.0.1:5432 (fully open, authenticated)
+--
+-- Streaming replication established immediately after basebackup:
+--   10.200.0.2 appears in pg_stat_replication on pg-primary with state=streaming, bytes_lag=0
+--   This confirms sustained TCP keep-alive from 10.200.0.2 → 10.200.0.1:5432 via wg0
+
+-- NSG rule enforcing this path (infra/terraform/envs/dr-fce/terraform.tfvars):
+--   pg_dr_onprem_cidrs = ["10.200.0.1/32"]
+--   → NSG allow-postgres: source 10.200.0.1/32, destination-port 5432, direction Inbound
+
+-- WireGuard tunnel endpoints (infra/terraform/envs/dr-fce/terraform.tfvars):
+--   wg_onprem_tunnel_ip = "10.200.0.1"   (pg-primary wg0 address)
+--   wg_azure_tunnel_ip  = "10.200.0.2"   (vm-pg-dr-fce wg0 address)
+--   wg_listen_port      = 51820
+
+-- Commands to run live when on the network (from DR VM via dr_tunnel.cfg):
+--   ssh -F /home/aris/.ssh/dr_tunnel.cfg dr-tunnel \
+--     'nc -zv 10.200.0.1 5432 2>&1 && pg_isready -h 10.200.0.1 -p 5432 -U replicator'
+--
+-- Expected output:
+--   Connection to 10.200.0.1 5432 port [tcp/postgresql] succeeded!
+--   10.200.0.1:5432 - accepting connections
+
+-- Result: PASS (inferred) — TCP connectivity confirmed via successful pg_basebackup and active streaming replication

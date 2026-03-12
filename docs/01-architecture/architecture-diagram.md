@@ -22,3 +22,11 @@ This document describes the components shown in the architecture diagram files:
 ## Failover behavior
 - On-prem VM failure: VIP moves to pg-standby and it is promoted.
 - Site failure: Azure VM replica is promoted; Traffic Manager directs traffic to Azure.
+
+## Azure Arc — Hybrid Management Layer (additional sprint task, 2026-03-12)
+- pg-primary, pg-standby, and app-onprem are onboarded as Arc-enabled servers.
+- All three appear in Azure Resource Manager under rg-clopr2-katar711-gwc.
+- Arc provides unified portal visibility, Azure Policy guest configuration, and Defender for Cloud coverage for the on-prem tier.
+- The Arc management plane communicates outbound HTTPS only and does NOT interact with PostgreSQL replication, Keepalived, or WireGuard.
+- Arc does NOT replace or modify any component of the DR path.
+- Reference: docs/03-operations/azure-arc-integration.md

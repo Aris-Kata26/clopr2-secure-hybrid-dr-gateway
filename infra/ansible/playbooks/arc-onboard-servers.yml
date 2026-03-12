@@ -1,0 +1,444 @@
+---
+# ============================================================
+# arc-onboard-servers.yml — Azure Arc agent install + validation
+# ============================================================
+# Onboards on-prem VMs (pg-primary, pg-standby, app-onprem) as
+# Azure Arc-enabled servers.
+#
+# CRITICAL: This playbook is purely additive.
+# It does NOT touch PostgreSQL, Keepalived, WireGuard, or Terraform state.
+#
+# USAGE
+# -----
+# Step 1 — Pre-checks and agent install (safe, no Azure auth needed):
+#   cd infra/ansible
+#   ansible-playbook -i inventories/dev playbooks/arc-onboard-servers.yml \
+#     --tags "precheck,install"
+#
+# Step 2 — Connect each VM interactively (device code auth, run AFTER Step 1):
+#   See "Manual connect" section at the bottom of this file.
+#
+# Step 3 — Post-connect validation:
+#   cd infra/ansible
+#   ansible-playbook -i inventories/dev playbooks/arc-onboard-servers.yml \
+#     --tags "postcheck"
+#
+# Full run with auto-connect (requires ARM_* env vars set):
+#   cd infra/ansible
+#   AZURE_SUBSCRIPTION_ID=<sub-id> AZURE_TENANT_ID=<tenant-id> \
+#   ansible-playbook -i inventories/dev playbooks/arc-onboard-servers.yml \
+#     -e "arc_auto_connect=true arc_resource_group=rg-clopr2-katar711-gwc arc_location=germanywestcentral"
+#
+# ============================================================
+# MANUAL CONNECT (device code — recommended for lab/demo use)
+# ============================================================
+# After the install tag completes, SSH into each VM and run:
+#
+#   # SSH to pg-primary (via Proxmox jump)
+#   ssh pg-primary     # (uses your ~/.ssh/config ProxyJump)
+#
+#   sudo azcmagent connect \
+#     --resource-group rg-clopr2-katar711-gwc \
+#     --subscription-id <YOUR_SUBSCRIPTION_ID> \
+#     --location germanywestcentral \
+#     --tags "project=clopr2,node=pg-primary,env=dev,owner=katar711" \
+#     --use-device-code
+#
+#   # Copy the device code from terminal output, go to https://microsoft.com/devicelogin
+#   # Paste the code and authenticate with your BCLC24 account.
+#   # Repeat for pg-standby and app-onprem (change --tags value each time).
+#
+# ============================================================
+
+# ---- Play 1: Pre-check — outbound HTTPS from on-prem VMs ----
+- name: arc | Pre-check outbound connectivity to Azure endpoints
+  hosts: onprem
+  become: false
+  gather_facts: false
+  tags: [precheck, always_precheck]
+  tasks:
+    - name: Test HTTPS reachability to management.azure.com
+      command: curl -sI --max-time 10 https://management.azure.com
+      register: curl_mgmt
+      changed_when: false
+      failed_when: false
+
+    - name: Test HTTPS reachability to login.microsoftonline.com
+      command: curl -sI --max-time 10 https://login.microsoftonline.com
+      register: curl_login
+      changed_when: false
+      failed_when: false
+
+    - name: Test HTTPS reachability to Arc his endpoint
+      command: curl -sI --max-time 10 https://his.arc.azure.com
+      register: curl_arc
+      changed_when: false
+      failed_when: false
+
+    - name: Report connectivity results
+      debug:
+        msg:
+          - "management.azure.com: {{ 'REACHABLE' if curl_mgmt.rc == 0 else 'UNREACHABLE (rc=' + (curl_mgmt.rc | string) + ')' }}"
+          - "login.microsoftonline.com: {{ 'REACHABLE' if curl_login.rc == 0 else 'UNREACHABLE (rc=' + (curl_login.rc | string) + ')' }}"
+          - "his.arc.azure.com: {{ 'REACHABLE' if curl_arc.rc == 0 else 'UNREACHABLE (rc=' + (curl_arc.rc | string) + ')' }}"
+
+    - name: Fail if management.azure.com is unreachable
+      fail:
+        msg: >
+          Cannot reach management.azure.com from {{ inventory_hostname }}.
+          Arc onboarding requires outbound TCP 443 to Azure endpoints.
+          Check iptables/ufw rules and network configuration before proceeding.
+      when: curl_mgmt.rc != 0
+
+# ---- Play 2: Baseline capture — record DR stack state BEFORE Arc install ----
+- name: arc | Capture pre-Arc DR baseline
+  hosts: onprem
+  become: true
+  gather_facts: false
+  tags: [precheck, baseline]
+  tasks:
+    - name: Check if azcmagent is already installed
+      command: which azcmagent
+      register: arc_already_installed
+      changed_when: false
+      failed_when: false
+
+    - name: Show Arc agent pre-install status
+      debug:
+        msg: "{{ 'Arc agent ALREADY installed at ' + arc_already_installed.stdout if arc_already_installed.rc == 0 else 'Arc agent not yet installed — clean state confirmed' }}"
+
+    - name: Capture systemd service states
+      shell: |
+        echo "=== systemctl status keepalived ===" && \
+        systemctl status keepalived --no-pager 2>&1 || echo "(keepalived not running on this node)" && \
+        echo "" && \
+        echo "=== systemctl status postgresql ===" && \
+        systemctl status postgresql --no-pager 2>&1 || true
+      register: service_status
+      changed_when: false
+
+    - name: Print service status
+      debug:
+        var: service_status.stdout_lines
+
+    - name: Capture WireGuard tunnel state (pg-primary only)
+      command: wg show
+      become: true
+      register: wg_status
+      changed_when: false
+      failed_when: false
+      when: inventory_hostname == 'pg-primary'
+
+    - name: Print WireGuard status
+      debug:
+        msg: "{{ wg_status.stdout_lines | default(['(skipped — not pg-primary)']) }}"
+
+    - name: Capture pg_stat_replication (pg-primary only)
+      shell: >
+        sudo -u postgres psql -c
+        "SELECT client_addr, state, sync_state, write_lag, replay_lag
+         FROM pg_stat_replication ORDER BY client_addr;"
+      register: pg_repl
+      changed_when: false
+      failed_when: false
+      when: inventory_hostname == 'pg-primary'
+
+    - name: Print pg_stat_replication
+      debug:
+        msg: "{{ pg_repl.stdout_lines | default(['(skipped — not pg-primary)']) }}"
+
+    - name: Capture pg_is_in_recovery (pg-standby only)
+      shell: sudo -u postgres psql -tc "SELECT pg_is_in_recovery();" | tr -d ' \n'
+      register: pg_recovery
+      changed_when: false
+      failed_when: false
+      when: inventory_hostname == 'pg-standby'
+
+    - name: Print pg_is_in_recovery
+      debug:
+        msg: "pg_is_in_recovery = {{ pg_recovery.stdout | default('(skipped)') }}"
+
+    - name: Check Keepalived VIP ownership (pg-primary only)
+      shell: ip addr show | grep '10.0.96.10'
+      register: vip_check
+      changed_when: false
+      failed_when: false
+      when: inventory_hostname == 'pg-primary'
+
+    - name: Assert VIP is active on pg-primary
+      assert:
+        that: vip_check.rc == 0
+        fail_msg: >
+          VIP 10.0.96.10 not found on pg-primary!
+          Keepalived may not be running. Investigate before proceeding with Arc install.
+        success_msg: "VIP 10.0.96.10 confirmed active on pg-primary."
+      when: inventory_hostname == 'pg-primary'
+
+# ---- Play 3: Install Azure Connected Machine agent ----
+- name: arc | Install Azure Connected Machine agent (azcmagent)
+  hosts: onprem
+  become: true
+  gather_facts: true
+  tags: [install]
+  tasks:
+    - name: Create temp directory for Arc install
+      file:
+        path: /tmp/arc-install
+        state: directory
+        mode: '0755'
+
+    - name: Download azcmagent install script
+      get_url:
+        url: "https://aka.ms/azcmagent"
+        dest: /tmp/arc-install/install_linux_azcmagent.sh
+        mode: '0755'
+        force: false
+      register: download_result
+
+    - name: Install azcmagent (runs install script)
+      command: bash /tmp/arc-install/install_linux_azcmagent.sh
+      args:
+        creates: /usr/bin/azcmagent
+      register: install_result
+
+    - name: Verify azcmagent binary is present
+      command: azcmagent version
+      register: azcmagent_version
+      changed_when: false
+
+    - name: Print azcmagent version
+      debug:
+        msg: "Installed: {{ azcmagent_version.stdout }}"
+
+    - name: Ensure himds service is enabled and running
+      systemd:
+        name: himds
+        state: started
+        enabled: true
+
+    - name: Ensure GC (guest configuration) service is enabled
+      systemd:
+        name: gcad
+        state: started
+        enabled: true
+      failed_when: false
+
+    - name: Post-install — confirm keepalived still running (pg-primary and pg-standby)
+      systemd:
+        name: keepalived
+      register: kl_post_install
+      failed_when: false
+      when: inventory_hostname in ['pg-primary', 'pg-standby']
+
+    - name: Assert keepalived still active after agent install
+      assert:
+        that: kl_post_install.status.ActiveState == 'active'
+        fail_msg: "CRITICAL: keepalived is not active on {{ inventory_hostname }} after Arc agent install!"
+        success_msg: "keepalived remains active on {{ inventory_hostname }} after Arc agent install."
+      when: inventory_hostname in ['pg-primary', 'pg-standby']
+
+    - name: Post-install — confirm postgresql still running
+      systemd:
+        name: "postgresql"
+      register: pg_post_install
+      failed_when: false
+
+    - name: Assert postgresql still active after agent install
+      assert:
+        that: pg_post_install.status.ActiveState == 'active'
+        fail_msg: "CRITICAL: postgresql is not active on {{ inventory_hostname }} after Arc agent install!"
+        success_msg: "postgresql remains active on {{ inventory_hostname }} after Arc agent install."
+      when: inventory_hostname in ['pg-primary', 'pg-standby']
+
+# ---- Play 4: Auto-connect to Azure Arc (optional, requires SP credentials) ----
+# This play only runs when arc_auto_connect=true is passed with -e flag.
+# Default: SKIPPED. Use manual device-code connect (see Phase 4 instructions above).
+- name: arc | Connect machines to Azure Arc (auto-connect with SP)
+  hosts: onprem
+  become: true
+  serial: 1
+  gather_facts: false
+  tags: [connect]
+  when: arc_auto_connect | default(false) | bool
+  vars:
+    arc_resource_group: "{{ arc_resource_group | default('rg-clopr2-katar711-gwc') }}"
+    arc_location: "{{ arc_location | default('germanywestcentral') }}"
+    arc_subscription_id: "{{ lookup('env', 'AZURE_SUBSCRIPTION_ID') }}"
+    arc_tenant_id: "{{ lookup('env', 'AZURE_TENANT_ID') }}"
+    arc_client_id: "{{ lookup('env', 'AZURE_CLIENT_ID') }}"
+    arc_client_secret: "{{ lookup('env', 'AZURE_CLIENT_SECRET') }}"
+  tasks:
+    - name: Validate Arc SP credentials are available
+      assert:
+        that:
+          - arc_subscription_id | length > 0
+          - arc_tenant_id | length > 0
+          - arc_client_id | length > 0
+          - arc_client_secret | length > 0
+        fail_msg: >
+          Missing SP credentials. Set AZURE_SUBSCRIPTION_ID, AZURE_TENANT_ID,
+          AZURE_CLIENT_ID, AZURE_CLIENT_SECRET environment variables before running
+          with arc_auto_connect=true.
+
+    - name: Check if machine is already connected
+      command: azcmagent show
+      register: arc_show_pre
+      changed_when: false
+      failed_when: false
+
+    - name: Skip connect if already connected
+      debug:
+        msg: "Machine {{ inventory_hostname }} is already connected to Azure Arc. Skipping."
+      when: "'Connected' in (arc_show_pre.stdout | default(''))"
+
+    - name: Connect machine to Azure Arc (SP auth, serial to avoid rate limits)
+      command: >
+        azcmagent connect
+        --resource-group "{{ arc_resource_group }}"
+        --subscription-id "{{ arc_subscription_id }}"
+        --tenant-id "{{ arc_tenant_id }}"
+        --service-principal-id "{{ arc_client_id }}"
+        --service-principal-secret "{{ arc_client_secret }}"
+        --location "{{ arc_location }}"
+        --tags "project=clopr2,node={{ inventory_hostname }},env=dev,owner=katar711"
+      no_log: true
+      when: "'Connected' not in (arc_show_pre.stdout | default(''))"
+      register: connect_result
+
+    - name: Verify connection status
+      command: azcmagent show
+      register: arc_show_post
+      changed_when: false
+
+    - name: Assert machine is now connected
+      assert:
+        that: "'Connected' in arc_show_post.stdout"
+        fail_msg: "Arc connect failed on {{ inventory_hostname }}. Check credentials and resource group."
+        success_msg: "{{ inventory_hostname }} successfully connected to Azure Arc."
+
+# ---- Play 5: Post-connect validation ----
+- name: arc | Post-Arc validation — confirm DR stack is unaffected
+  hosts: onprem
+  become: true
+  gather_facts: false
+  tags: [postcheck, validate]
+  tasks:
+    - name: Get Arc agent status
+      command: azcmagent show
+      register: arc_final_status
+      changed_when: false
+      failed_when: false
+
+    - name: Print Arc agent status
+      debug:
+        var: arc_final_status.stdout_lines
+
+    - name: Confirm Arc Status is Connected
+      debug:
+        msg: >
+          Arc status on {{ inventory_hostname }}:
+          {{ 'CONNECTED ✓' if 'Connected' in (arc_final_status.stdout | default('')) else 'NOT YET CONNECTED — run azcmagent connect manually (see playbook header)' }}
+
+    - name: Post-Arc — keepalived status check
+      shell: systemctl status keepalived --no-pager
+      register: kl_final
+      changed_when: false
+      failed_when: false
+      when: inventory_hostname in ['pg-primary', 'pg-standby']
+
+    - name: Assert keepalived still active post-Arc
+      assert:
+        that: "'active (running)' in kl_final.stdout"
+        fail_msg: "CRITICAL: keepalived is not running on {{ inventory_hostname }} post-Arc install!"
+        success_msg: "keepalived is active on {{ inventory_hostname }} post-Arc install — VIP unaffected."
+      when: inventory_hostname in ['pg-primary', 'pg-standby']
+
+    - name: Post-Arc — WireGuard tunnel status (pg-primary only)
+      command: wg show
+      register: wg_final
+      changed_when: false
+      failed_when: false
+      when: inventory_hostname == 'pg-primary'
+
+    - name: Print WireGuard post-Arc status
+      debug:
+        msg: "{{ wg_final.stdout_lines | default(['(skipped)']) }}"
+
+    - name: Post-Arc — pg_stat_replication check (pg-primary only)
+      shell: >
+        sudo -u postgres psql -c
+        "SELECT client_addr, state, write_lag, replay_lag FROM pg_stat_replication ORDER BY client_addr;"
+      register: pg_repl_final
+      changed_when: false
+      failed_when: false
+      when: inventory_hostname == 'pg-primary'
+
+    - name: Print pg_stat_replication post-Arc
+      debug:
+        msg: "{{ pg_repl_final.stdout_lines | default(['(skipped)']) }}"
+
+    - name: Assert replication rows still present (pg-primary)
+      shell: >
+        sudo -u postgres psql -tAc
+        "SELECT count(*) FROM pg_stat_replication;"
+      register: repl_count
+      changed_when: false
+      failed_when: false
+      when: inventory_hostname == 'pg-primary'
+
+    - name: Warn if replication count is 0 post-Arc
+      debug:
+        msg: >
+          WARNING: pg_stat_replication shows 0 replicas on pg-primary post-Arc!
+          Expected: 2 (10.0.96.14 standby + 10.200.0.2 Azure DR).
+          Investigate immediately.
+      when:
+        - inventory_hostname == 'pg-primary'
+        - (repl_count.stdout | default('0') | int) == 0
+
+    - name: Confirm replication intact post-Arc
+      debug:
+        msg: "Replication confirmed — {{ repl_count.stdout | default('?') }} replica(s) connected to pg-primary post-Arc install."
+      when:
+        - inventory_hostname == 'pg-primary'
+        - (repl_count.stdout | default('0') | int) > 0
+
+    - name: Post-Arc — pg_is_in_recovery check (pg-standby only)
+      shell: sudo -u postgres psql -tc "SELECT pg_is_in_recovery();" | tr -d ' \n'
+      register: pg_recovery_final
+      changed_when: false
+      failed_when: false
+      when: inventory_hostname == 'pg-standby'
+
+    - name: Assert pg-standby still in recovery mode post-Arc
+      assert:
+        that: "'t' in pg_recovery_final.stdout"
+        fail_msg: "CRITICAL: pg-standby is NOT in recovery mode post-Arc! pg_is_in_recovery()=f. Check replication."
+        success_msg: "pg-standby correctly returns pg_is_in_recovery()=t post-Arc install."
+      when: inventory_hostname == 'pg-standby'
+
+    - name: Check VIP still on pg-primary
+      shell: ip addr show | grep '10.0.96.10'
+      register: vip_final
+      changed_when: false
+      failed_when: false
+      when: inventory_hostname == 'pg-primary'
+
+    - name: Assert VIP still active post-Arc
+      assert:
+        that: vip_final.rc == 0
+        fail_msg: "CRITICAL: VIP 10.0.96.10 not found on pg-primary post-Arc install!"
+        success_msg: "VIP 10.0.96.10 confirmed active on pg-primary post-Arc install."
+      when: inventory_hostname == 'pg-primary'
+
+    - name: Final summary
+      debug:
+        msg:
+          - "================================================="
+          - "Arc onboarding status for {{ inventory_hostname }}"
+          - "================================================="
+          - "Arc connected: {{ 'YES' if 'Connected' in (arc_final_status.stdout | default('')) else 'NOT YET — run azcmagent connect manually' }}"
+          - "keepalived: {{ 'OK' if 'active (running)' in (kl_final.stdout | default('N/A')) else 'N/A (not pg node)' }}"
+          - "VIP 10.0.96.10: {{ 'PRESENT' if (vip_final.rc | default(-1)) == 0 else 'N/A (not pg-primary)' }}"
+          - "WireGuard: {{ 'UP' if (wg_final.stdout | default('')) | length > 0 else 'N/A (not pg-primary)' }}"
+          - "pg_stat_replication: {{ (repl_count.stdout | default('N/A')) + ' replica(s)' }}"

@@ -227,7 +227,7 @@ The DR VM uses a **system-assigned managed identity**. No credentials are stored
 > 1. Replication credential rotated on primary and applied on both replicas (`pg-standby`, `vm-pg-dr-fce`).
 > 2. Plaintext `pg_replication_password` and `keepalived_auth_pass` replaced with Ansible Vault values (`!vault`).
 > 3. Vault password file moved outside repo: `/home/aris/.ansible/vault_pass_clopr2`.
-> 4. Git history sanitized with `git filter-repo --replace-text` and force-push prepared.
+> 4. Git history sanitized with `git filter-repo --replace-text` and force-pushed to `origin/main`.
 
 **Verdict: PASS ✅ — plaintext credentials removed from active configuration and history rewritten to purge legacy exposure.**
 

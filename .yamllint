@@ -1,0 +1,57 @@
+---
+# yamllint configuration for CLOPR2 project
+# Customize rules for Ansible playbooks and variable files
+
+extends: default
+
+rules:
+  # Allow Ansible-specific custom tags (!vault, !include, etc.)
+  tags:
+    allowed: ["!vault", "!include", "!unsafe"]
+
+  # Allow longer lines for encrypted vault content
+  line-length:
+    max: 120
+    level: warning
+
+  # Ansible uses variable syntax that can look like jinja2
+  truthy:
+    allowed: ["true", "false", "yes", "no"]
+
+  # Allow block scalars in mappings (vault content)
+  block-mapping-content-indent: disable
+
+  # Standard indentation for consistency
+  indentation:
+    spaces: 2
+    check-multi-line-strings: false
+
+  # Comments should have space after hash
+  comments:
+    min-spaces-from-content: 2
+
+  # Allow empty lines for readability
+  empty-lines:
+    max: 3
+
+  # Ansible roles and playbooks are typically YAML
+  document-start: disable
+
+  # Allow multiple documents in single file (some cases)
+  document-end: disable
+
+  # Disable key-duplicates for Ansible merging behavior
+  key-duplicates: enable
+
+  # Hyphens and colons
+  hyphens:
+    max-spaces-after: 1
+
+  colons:
+    max-spaces-after: 1
+
+  # Trailing spaces and commas not allowed
+  trailing-spaces: enable
+
+  # Don't require newline at end of file for all cases
+  new-line-at-end-of-file: disable

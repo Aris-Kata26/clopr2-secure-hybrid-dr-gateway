@@ -1,0 +1,23 @@
+{
+  "yaml.schemaStore.enable": true,
+  "yaml.schemas": {
+    "https://json.schemastore.org/ansible-stable-2.9.json": [
+      "infra/ansible/**/*.yml",
+      "infra/ansible/**/*.yaml"
+    ]
+  },
+  "yaml.customTags": [
+    "!vault",
+    "!include",
+    "!unsafe",
+    "!unsafe scalar"
+  ],
+  "[yaml]": {
+    "editor.formatOnSave": false,
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2
+  },
+  "yaml.format.enable": true,
+  "yaml.format.singleQuote": false,
+  "yaml.format.bracketSpacing": true
+}

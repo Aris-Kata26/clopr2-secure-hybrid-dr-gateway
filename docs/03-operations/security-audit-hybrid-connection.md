@@ -219,22 +219,17 @@ The DR VM uses a **system-assigned managed identity**. No credentials are stored
 
 **Verdict: PASS ✅** — managed identity, least-privilege role.
 
-### 5.3 Secret Exposure in Repository — CRITICAL FINDING
+### 5.3 Secret Exposure in Repository — SEC-01 Resolved
 
-> **🚨 FINDING SEC-01 (HIGH):** The PostgreSQL replication password is committed in **plaintext** to the git repository:
+> **SEC-01 status: RESOLVED (2026-03-13).**
 >
-> **File:** `infra/ansible/inventories/dev/group_vars/pg_nodes.yml`
-> ```yaml
-> pg_replication_password: "REMOVED_SECRET"
-> ```
->
-> This file was committed in commit `43649a6` and is pushed to the remote repository (`github.com/Aris-Kata26/clopr2-secure-hybrid-dr-gateway`). The Keepalived VRRP authentication password (`REMOVED_SECRET`) is also in the same file in plaintext.
->
-> The comment in the file acknowledges this: `# NOTE: vault this in production — plain var for bootstrap`.
->
-> **Action required (see Section 8 – Recommendations for remediation steps).**
+> Completed remediation:
+> 1. Replication credential rotated on primary and applied on both replicas (`pg-standby`, `vm-pg-dr-fce`).
+> 2. Plaintext `pg_replication_password` and `keepalived_auth_pass` replaced with Ansible Vault values (`!vault`).
+> 3. Vault password file moved outside repo: `/home/aris/.ansible/vault_pass_clopr2`.
+> 4. Git history sanitized with `git filter-repo --replace-text` and force-push prepared.
 
-**Verdict: FAIL ❌ — plaintext credentials committed to git.**
+**Verdict: PASS ✅ — plaintext credentials removed from active configuration and history rewritten to purge legacy exposure.**
 
 ---
 
@@ -318,19 +313,19 @@ The on-prem VMs rely on the Proxmox network isolation (private LAN `10.0.0.0/16`
 | VM SSH authentication | 🟢 Low | Key-only auth enforced |
 | VM patch management | 🟢 Low | Ubuntu 24.04 LTS + auto-updates active |
 | Key Vault / managed identity | 🟢 Low | RBAC, least-privilege, no creds on disk |
-| **Plaintext secrets in git** | 🔴 **High** | pg_replication_password in tracked file |
+| **Plaintext secrets in git (SEC-01)** | 🟢 Low (resolved) | Rotated, vault-encrypted, and history-sanitized on 2026-03-13 |
 | On-prem host firewall | 🟡 Medium | UFW inactive; relies on network isolation |
 | tfstate secret exposure | 🟡 Medium | wg_azure_privkey in local tfstate |
 | Sudo NOPASSWD | 🟡 Low-Medium | Lab acceptable; reduces audit trail |
 | Defender for Servers | 🟡 Low | Disabled by design; acceptable for lab |
 
-**Overall posture: MEDIUM risk** — the tunnel, NSG, and authentication controls are correctly implemented. The primary risk is the plaintext credential committed to git history.
+**Overall posture: MEDIUM risk** — the tunnel, NSG, and authentication controls are correctly implemented. SEC-01 is resolved; remaining risk is mostly host hardening (UFW inactive, broad sudo, tfstate sensitivity).
 
 ### 8.2 Identified Vulnerabilities
 
 | ID | Severity | Finding |
 |----|----------|---------|
-| SEC-01 | 🔴 HIGH | `pg_replication_password` and `keepalived_auth_pass` committed in plaintext to git (`pg_nodes.yml`) |
+| SEC-01 | 🟢 RESOLVED | Credentials rotated, vault-encrypted, and purged from git history (2026-03-13) |
 | VM-01 | 🟡 MEDIUM | UFW inactive on all on-prem VMs; `sshd` and `postgres` bound to `0.0.0.0` |
 | WG-01 | 🟡 LOW | WireGuard Azure private key present in `terraform.tfstate` (local file, excluded from git) |
 | NSG-01 | 🟢 LOW | Direct public IP attached to DR VM; no Azure Firewall layer |
@@ -345,7 +340,7 @@ The on-prem VMs rely on the Proxmox network isolation (private LAN `10.0.0.0/16`
 
 The CLOPR2 hybrid connectivity design is well-architected for a lab DR environment. The WireGuard tunnel uses state-of-the-art cryptography (ChaCha20-Poly1305 / Curve25519), private keys are stored with correct permissions and encrypted via Ansible Vault in the repository, and Azure NSG rules enforce strict source-IP restrictions that prevent internet exposure of SSH and PostgreSQL. Azure Arc agents operate with outbound-only traffic and dedicated non-root service accounts.
 
-The single high-severity finding is the plaintext PostgreSQL replication password committed to the git repository, which requires remediation regardless of the lab context.
+The previously identified high-severity finding (SEC-01 plaintext secret exposure) has been remediated.
 
 ### 9.2 Recommendations
 

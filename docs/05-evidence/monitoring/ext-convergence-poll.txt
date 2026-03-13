@@ -1,0 +1,8 @@
+poll=1 utc=15:07:17Z
+pg-standby AMA=Deleting DEP=Deleting
+app-onprem AMA=Creating DEP=Creating
+
+poll=2 utc=15:07:51Z
+pg-standby AMA=Deleting DEP=Deleting
+app-onprem AMA=Creating DEP=Creating
+

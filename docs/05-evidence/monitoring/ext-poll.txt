@@ -1,0 +1,36 @@
+UTC=2026-03-13T15:03:17Z
+pg-primary AMA=Succeeded DEP=Failed
+pg-primary AMA_DETAIL:
+{
+  "prov": "Succeeded",
+  "statuses": null,
+  "substatuses": null
+}
+pg-primary DEP_DETAIL:
+{
+  "prov": "Failed",
+  "statuses": null,
+  "substatuses": null
+}
+pg-standby AMA=Deleting DEP=Deleting
+pg-standby AMA_DETAIL:
+{
+  "prov": "Deleting",
+  "statuses": null,
+  "substatuses": null
+}
+pg-standby DEP_DETAIL:
+{
+  "prov": "Deleting",
+  "statuses": null,
+  "substatuses": null
+}
+app-onprem AMA=Creating DEP=missing
+app-onprem AMA_DETAIL:
+{
+  "prov": "Creating",
+  "statuses": null,
+  "substatuses": null
+}
+app-onprem DEP_DETAIL:
+{"missing":true}

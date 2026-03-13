@@ -1,0 +1,43 @@
+{
+  "properties": {
+    "destinations": {
+      "logAnalytics": [
+        {
+          "name": "la",
+          "workspaceResourceId": "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.OperationalInsights/workspaces/log-clopr2-dev-gwc"
+        }
+      ]
+    },
+    "dataSources": {
+      "syslog": [
+        {
+          "name": "syslog-hybrid",
+          "streams": ["Microsoft-Syslog"],
+          "facilityNames": ["auth", "authpriv", "daemon", "syslog"],
+          "logLevels": ["*"]
+        }
+      ],
+      "performanceCounters": [
+        {
+          "name": "perf-cpu-memory",
+          "streams": ["Microsoft-Perf"],
+          "samplingFrequencyInSeconds": 60,
+          "counterSpecifiers": [
+            "\\Processor(_Total)\\% Processor Time",
+            "\\Memory\\Available MBytes"
+          ]
+        }
+      ]
+    },
+    "dataFlows": [
+      {
+        "streams": ["Microsoft-Syslog"],
+        "destinations": ["la"]
+      },
+      {
+        "streams": ["Microsoft-Perf"],
+        "destinations": ["la"]
+      }
+    ]
+  }
+}

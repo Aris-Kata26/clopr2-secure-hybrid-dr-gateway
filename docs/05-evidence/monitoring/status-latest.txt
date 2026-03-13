@@ -1,0 +1,49 @@
+GeneratedUTC: 2026-03-13T15:43:21Z
+
+[Scope]
+- Recovery focus: pg-standby only
+- S4-01 remains open
+
+[ArcConnectedStatus]
+- pg-primary: Connected
+- pg-standby: Connected
+- app-onprem: Connected
+
+[pg-standby Extension Recovery Timeline]
+- 2026-03-13T15:23:34Z AMA=missing DEP=missing
+- 2026-03-13T15:26:25Z AMA=Creating DEP=Creating
+- 2026-03-13T15:31:06Z AMA=Creating DEP=Creating
+- 2026-03-13T15:34:19Z AMA=Creating DEP=Creating
+- 2026-03-13T15:41:53Z TIMEBOX_START=30m
+- 2026-03-13T15:43:21Z AMA=Creating DEP=Creating
+
+[Current ExtensionProvisioning]
+- pg-primary: AzureMonitorLinuxAgent=Succeeded, DependencyAgentLinux=Failed
+- pg-standby: AzureMonitorLinuxAgent=Creating, DependencyAgentLinux=Creating
+- app-onprem: AzureMonitorLinuxAgent=Creating, DependencyAgentLinux=Creating
+
+[DCRAssociations]
+- pg-primary: assoc-dcr-hybrid-monitoring-pg-primary -> dcr-hybrid-monitoring
+- pg-standby: assoc-dcr-hybrid-monitoring-pg-standby -> dcr-hybrid-monitoring
+- app-onprem: assoc-dcr-hybrid-monitoring-app-onprem -> dcr-hybrid-monitoring
+
+[TelemetryValidation_15m]
+- Heartbeat: pg-primary visible (14); pg-standby not visible; app-onprem not visible in latest capture
+- Syslog: pg-primary visible (1319); pg-standby not visible; app-onprem not visible in latest capture
+
+[BlockerClassification]
+- Azure backend delay/control-plane lock: YES
+  Evidence: earlier HCRP409 (marked for deletion / still processing), now prolonged Creating on pg-standby.
+- DCR association issue: NO
+  Evidence: association exists for pg-standby and points to dcr-hybrid-monitoring.
+- Agent install failure: PARTIAL
+  Evidence: pg-primary DependencyAgentLinux remains Failed.
+
+Conclusion:
+S4-01 success criteria are not yet met because pg-standby is not yet visible in Heartbeat/Syslog.
+
+[Recommendation]
+- Keep S4-01 open.
+- Retry pg-standby state checks at the next 30-minute mark.
+- If still Creating, run one controlled recreate cycle for pg-standby only and re-timebox 30 minutes.
+- Proceed to another Sprint 4 task in parallel while maintaining S4-01 as blocked by Azure Arc control-plane convergence.

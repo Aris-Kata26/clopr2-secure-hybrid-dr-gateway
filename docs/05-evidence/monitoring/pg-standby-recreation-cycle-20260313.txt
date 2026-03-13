@@ -1,0 +1,7 @@
+=== pg-standby Extension Deletion Monitoring ===
+Start: 2026-03-13T15:57:42Z
+
+[1/20] 2026-03-13T15:57:42Z | AMA=Deleting | DEP=Deleting
+✓ Both deleted! Ready to create.
+
+End: 2026-03-13T15:57:46Z

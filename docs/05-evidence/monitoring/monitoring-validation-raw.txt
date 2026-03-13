@@ -1,0 +1,233 @@
+### EXTENSIONS pg-primary
+[
+  {
+    "id": "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.HybridCompute/machines/pg-primary/extensions/AzureMonitorLinuxAgent",
+    "location": "germanywestcentral",
+    "name": "AzureMonitorLinuxAgent",
+    "properties": {
+      "autoUpgradeMinorVersion": false,
+      "enableAutomaticUpgrade": true,
+      "forceUpdateTag": null,
+      "instanceView": {
+        "name": "AzureMonitorLinuxAgent",
+        "status": {
+          "code": null,
+          "displayStatus": null,
+          "level": null,
+          "message": null,
+          "time": null
+        },
+        "type": "AzureMonitorLinuxAgent",
+        "typeHandlerVersion": "1.40.0"
+      },
+      "protectedSettings": null,
+      "provisioningState": "Creating",
+      "publisher": "Microsoft.Azure.Monitor",
+      "settings": null,
+      "type": "AzureMonitorLinuxAgent",
+      "typeHandlerVersion": "1.40.0"
+    },
+    "resourceGroup": "rg-clopr2-katar711-gwc",
+    "systemData": {
+      "createdAt": "2026-03-13T11:17:54.110000+00:00",
+      "createdBy": "katar1@bts.lgk.lu",
+      "createdByType": "User",
+      "lastModifiedAt": "2026-03-13T11:17:54.110000+00:00",
+      "lastModifiedBy": "katar1@bts.lgk.lu",
+      "lastModifiedByType": "User"
+    },
+    "tags": null,
+    "type": "Microsoft.HybridCompute/machines/extensions"
+  }
+]
+### EXTENSIONS pg-standby
+[
+  {
+    "id": "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.HybridCompute/machines/pg-standby/extensions/AzureMonitorLinuxAgent",
+    "location": "germanywestcentral",
+    "name": "AzureMonitorLinuxAgent",
+    "properties": {
+      "autoUpgradeMinorVersion": false,
+      "enableAutomaticUpgrade": true,
+      "forceUpdateTag": null,
+      "instanceView": {
+        "name": "AzureMonitorLinuxAgent",
+        "status": {
+          "code": null,
+          "displayStatus": null,
+          "level": null,
+          "message": null,
+          "time": null
+        },
+        "type": "AzureMonitorLinuxAgent",
+        "typeHandlerVersion": "1.40.0"
+      },
+      "protectedSettings": null,
+      "provisioningState": "Creating",
+      "publisher": "Microsoft.Azure.Monitor",
+      "settings": null,
+      "type": "AzureMonitorLinuxAgent",
+      "typeHandlerVersion": "1.40.0"
+    },
+    "resourceGroup": "rg-clopr2-katar711-gwc",
+    "systemData": {
+      "createdAt": "2026-03-13T11:19:08.001928+00:00",
+      "createdBy": "katar1@bts.lgk.lu",
+      "createdByType": "User",
+      "lastModifiedAt": "2026-03-13T11:19:08.001928+00:00",
+      "lastModifiedBy": "katar1@bts.lgk.lu",
+      "lastModifiedByType": "User"
+    },
+    "tags": null,
+    "type": "Microsoft.HybridCompute/machines/extensions"
+  }
+]
+### EXTENSIONS app-onprem
+[
+  {
+    "id": "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.HybridCompute/machines/app-onprem/extensions/AzureMonitorLinuxAgent",
+    "location": "germanywestcentral",
+    "name": "AzureMonitorLinuxAgent",
+    "properties": {
+      "autoUpgradeMinorVersion": false,
+      "enableAutomaticUpgrade": true,
+      "forceUpdateTag": null,
+      "instanceView": {
+        "name": "AzureMonitorLinuxAgent",
+        "status": {
+          "code": null,
+          "displayStatus": null,
+          "level": null,
+          "message": null,
+          "time": null
+        },
+        "type": "AzureMonitorLinuxAgent",
+        "typeHandlerVersion": "1.40.0"
+      },
+      "protectedSettings": null,
+      "provisioningState": "Creating",
+      "publisher": "Microsoft.Azure.Monitor",
+      "settings": null,
+      "type": "AzureMonitorLinuxAgent",
+      "typeHandlerVersion": "1.40.0"
+    },
+    "resourceGroup": "rg-clopr2-katar711-gwc",
+    "systemData": {
+      "createdAt": "2026-03-13T11:20:24.879228+00:00",
+      "createdBy": "katar1@bts.lgk.lu",
+      "createdByType": "User",
+      "lastModifiedAt": "2026-03-13T11:20:24.879228+00:00",
+      "lastModifiedBy": "katar1@bts.lgk.lu",
+      "lastModifiedByType": "User"
+    },
+    "tags": null,
+    "type": "Microsoft.HybridCompute/machines/extensions"
+  }
+]
+### HEARTBEAT 2h count
+[
+  {
+    "TableName": "PrimaryResult",
+    "count_": "0"
+  }
+]
+### SYSLOG 2h count
+[
+  {
+    "TableName": "PrimaryResult",
+    "count_": "0"
+  }
+]
+### DCR SHOW
+{
+  "dataCollectionEndpointId": null,
+  "dataFlows": [
+    {
+      "destinations": [
+        "la"
+      ],
+      "outputStream": null,
+      "streams": [
+        "Microsoft-Syslog"
+      ],
+      "transformKql": null
+    },
+    {
+      "destinations": [
+        "la"
+      ],
+      "outputStream": null,
+      "streams": [
+        "Microsoft-Perf"
+      ],
+      "transformKql": null
+    }
+  ],
+  "dataSources": {
+    "extensions": null,
+    "iisLogs": null,
+    "logFiles": null,
+    "performanceCounters": [
+      {
+        "counterSpecifiers": [
+          "\\Processor(_Total)\\% Processor Time",
+          "\\Memory\\Available MBytes"
+        ],
+        "name": "perf-cpu-memory",
+        "samplingFrequencyInSeconds": 60,
+        "streams": [
+          "Microsoft-Perf"
+        ]
+      }
+    ],
+    "syslog": [
+      {
+        "facilityNames": [
+          "auth",
+          "authpriv",
+          "daemon",
+          "syslog"
+        ],
+        "logLevels": [
+          "*"
+        ],
+        "name": "syslog-hybrid",
+        "streams": [
+          "Microsoft-Syslog"
+        ]
+      }
+    ],
+    "windowsEventLogs": null
+  },
+  "description": null,
+  "destinations": {
+    "azureMonitorMetrics": null,
+    "logAnalytics": [
+      {
+        "name": "la",
+        "workspaceId": "ad36192c-ac77-40dc-878d-0f8e74cd3638",
+        "workspaceResourceId": "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.OperationalInsights/workspaces/log-clopr2-dev-gwc"
+      }
+    ]
+  },
+  "etag": "\"62009c61-0000-1500-0000-69b3f3dc0000\"",
+  "id": "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Insights/dataCollectionRules/dcr-hybrid-monitoring",
+  "immutableId": "dcr-6f746c8509c94adfaf05977d657597b5",
+  "kind": null,
+  "location": "germanywestcentral",
+  "metadata": null,
+  "name": "dcr-hybrid-monitoring",
+  "provisioningState": "Succeeded",
+  "resourceGroup": "rg-clopr2-katar711-gwc",
+  "streamDeclarations": null,
+  "systemData": {
+    "createdAt": "2026-03-13T11:24:09.928731+00:00",
+    "createdBy": "katar1@bts.lgk.lu",
+    "createdByType": "User",
+    "lastModifiedAt": "2026-03-13T11:24:09.928731+00:00",
+    "lastModifiedBy": "katar1@bts.lgk.lu",
+    "lastModifiedByType": "User"
+  },
+  "tags": null,
+  "type": "Microsoft.Insights/dataCollectionRules"
+}

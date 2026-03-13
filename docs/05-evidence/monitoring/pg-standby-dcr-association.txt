@@ -1,0 +1,3 @@
+Name                                    Dcr
+--------------------------------------  ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+assoc-dcr-hybrid-monitoring-pg-standby  /subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-katar711-gwc/providers/Microsoft.Insights/dataCollectionRules/dcr-hybrid-monitoring

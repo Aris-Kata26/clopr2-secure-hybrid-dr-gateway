@@ -1,0 +1,2 @@
+RecoveryStartUTC=2026-03-13T15:00:25Z
+[cleanup:pg-standby]

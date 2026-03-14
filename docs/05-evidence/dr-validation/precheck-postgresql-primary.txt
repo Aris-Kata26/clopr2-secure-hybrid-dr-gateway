@@ -1,0 +1,10 @@
+● postgresql.service - PostgreSQL RDBMS
+     Loaded: loaded (/usr/lib/systemd/system/postgresql.service; enabled; preset: enabled)
+     Active: active (exited) since Tue 2026-03-10 12:56:18 UTC; 4 days ago
+   Main PID: 6890 (code=exited, status=0/SUCCESS)
+        CPU: 1ms
+
+Mar 10 12:56:18 pg-primary systemd[1]: Starting postgresql.service - PostgreSQL RDBMS...
+Mar 10 12:56:18 pg-primary systemd[1]: Finished postgresql.service - PostgreSQL RDBMS.
+Mar 10 16:36:24 pg-primary systemd[1]: Reloading postgresql.service - PostgreSQL RDBMS...
+Mar 10 16:36:24 pg-primary systemd[1]: Reloaded postgresql.service - PostgreSQL RDBMS.

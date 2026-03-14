@@ -1,0 +1,25 @@
+● keepalived.service - Keepalive Daemon (LVS and VRRP)
+     Loaded: loaded (/usr/lib/systemd/system/keepalived.service; enabled; preset: enabled)
+     Active: active (running) since Sat 2026-03-14 06:44:30 UTC; 7h ago
+       Docs: man:keepalived(8)
+             man:keepalived.conf(5)
+             man:genhash(1)
+             https://keepalived.org
+   Main PID: 530703 (keepalived)
+      Tasks: 2 (limit: 1081)
+     Memory: 11.6M (peak: 17.0M)
+        CPU: 15min 45.280s
+     CGroup: /system.slice/keepalived.service
+             ├─530703 /usr/sbin/keepalived --dont-fork
+             └─530704 /usr/sbin/keepalived --dont-fork
+
+Mar 14 06:45:18 pg-primary Keepalived_vrrp[530704]: VRRP_Script(chk_postgresql) timed_out
+Mar 14 06:45:18 pg-primary Keepalived_vrrp[530704]: (pg_ha) Changing effective priority from 100 to 80
+Mar 14 06:45:24 pg-primary Keepalived_vrrp[530704]: VRRP_Script(chk_postgresql) succeeded
+Mar 14 06:45:24 pg-primary Keepalived_vrrp[530704]: (pg_ha) Changing effective priority from 80 to 100
+Mar 14 06:45:54 pg-primary Keepalived_vrrp[530704]: Track script chk_postgresql is already running, expect idle - skipping run
+Mar 14 06:45:58 pg-primary Keepalived_vrrp[530704]: VRRP_Script(chk_postgresql) timed_out
+Mar 14 06:45:58 pg-primary Keepalived_vrrp[530704]: (pg_ha) Changing effective priority from 100 to 80
+Mar 14 06:46:02 pg-primary Keepalived_vrrp[530704]: VRRP_Script(chk_postgresql) succeeded
+Mar 14 06:46:02 pg-primary Keepalived_vrrp[530704]: (pg_ha) Changing effective priority from 80 to 100
+Mar 14 06:46:16 pg-primary Keepalived_vrrp[530704]: Track script chk_postgresql is already running, expect idle - skipping run

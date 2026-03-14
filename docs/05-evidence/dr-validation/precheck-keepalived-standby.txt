@@ -1,0 +1,25 @@
+● keepalived.service - Keepalive Daemon (LVS and VRRP)
+     Loaded: loaded (/usr/lib/systemd/system/keepalived.service; enabled; preset: enabled)
+     Active: active (running) since Fri 2026-03-13 06:47:16 UTC; 1 day 7h ago
+       Docs: man:keepalived(8)
+             man:keepalived.conf(5)
+             man:genhash(1)
+             https://keepalived.org
+   Main PID: 277998 (keepalived)
+      Tasks: 2 (limit: 1081)
+     Memory: 5.5M (peak: 10.1M)
+        CPU: 1h 6min 9.207s
+     CGroup: /system.slice/keepalived.service
+             ├─277998 /usr/sbin/keepalived --dont-fork
+             └─278003 /usr/sbin/keepalived --dont-fork
+
+Mar 13 06:47:16 pg-standby Keepalived[277998]: NOTICE: setting config option max_auto_priority should result in better keepalived performance
+Mar 13 06:47:16 pg-standby Keepalived[277998]: Starting VRRP child process, pid=278003
+Mar 13 06:47:16 pg-standby Keepalived_vrrp[278003]: (/etc/keepalived/keepalived.conf: Line 28) Truncating auth_pass to 8 characters
+Mar 13 06:47:16 pg-standby Keepalived_vrrp[278003]: (pg_ha) Entering BACKUP STATE (init)
+Mar 13 06:47:16 pg-standby Keepalived[277998]: Startup complete
+Mar 13 06:47:16 pg-standby systemd[1]: Started keepalived.service - Keepalive Daemon (LVS and VRRP).
+Mar 13 06:47:16 pg-standby Keepalived_vrrp[278003]: VRRP_Script(chk_postgresql) succeeded
+Mar 14 06:44:25 pg-standby Keepalived_vrrp[278003]: (pg_ha) Entering MASTER STATE
+Mar 14 06:44:37 pg-standby Keepalived_vrrp[278003]: (pg_ha) Master received advert from 10.0.96.11 with higher priority 100, ours 90
+Mar 14 06:44:37 pg-standby Keepalived_vrrp[278003]: (pg_ha) Entering BACKUP STATE

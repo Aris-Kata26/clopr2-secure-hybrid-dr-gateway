@@ -1,0 +1,5 @@
+ client_addr | application_name |   state   | sync_state | sent_lsn  | replay_lsn 
+-------------+------------------+-----------+------------+-----------+------------
+ 10.0.96.14  | 16/main          | streaming | async      | 0/542FB08 | 0/542FB08
+(1 row)
+

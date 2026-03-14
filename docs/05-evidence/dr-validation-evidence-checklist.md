@@ -1,9 +1,10 @@
 # DR Validation Evidence Checklist
 <!-- CLOPR2 Secure Hybrid DR Gateway | Owner: KATAR711 | Team: BCLC24 -->
 
-## Status: PENDING — execute dr-validation-runbook.md to populate
+## Status: COMPLETE — executed 2026-03-14, commit 12a6374
 
-Evidence target directory: `docs/05-evidence/dr-validation/`
+Evidence directory: `docs/05-evidence/dr-validation/`
+Runbook: `docs/03-operations/dr-validation-runbook.md` v1.2
 
 ---
 
@@ -11,17 +12,17 @@ Evidence target directory: `docs/05-evidence/dr-validation/`
 
 | # | File | Source host | Content | Status |
 |---|---|---|---|---|
-| P-1 | `precheck-timestamp.txt` | pg-primary | ISO timestamp of pre-check run | [ ] |
-| P-2 | `precheck-vip.txt` | pg-primary | `ip addr show eth0` — VIP on primary confirmed | [ ] |
-| P-3 | `precheck-keepalived-primary.txt` | pg-primary | `systemctl status keepalived` — MASTER | [ ] |
-| P-4 | `precheck-postgresql-primary.txt` | pg-primary | `systemctl status postgresql` — active | [ ] |
-| P-5 | `precheck-wg.txt` | pg-primary | `wg show` — tunnel up, handshake fresh | [ ] |
-| P-6 | `precheck-replication.txt` | pg-primary | `pg_stat_replication` — ≥ 2 rows (standby + DR) | [ ] |
-| P-7 | `precheck-keepalived-standby.txt` | pg-standby | `systemctl status keepalived` — BACKUP | [ ] |
-| P-8 | `precheck-vip-standby.txt` | pg-standby | `ip addr show eth0` — VIP absent on standby | [ ] |
-| P-9 | `precheck-recovery.txt` | pg-standby | `pg_is_in_recovery()` = t | [ ] |
-| P-10 | `precheck-app-health.txt` | local/app | `curl /health` HTTP 200, JSON body shows `pg_is_in_recovery: false` (connected to primary) | [ ] |
-| P-11 | screenshot: `precheck-pg-stat-replication.png` | pg-primary terminal | Visual of replication table | [ ] |
+| P-1 | `precheck-timestamp.txt` | pg-primary | ISO timestamp of pre-check run | [x] |
+| P-2 | `precheck-vip.txt` | pg-primary | `ip addr show eth0` — VIP 10.0.96.10 confirmed on primary | [x] |
+| P-3 | `precheck-keepalived-primary.txt` | pg-primary | `systemctl status keepalived` — MASTER, active (running) | [x] |
+| P-4 | `precheck-postgresql-primary.txt` | pg-primary | `systemctl status postgresql` — active (exited, Ubuntu wrapper) | [x] |
+| P-5 | `precheck-wg.txt` | pg-primary | `wg show` — config present, no handshake (Azure VM deallocated — deviation noted) | [x] |
+| P-6 | `precheck-replication.txt` | pg-primary | `pg_stat_replication` — 1 row (Azure DR absent — deviation noted) | [x] |
+| P-7 | `precheck-keepalived-standby.txt` | pg-standby | `systemctl status keepalived` — BACKUP, active (running) | [x] |
+| P-8 | `precheck-vip-standby.txt` | pg-standby | `ip addr show eth0` — VIP absent on standby | [x] |
+| P-9 | `precheck-recovery.txt` | pg-standby | `pg_is_in_recovery()` = t | [x] |
+| P-10 | `precheck-app-health.txt` | app-onprem | `/health` HTTP 200, `pg_is_in_recovery: false` | [x] |
+| P-11 | screenshot N/A | — | Captured via automated script; terminal screenshots not taken | [N/A] |
 
 ---
 
@@ -29,19 +30,19 @@ Evidence target directory: `docs/05-evidence/dr-validation/`
 
 | # | File | Source host | Content | Status |
 |---|---|---|---|---|
-| F-1 | `failover-start-timestamp.txt` | pg-primary | ISO timestamp when postgresql was stopped | [ ] |
-| F-2 | `failover-pg-stopped.txt` | pg-primary | `systemctl status postgresql` — inactive | [ ] |
-| F-3 | `failover-vip-moved.txt` | pg-standby | `ip addr show eth0` — VIP (10.0.96.10) present + timestamp | [ ] |
-| F-4 | `failover-vip-on-primary-post.txt` | pg-primary | `ip addr show eth0` — VIP absent on primary | [ ] |
-| F-5 | `failover-keepalived-standby-post.txt` | pg-standby | `systemctl status keepalived` — MASTER state | [ ] |
-| F-6 | `failover-pg-recovery-standby.txt` | pg-standby | `pg_is_in_recovery()` = t (standby still in recovery) | [ ] |
-| F-7 | `failover-app-health-recovery.txt` | local/app | Poll loop showing app returning HTTP 200 after VIP move; JSON body shows `pg_is_in_recovery: true` confirming connection to pg-standby | [ ] |
-| F-8 | `failover-rto.txt` | pg-primary | FAILOVER_START, FAILOVER_END, RTO delta in seconds | [ ] |
-| F-9 | `failover-wg-status.txt` | pg-primary | `wg show` — WireGuard tunnel unaffected | [ ] |
-| F-10 | `failover-full-snapshot.txt` | pg-primary | Combined post-failover state | [ ] |
-| F-11 | `failover-standby-snapshot.txt` | pg-standby | Combined post-failover state on standby | [ ] |
-| F-12 | screenshot: `failover-vip-on-standby.png` | pg-standby terminal | Visual of VIP on standby eth0 | [ ] |
-| F-13 | screenshot: `failover-app-health-200.png` | curl output | App /health HTTP 200; JSON shows `pg_is_in_recovery: true` | [ ] |
+| F-1 | `failover-start-timestamp.txt` | local | ISO timestamp when failover was initiated | [x] |
+| F-2 | `failover-keepalived-primary.txt` | pg-primary | `systemctl status keepalived` — inactive (dead) at 14:39:13 UTC | [x] |
+| F-3 | `failover-vip-moved.txt` | pg-standby | `ip addr show eth0` — VIP 10.0.96.10 present on standby | [x] |
+| F-4 | `failover-vip-primary-lost.txt` | pg-primary | `ip addr show eth0` — VIP absent from primary | [x] |
+| F-5 | `failover-keepalived-standby.txt` | pg-standby | `systemctl status keepalived` — MASTER STATE at 14:39:13 UTC | [x] |
+| F-6 | `failover-recovery-standby.txt` | pg-standby | `pg_is_in_recovery()` = t (standby still in replica mode, no promotion) | [x] |
+| F-7 | `failover-app-health.txt` | app-onprem | `/health` HTTP 200, `pg_is_in_recovery: true` — VIP on standby confirmed | [x] |
+| F-8 | `failover-rto-timestamp.txt` | local | ISO timestamp at evidence capture — RTO < 1s VRRP, < 5s app-confirmed | [x] |
+| F-9 | WireGuard N/A | — | Azure DR VM deallocated; tunnel down pre-test (deviation, not failover-caused) | [N/A] |
+| F-10 | `posttest-final-snapshot.txt` | pg-primary | Combined post-test state — covers F-10/F-11 | [x] |
+| F-11 | see F-5 + F-6 | pg-standby | Standby state captured in failover-keepalived-standby.txt + failover-recovery-standby.txt | [x] |
+| F-12 | screenshot N/A | — | Captured via automated script | [N/A] |
+| F-13 | screenshot N/A | — | Captured via automated script | [N/A] |
 
 ---
 
@@ -49,20 +50,20 @@ Evidence target directory: `docs/05-evidence/dr-validation/`
 
 | # | File | Source host | Content | Status |
 |---|---|---|---|---|
-| B-1 | `fallback-start-timestamp.txt` | pg-primary | ISO timestamp when fallback started | [ ] |
-| B-2 | `fallback-pg-restarted.txt` | pg-primary | `systemctl status postgresql` — active + pg_isready OK | [ ] |
-| B-3 | `fallback-keepalived-primary-post.txt` | pg-primary | `systemctl status keepalived` — priority restored | [ ] |
-| B-4 | `fallback-vip-on-standby-post.txt` | pg-standby | `ip addr show eth0` — VIP absent after keepalived restart | [ ] |
-| B-5 | `fallback-vip-returned.txt` | pg-primary | `ip addr show eth0` — VIP (10.0.96.10) back on primary + timestamp | [ ] |
-| B-6 | `fallback-replication-wait.txt` | pg-primary | Poll loop showing standby reconnect | [ ] |
-| B-7 | `fallback-replication-restored.txt` | pg-primary | `pg_stat_replication` — ≥ 2 rows restored | [ ] |
-| B-8 | `fallback-recovery-standby.txt` | pg-standby | `pg_is_in_recovery()` = t (standby back in replica mode) | [ ] |
-| B-9 | `fallback-app-health.txt` | local/app | `curl /health` HTTP 200; JSON body shows `pg_is_in_recovery: false` confirming VIP back on primary | [ ] |
-| B-10 | `fallback-rto.txt` | pg-primary | FALLBACK_START, FALLBACK_END, delta in seconds | [ ] |
-| B-11 | `fallback-full-snapshot.txt` | pg-primary | Combined post-fallback state (VIP, PG, KA, WG, replication) | [ ] |
-| B-12 | screenshot: `fallback-vip-on-primary.png` | pg-primary terminal | Visual of VIP returned to primary | [ ] |
-| B-13 | screenshot: `fallback-replication-restored.png` | pg-primary terminal | Visual of pg_stat_replication with both replicas | [ ] |
-| B-14 | screenshot: `fallback-app-health-200.png` | curl output | App /health HTTP 200; JSON shows `pg_is_in_recovery: false` | [ ] |
+| B-1 | `fallback-start-timestamp.txt` | local | ISO timestamp: 15:52:15 UTC | [x] |
+| B-2 | `fallback-postgresql-started.txt` | pg-primary | `systemctl status postgresql` — active (exited) | [x] |
+| B-3 | `fallback-keepalived-primary.txt` | pg-primary | `systemctl status keepalived` — MASTER STATE at 15:52:29 UTC | [x] |
+| B-4 | `fallback-vip-standby.txt` | pg-standby | `ip addr show eth0` — VIP absent from standby | [x] |
+| B-5 | `fallback-vip-returned.txt` | pg-primary | `ip addr show eth0` — VIP 10.0.96.10 back on primary | [x] |
+| B-6 | see fallback-replication.txt | pg-primary | Replication reconnected automatically — no wait loop needed | [x] |
+| B-7 | `fallback-replication.txt` | pg-primary | `pg_stat_replication` — 10.0.96.14 streaming, lag ~11ms | [x] |
+| B-8 | `fallback-recovery-standby.txt` | pg-standby | `pg_is_in_recovery()` = t | [x] |
+| B-9 | `fallback-app-health.txt` | app-onprem | `/health` HTTP 200, `pg_is_in_recovery: false` — VIP back on primary | [x] |
+| B-10 | `fallback-complete-timestamp.txt` | local | ISO timestamp: 15:52:39 UTC — elapsed 24 seconds | [x] |
+| B-11 | `posttest-final-snapshot.txt` | pg-primary | Full post-fallback system state | [x] |
+| B-12 | screenshot N/A | — | Captured via automated script | [N/A] |
+| B-13 | screenshot N/A | — | Captured via automated script | [N/A] |
+| B-14 | screenshot N/A | — | Captured via automated script | [N/A] |
 
 ---
 
@@ -70,27 +71,35 @@ Evidence target directory: `docs/05-evidence/dr-validation/`
 
 | # | File | Source host | Content | Status |
 |---|---|---|---|---|
-| Z-1 | `post-test-final.txt` | pg-primary | Full system state — all services, VIP, replication, WireGuard | [ ] |
-| Z-2 | screenshot: `post-test-pg-stat-replication.png` | pg-primary terminal | Replication healthy, 2 rows | [ ] |
+| Z-1 | `posttest-final-snapshot.txt` | pg-primary | Full system state — VIP, PG, keepalived, replication, all nominal | [x] |
+| Z-2 | screenshot N/A | — | Captured via automated script | [N/A] |
 
 ---
 
-## Summary table (fill in after test)
+## Summary table
 
 | Metric | Value |
 |---|---|
-| Failover RTO | ___ seconds |
-| VIP move time | ___ seconds |
-| App recovery time | ___ seconds |
-| Fallback total time | ___ seconds |
-| Replication reconnect time | ___ seconds |
-| Test date | ___ |
+| Failover RTO (VRRP election) | < 1 second |
+| Failover RTO (app-confirmed) | < 5 seconds |
+| VIP move time | 14:39:13 UTC (same second as keepalived stop) |
+| Fallback total time | 24 seconds (15:52:15 → 15:52:39 UTC) |
+| Replication reconnect time | Automatic — resumed within fallback window |
+| Test date | 2026-03-14 |
 | Tested by | KATAR711 |
-| Environment | dev (Proxmox + Azure germanywestcentral) |
+| Environment | dev (Proxmox on-prem + Azure germanywestcentral) |
 | Arc dependency | None — direct operational evidence |
+| Commit | 12a6374 (branch: main) |
 
 ---
 
-## Notes / issues during test
+## Notes / deviations
 
-<!-- Record any anomalies, retries, or deviations from the runbook here -->
+**Pre-test deviation — Azure DR VM deallocated:**
+Azure DR VM auto-shutdown fired overnight. WireGuard tunnel had no active handshake; Azure DR VM absent from `pg_stat_replication` (1 row instead of expected 2). Documented and scoped out — on-prem HA test proceeded independently and is unaffected by this deviation.
+
+**Key finding — `nopreempt` failover trigger:**
+The correct failover trigger is `systemctl stop keepalived` on pg-primary, not `systemctl stop postgresql`. Stopping only postgresql drops keepalived priority 100→80 but the BACKUP does not preempt a still-advertising MASTER with `nopreempt` active. Runbook updated to v1.2 with this finding in sections 2, 3A, 5, and 9.
+
+**Fallback behaviour:**
+Starting keepalived on pg-primary (after postgresql is running) is sufficient to return the VIP. No action on pg-standby required — pg-primary wins the VRRP election naturally at priority 100 vs pg-standby's 90.

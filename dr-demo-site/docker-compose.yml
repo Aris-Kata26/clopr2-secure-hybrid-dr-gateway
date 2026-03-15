@@ -1,0 +1,8 @@
+services:
+  dr-demo:
+    build: .
+    image: clopr2-dr-demo:latest
+    container_name: clopr2-dr-demo
+    ports:
+      - "8888:80"
+    restart: unless-stopped

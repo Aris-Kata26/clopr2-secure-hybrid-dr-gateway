@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CLOPR2 — Secure Hybrid DR Gateway</title>
+  <style>
+    /* ─── Reset & Base ─────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0f172a;
+      --surface:   #1e293b;
+      --surface2:  #263249;
+      --border:    #334155;
+      --text:      #e2e8f0;
+      --muted:     #94a3b8;
+      --green:     #22c55e;
+      --green-dim: #15803d;
+      --blue:      #38bdf8;
+      --amber:     #f59e0b;
+      --red:       #ef4444;
+      --purple:    #a78bfa;
+      --accent:    #0ea5e9;
+      --mono:      'JetBrains Mono', 'Fira Code', 'Cascadia Code', ui-monospace, monospace;
+      --sans:      -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.65;
+      min-height: 100vh;
+    }
+
+    /* ─── Nav ───────────────────────────────────────────────────────────── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(15,23,42,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      height: 52px;
+      display: flex; align-items: center; gap: 0;
+      overflow-x: auto;
+    }
+    .nav-brand {
+      font-weight: 700; font-size: 13px; letter-spacing: .04em;
+      color: var(--blue); text-transform: uppercase; white-space: nowrap;
+      margin-right: 2rem; flex-shrink: 0;
+    }
+    nav a {
+      color: var(--muted); text-decoration: none; font-size: 13px;
+      padding: 0 .9rem; height: 52px; display: flex; align-items: center;
+      white-space: nowrap; border-bottom: 2px solid transparent;
+      transition: color .15s, border-color .15s;
+    }
+    nav a:hover { color: var(--text); border-bottom-color: var(--blue); }
+
+    /* ─── Layout ────────────────────────────────────────────────────────── */
+    .page { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
+
+    section { padding: 4.5rem 0; border-bottom: 1px solid var(--border); }
+    section:last-of-type { border-bottom: none; }
+
+    h1 { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800; line-height: 1.2; }
+    h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem; }
+    h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: .75rem; }
+    h4 { font-size: .85rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: .5rem; }
+
+    p { color: var(--muted); max-width: 68ch; line-height: 1.75; }
+    p + p { margin-top: .75rem; }
+
+    .tag {
+      display: inline-block; font-size: 11px; font-weight: 700;
+      padding: 2px 8px; border-radius: 4px; letter-spacing: .05em;
+      text-transform: uppercase; vertical-align: middle;
+    }
+    .tag-green  { background: rgba(34,197,94,.15);  color: var(--green); }
+    .tag-blue   { background: rgba(56,189,248,.15);  color: var(--blue); }
+    .tag-amber  { background: rgba(245,158,11,.15);  color: var(--amber); }
+    .tag-purple { background: rgba(167,139,250,.15); color: var(--purple); }
+    .tag-muted  { background: rgba(148,163,184,.1);  color: var(--muted); }
+
+    /* ─── Hero ──────────────────────────────────────────────────────────── */
+    #hero {
+      padding: 5rem 0 4rem;
+      border-bottom: 1px solid var(--border);
+      background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(14,165,233,.12), transparent);
+    }
+    .hero-eyebrow {
+      font-size: 12px; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--blue); margin-bottom: 1rem;
+    }
+    .hero-title { margin-bottom: .5rem; }
+    .hero-sub {
+      font-size: 1.2rem; color: var(--muted); margin: 1rem 0 2rem; max-width: 54ch;
+    }
+    .badge-row { display: flex; flex-wrap: wrap; gap: .5rem; }
+    .badge {
+      font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 6px;
+      border: 1px solid; letter-spacing: .03em;
+    }
+    .badge-green  { border-color: var(--green-dim);  color: var(--green);  background: rgba(34,197,94,.08); }
+    .badge-blue   { border-color: #0369a1;            color: var(--blue);   background: rgba(56,189,248,.08); }
+    .badge-purple { border-color: #6d28d9;            color: var(--purple); background: rgba(167,139,250,.08); }
+    .badge-amber  { border-color: #92400e;            color: var(--amber);  background: rgba(245,158,11,.08); }
+
+    /* ─── Cards ─────────────────────────────────────────────────────────── */
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1.5rem;
+    }
+    .card-grid { display: grid; gap: 1rem; }
+    .card-grid-2 { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+    .card-grid-3 { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+    .card-grid-4 { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+
+    /* ─── Metric Cards ──────────────────────────────────────────────────── */
+    .metric-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1.25rem 1.5rem;
+      position: relative; overflow: hidden;
+    }
+    .metric-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0;
+      height: 3px; background: var(--accent-color, var(--blue));
+    }
+    .metric-card.green  { --accent-color: var(--green); }
+    .metric-card.blue   { --accent-color: var(--blue); }
+    .metric-card.amber  { --accent-color: var(--amber); }
+    .metric-card.purple { --accent-color: var(--purple); }
+    .metric-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin-bottom: .4rem; }
+    .metric-value { font-size: 2rem; font-weight: 800; line-height: 1; margin-bottom: .3rem; }
+    .metric-value.green  { color: var(--green); }
+    .metric-value.blue   { color: var(--blue); }
+    .metric-value.amber  { color: var(--amber); }
+    .metric-value.purple { color: var(--purple); }
+    .metric-sub { font-size: 12px; color: var(--muted); }
+
+    /* ─── Architecture Diagram ──────────────────────────────────────────── */
+    .arch-diagram {
+      display: grid;
+      grid-template-columns: 1fr 80px 1fr 80px 1fr;
+      gap: 0;
+      align-items: center;
+      margin: 2rem 0;
+    }
+    .arch-zone {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+    }
+    .arch-zone-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .08em; margin-bottom: 1rem;
+      padding-bottom: .5rem; border-bottom: 1px solid var(--border);
+    }
+    .arch-node {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: .6rem .9rem;
+      margin-bottom: .5rem;
+      font-size: 13px;
+    }
+    .arch-node:last-child { margin-bottom: 0; }
+    .arch-node-name { font-weight: 600; font-size: 13px; }
+    .arch-node-ip { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+    .arch-node-role { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .arch-node.primary .arch-node-name { color: var(--green); }
+    .arch-node.standby .arch-node-name { color: var(--blue); }
+    .arch-node.app     .arch-node-name { color: var(--purple); }
+    .arch-node.dr      .arch-node-name { color: var(--amber); }
+
+    .arch-arrow {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: .3rem; padding: 0 .5rem;
+    }
+    .arch-arrow-line {
+      width: 100%; height: 2px;
+      background: linear-gradient(90deg, var(--blue) 0%, var(--accent) 100%);
+      position: relative;
+    }
+    .arch-arrow-line::after {
+      content: '▶'; position: absolute; right: -6px; top: -7px;
+      font-size: 10px; color: var(--accent);
+    }
+    .arch-arrow-label {
+      font-size: 10px; color: var(--blue); font-weight: 600;
+      text-align: center; white-space: nowrap;
+    }
+
+    /* ─── Timeline ──────────────────────────────────────────────────────── */
+    .timeline { display: grid; gap: 1px; position: relative; }
+
+    .tl-phase {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+    .tl-header {
+      background: var(--surface2);
+      padding: 1.25rem 1.25rem;
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .tl-phase-name { font-size: 13px; font-weight: 700; margin-bottom: .3rem; }
+    .tl-phase-date { font-size: 11px; color: var(--muted); font-family: var(--mono); }
+    .tl-body { padding: 1.25rem; background: var(--surface); }
+    .tl-steps { list-style: none; display: flex; flex-direction: column; gap: .4rem; }
+    .tl-step {
+      display: flex; align-items: flex-start; gap: .6rem;
+      font-size: 13px; color: var(--muted);
+    }
+    .tl-step-icon { flex-shrink: 0; margin-top: 1px; }
+    .tl-step-icon.pass  { color: var(--green); }
+    .tl-step-icon.info  { color: var(--blue); }
+    .tl-step-icon.warn  { color: var(--amber); }
+    .tl-step strong { color: var(--text); }
+    .tl-result {
+      margin-top: .9rem; padding: .5rem .75rem;
+      background: rgba(34,197,94,.06); border: 1px solid rgba(34,197,94,.25);
+      border-radius: 6px; font-size: 12px; color: var(--green); font-weight: 600;
+    }
+
+    /* ─── Code / Evidence ───────────────────────────────────────────────── */
+    .evidence-block {
+      background: #0a0f1a;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .evidence-header {
+      background: var(--surface2);
+      padding: .5rem 1rem;
+      font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .06em;
+      color: var(--muted); border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: .5rem;
+    }
+    .evidence-header .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+    .evidence-header .dot.green { background: var(--green); }
+    .evidence-header .dot.amber { background: var(--amber); }
+    .evidence-header .dot.blue  { background: var(--blue); }
+    .evidence-body {
+      padding: 1rem;
+      font-family: var(--mono);
+      font-size: 12.5px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    .hl-key    { color: #7dd3fc; }
+    .hl-str    { color: #86efac; }
+    .hl-true   { color: var(--green); font-weight: 700; }
+    .hl-false  { color: var(--red);   font-weight: 700; }
+    .hl-num    { color: #fbbf24; }
+    .hl-ok     { color: var(--green); font-weight: 700; }
+    .hl-pass   { color: var(--green); font-weight: 700; }
+    .hl-ts     { color: var(--muted); }
+
+    .proof-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem; }
+
+    /* ─── State Table ───────────────────────────────────────────────────── */
+    .state-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+    .state-table th {
+      text-align: left; padding: .6rem 1rem;
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .06em; color: var(--muted);
+      border-bottom: 2px solid var(--border);
+    }
+    .state-table td { padding: .7rem 1rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    .state-table tr:last-child td { border-bottom: none; }
+    .state-table td:first-child { font-weight: 600; color: var(--text); font-family: var(--mono); font-size: 12.5px; }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; vertical-align: middle; }
+    .status-dot.green  { background: var(--green); box-shadow: 0 0 6px var(--green); }
+    .status-dot.amber  { background: var(--amber); box-shadow: 0 0 6px var(--amber); }
+    .status-dot.blue   { background: var(--blue);  box-shadow: 0 0 6px var(--blue); }
+    .status-dot.muted  { background: var(--muted); }
+
+    /* ─── Follow-up ─────────────────────────────────────────────────────── */
+    .followup-item {
+      display: flex; gap: 1rem; align-items: flex-start;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 1rem 1.25rem;
+      margin-bottom: .75rem;
+    }
+    .followup-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+    .followup-body { flex: 1; }
+    .followup-title { font-weight: 600; font-size: 14px; margin-bottom: .25rem; }
+    .followup-desc { font-size: 13px; color: var(--muted); }
+
+    /* ─── Section headers ───────────────────────────────────────────────── */
+    .section-header { margin-bottom: 2rem; }
+    .section-eyebrow {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .1em; color: var(--blue); margin-bottom: .4rem;
+    }
+
+    /* ─── Divider ────────────────────────────────────────────────────────── */
+    .divider { height: 1px; background: var(--border); margin: 2rem 0; }
+
+    /* ─── Footer ─────────────────────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 0;
+      text-align: center;
+      font-size: 12px; color: var(--muted);
+    }
+    footer strong { color: var(--text); }
+
+    /* ─── Utilities ─────────────────────────────────────────────────────── */
+    .flex { display: flex; }
+    .flex-col { flex-direction: column; }
+    .gap-sm { gap: .5rem; }
+    .gap-md { gap: 1rem; }
+    .gap-lg { gap: 1.5rem; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .mt-sm { margin-top: .5rem; }
+    .mt-md { margin-top: 1rem; }
+    .mt-lg { margin-top: 1.5rem; }
+    .mt-xl { margin-top: 2.5rem; }
+    .mb-sm { margin-bottom: .5rem; }
+    .mb-md { margin-bottom: 1rem; }
+    .text-green  { color: var(--green); }
+    .text-blue   { color: var(--blue); }
+    .text-amber  { color: var(--amber); }
+    .text-purple { color: var(--purple); }
+    .text-muted  { color: var(--muted); }
+    .text-mono   { font-family: var(--mono); font-size: 12.5px; }
+    .font-bold   { font-weight: 700; }
+
+    /* ─── Responsive ─────────────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .arch-diagram { grid-template-columns: 1fr; }
+      .arch-arrow { display: none; }
+      .tl-phase { grid-template-columns: 1fr; }
+      .tl-header { border-right: none; border-bottom: 1px solid var(--border); }
+    }
+
+    @media (max-width: 600px) {
+      section { padding: 3rem 0; }
+      .proof-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════ NAV ═══════════════════════════════════════════════════ -->
+<nav>
+  <div class="nav-brand">CLOPR2 · DR Gateway</div>
+  <a href="#summary">Summary</a>
+  <a href="#architecture">Architecture</a>
+  <a href="#timeline">DR Timeline</a>
+  <a href="#metrics">Metrics</a>
+  <a href="#proof">Proof</a>
+  <a href="#state">Final State</a>
+  <a href="#followup">Follow-up</a>
+</nav>
+
+<!-- ═══════════════ HERO ══════════════════════════════════════════════════ -->
+<section id="hero">
+  <div class="page">
+    <div class="hero-eyebrow">KATAR711 · BCLC24 · Sprint 4</div>
+    <h1 class="hero-title">Secure Hybrid DR Gateway</h1>
+    <p class="hero-sub" style="color:var(--text); font-size:1.05rem; font-weight:400;">
+      IaC Edition — Proxmox on-prem + Azure cloud
+    </p>
+    <p class="hero-sub">
+      Full-cycle DR validation: on-prem HA failover/fallback and full-site failover to Azure
+      then failback to on-prem — all captured with live evidence.
+    </p>
+    <div class="badge-row mt-lg">
+      <span class="badge badge-green">✓ Failover PASS</span>
+      <span class="badge badge-green">✓ Failback PASS</span>
+      <span class="badge badge-blue">RPO 0 bytes</span>
+      <span class="badge badge-blue">PostgreSQL 16 Streaming</span>
+      <span class="badge badge-purple">WireGuard VPN</span>
+      <span class="badge badge-purple">Keepalived VRRP</span>
+      <span class="badge badge-amber">Terraform + Ansible IaC</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ EXECUTIVE SUMMARY ════════════════════════════════════ -->
+<section id="summary">
+  <div class="page">
+    <div class="section-header">
+      <div class="section-eyebrow">01 · Executive Summary</div>
+      <h2>What was built and validated</h2>
+    </div>
+
+    <div class="card-grid card-grid-2 mb-md">
+      <div class="card">
+        <h4>Project</h4>
+        <p style="color:var(--text); max-width:none;">
+          A production-grade hybrid disaster recovery platform spanning Proxmox on-premises
+          infrastructure and Microsoft Azure. Built entirely with Infrastructure-as-Code
+          (Terraform + Ansible), secured with WireGuard VPN, and validated end-to-end
+          with operational evidence.
+        </p>
+      </div>
+      <div class="card">
+        <h4>What was validated</h4>
+        <ul style="list-style:none; display:flex; flex-direction:column; gap:.6rem; margin-top:.25rem;">
+          <li class="tl-step"><span class="tl-step-icon pass">✔</span> <span>On-prem HA: VIP failover/fallback via Keepalived VRRP — <strong>RTO &lt;1s</strong></span></li>
+          <li class="tl-step"><span class="tl-step-icon pass">✔</span> <span>Full-site failover from on-prem to Azure DR VM — <strong>RPO 0 bytes</strong></span></li>
+          <li class="tl-step"><span class="tl-step-icon pass">✔</span> <span>Full-site failback from Azure back to on-prem — <strong>RTO 20m 53s</strong></span></li>
+          <li class="tl-step"><span class="tl-step-icon pass">✔</span> <span>Application health endpoint verified at every stage</span></li>
+          <li class="tl-step"><span class="tl-step-icon pass">✔</span> <span>33 evidence files committed to git on <span class="text-mono">main</span></span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card-grid card-grid-3">
+      <div class="card">
+        <h4>IaC stack</h4>
+        <p>Terraform (azurerm + bpg/proxmox) for all cloud and on-prem VM provisioning.
+        Ansible for PostgreSQL HA, Keepalived, WireGuard, and app deployment.</p>
+      </div>
+      <div class="card">
+        <h4>Observability</h4>
+        <p>Azure Monitor + Log Analytics workspace. Azure Arc agents on all 3 on-prem VMs
+        (Connected). Application health endpoint at <span class="text-mono">/health</span>
+        used as primary DR acceptance gate.</p>
+      </div>
+      <div class="card">
+        <h4>Security</h4>
+        <p>WireGuard VPN tunnel (UDP 51820), NSG least-privilege, Azure Key Vault for secrets,
+        Defender for Cloud, RBAC, and network threat model documented.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ ARCHITECTURE ══════════════════════════════════════════ -->
+<section id="architecture">
+  <div class="page">
+    <div class="section-header">
+      <div class="section-eyebrow">02 · Architecture</div>
+      <h2>Hybrid DR topology</h2>
+    </div>
+
+    <div class="arch-diagram">
+      <!-- ON-PREM -->
+      <div class="arch-zone">
+        <div class="arch-zone-label" style="color:var(--green);">🖥 On-Prem · Proxmox</div>
+
+        <div class="arch-node primary">
+          <div class="arch-node-name">pg-primary</div>
+          <div class="arch-node-ip">10.0.96.11</div>
+          <div class="arch-node-role">PostgreSQL 16 Primary · Keepalived MASTER (p100)</div>
+        </div>
+
+        <div class="arch-node standby">
+          <div class="arch-node-name">pg-standby</div>
+          <div class="arch-node-ip">10.0.96.14</div>
+          <div class="arch-node-role">Hot standby · Keepalived BACKUP (p90)</div>
+        </div>
+
+        <div class="arch-node app">
+          <div class="arch-node-name">app-onprem</div>
+          <div class="arch-node-ip">10.0.96.13</div>
+          <div class="arch-node-role">FastAPI app · connects to VIP :5432</div>
+        </div>
+
+        <div style="margin-top:.75rem; padding:.6rem; background:rgba(34,197,94,.06); border:1px solid rgba(34,197,94,.2); border-radius:6px; font-size:12px;">
+          <span class="text-green font-bold">VIP 10.0.96.10</span>
+          <span class="text-muted"> — floats via VRRP (VRID 51, nopreempt)</span>
+        </div>
+      </div>
+
+      <!-- ARROW 1 -->
+      <div class="arch-arrow">
+        <div class="arch-arrow-line"></div>
+        <div class="arch-arrow-label">WireGuard<br/>UDP 51820<br/>10.200.0.x</div>
+        <div class="arch-arrow-line" style="transform:rotate(180deg)"></div>
+      </div>
+
+      <!-- AZURE DR -->
+      <div class="arch-zone">
+        <div class="arch-zone-label" style="color:var(--amber);">☁ Azure · francecentral</div>
+
+        <div class="arch-node dr">
+          <div class="arch-node-name">vm-pg-dr-fce</div>
+          <div class="arch-node-ip">10.200.0.2 (WG) · Standard_B2ats_v2</div>
+          <div class="arch-node-role">PostgreSQL 16 DR replica · Docker (clopr2-app:dr)</div>
+        </div>
+
+        <div style="margin-top:.5rem; padding:.6rem; background:rgba(245,158,11,.06); border:1px solid rgba(245,158,11,.2); border-radius:6px; font-size:12px;">
+          <span class="text-amber font-bold">envs/dr-fce</span>
+          <span class="text-muted"> — VNet, NSG, Key Vault, Log Analytics</span>
+        </div>
+      </div>
+
+      <!-- ARROW 2 -->
+      <div class="arch-arrow">
+        <div class="arch-arrow-line"></div>
+        <div class="arch-arrow-label">Streaming<br/>replication<br/>async</div>
+        <div class="arch-arrow-line" style="transform:rotate(180deg)"></div>
+      </div>
+
+      <!-- AZURE DEV / AKS -->
+      <div class="arch-zone">
+        <div class="arch-zone-label" style="color:var(--blue);">☁ Azure · dev / AKS</div>
+
+        <div class="arch-node standby">
+          <div class="arch-node-name">AKS cluster</div>
+          <div class="arch-node-ip">swedencentral · Free tier</div>
+          <div class="arch-node-role">Standard_B2s_v2 · 1 node · ACR (Basic)</div>
+        </div>
+
+        <div class="arch-node standby">
+          <div class="arch-node-name">envs/dev pg-dr</div>
+          <div class="arch-node-ip">germanywestcentral</div>
+          <div class="arch-node-role">Dev DR VM · Key Vault · Log Analytics</div>
+        </div>
+
+        <div style="margin-top:.5rem; padding:.6rem; background:rgba(56,189,248,.06); border:1px solid rgba(56,189,248,.2); border-radius:6px; font-size:12px;">
+          <span class="text-blue font-bold">IaC</span>
+          <span class="text-muted"> — azurerm ~4.0 · Terraform modules</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="card-grid card-grid-3">
+      <div class="card">
+        <h4>PostgreSQL HA</h4>
+        <p>Streaming replication: pg-primary → pg-standby (on-prem HA) + pg-primary → Azure DR VM.
+        Keepalived VRRP moves VIP in &lt;1s when primary stops advertising.</p>
+      </div>
+      <div class="card">
+        <h4>WireGuard tunnel</h4>
+        <p>pg-primary (10.200.0.1) ↔ vm-pg-dr-fce (10.200.0.2). Persistent keepalive 25s.
+        Azure public IP: 20.216.128.32 UDP 51820. Tunnel carries replication traffic.</p>
+      </div>
+      <div class="card">
+        <h4>Keepalived VRRP</h4>
+        <p>VIP 10.0.96.10, VRID 51, <code style="font-family:var(--mono);font-size:11px">nopreempt</code>.
+        Failover trigger: <code style="font-family:var(--mono);font-size:11px">systemctl stop keepalived</code>.
+        Fallback: automatic on restart (priority 100 &gt; 90).</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ DR TIMELINE ═══════════════════════════════════════════ -->
+<section id="timeline">
+  <div class="page">
+    <div class="section-header">
+      <div class="section-eyebrow">03 · DR Drill Timeline</div>
+      <h2>Four phases, two dates</h2>
+    </div>
+
+    <!-- Phase 1: On-prem failover -->
+    <div class="tl-phase">
+      <div class="tl-header">
+        <span class="tag tag-green mb-sm">PASS</span>
+        <div class="tl-phase-name">On-Prem HA Failover</div>
+        <div class="tl-phase-date">S4-03 · 2026-03-14</div>
+      </div>
+      <div class="tl-body">
+        <ul class="tl-steps">
+          <li class="tl-step"><span class="tl-step-icon pass">✔</span><span>Pre-check: pg-primary MASTER, replication streaming, /health 200 <strong>pg_is_in_recovery:false</strong></span></li>
+          <li class="tl-step"><span class="tl-step-icon pass">✔</span><span>Failover trigger: <strong>systemctl stop keepalived</strong> on pg-primary</span></li>
+          <li class="tl-step"><span class="tl-step-icon pass">✔</span><span>VIP 10.0.96.10 moved to pg-standby in <strong>&lt;1 second</strong> (VRRP election)</span></li>
+          <li class="tl-step"><span class="tl-step-icon pass">✔</span><span>App re-confirmed: /health returns <strong>pg_is_in_recovery:true</strong> (standby serving reads)</span></li>
+          <li class="tl-step"><span class="tl-step-icon info">→</span><span>Key learning: stopping postgresql alone drops priority 100→80 but keepalived keeps advertising — no VIP move. Must stop keepalived.</span></li>
+        </ul>
+        <div class="tl-result">✔ VIP moved · App serving · RTO &lt;1s VRRP · &lt;5s app-confirmed</div>
+      </div>
+    </div>
+
+    <!-- Phase 2: On-prem fallback -->
+    <div class="tl-phase">
+      <div class="tl-header">
+        <span class="tag tag-green mb-sm">PASS</span>
+        <div class="tl-phase-name">On-Prem HA Fallback</div>
+        <div class="tl-phase-date">S4-03 · 2026-03-14</div>
+      </div>
+      <div class="tl-body">
+        <ul class="tl-steps">
+          <li class="tl-step"><span class="tl-step-icon pass">✔</span><span>Started postgresql then keepalived on pg-primary</span></li>
+          <li class="tl-step"><span class="tl-step-icon pass">✔</span><span>Keepalived priority 100 &gt; 90 → pg-primary wins election → VIP returned in &lt;5s</span></li>
+          <li class="tl-step"><span class="tl-step-icon pass">✔</span><span>Streaming replication resumed automatically from pg-primary to pg-standby</span></li>
+          <li class="tl-step"><span class="tl-step-icon pass">✔</span><span>App confirmed: /health returns <strong>pg_is_in_recovery:false</strong> — back on primary</span></li>
+        </ul>
+        <div class="tl-result">✔ VIP returned · Replication resumed · Fallback elapsed: 24 seconds</div>
+      </div>
+    </div>
+
+    <!-- Phase 3: Full-site failover -->
+    <div class="tl-phase">
+      <div class="tl-header">
+        <span class="tag tag-green mb-sm">PASS</span>
+        <div class="tl-phase-name">Full-Site Failover</div>
+        <div class="tl-phase-date">S4-09 · 2026-03-15</div>
+      </div>
+      <div class="tl-body">
+        <ul class="tl-steps">
+          <li class="tl-step"><span class="tl-step-icon pass">✔</span><span>Pre-checks: replication 0 lag, WG handshake 5s, Keepalived MASTER, /health 200</span></li>
+          <li class="tl-step"><span class="tl-step-icon pass">✔</span><span><strong>F-1</strong> Stopped on-prem app (docker compose down) at 15:42:13Z</span></li>
+          <li class="tl-step"><span class="tl-step-icon pass">✔</span><span><strong>F-2</strong> Captured final LSN: 0/542FCA0, bytes_lag=0 to DR VM</span></li>
+          <li class="tl-step"><span class="tl-step-icon pass">✔</span><span><strong>F-3</strong> Stopped postgresql + keepalived on pg-primary at 15:44:14Z</span></li>
+          <li class="tl-step"><span class="tl-step-icon pass">✔</span><span><strong>F-4/F-5</strong> DR VM replay stabilised at 0/542FD18 → pg_promote() → pg_is_in_recovery=f</span></li>
+          <li class="tl-step"><span class="tl-step-icon pass">✔</span><span><strong>F-6</strong> Write test on Azure primary: CREATE/INSERT 0 1/DROP — success</span></li>
+          <li class="tl-step"><span class="tl-step-icon pass">✔</span><span><strong>F-7</strong> Azure app started with <code style="font-family:var(--mono);font-size:11px">--network host</code> · /health 200 at 16:32:45Z</span></li>
+          <li class="tl-step"><span class="tl-step-icon info">→</span><span>SSH interruption (WSL lost route to PVE) added ~45 min latency — switched to Azure run-command. Outcome unaffected.</span></li>
+        </ul>
+        <div class="tl-result">✔ Azure DR VM promoted · App healthy · RPO 0 bytes · Operational RTO 48m 42s (&lt;5 min clean)</div>
+      </div>
+    </div>
+
+    <!-- Phase 4: Full-site failback -->
+    <div class="tl-phase">
+      <div class="tl-header">
+        <span class="tag tag-green mb-sm">PASS</span>
+        <div class="tl-phase-name">Full-Site Failback</div>
+        <div class="tl-phase-date">S4-09 · 2026-03-15</div>
+      </div>
+      <div class="tl-body">
+        <ul class="tl-steps">
+          <li class="tl-step"><span class="tl-step-icon pass">✔</span><span><strong>B-1/B-2</strong> Stopped Azure app, set DR VM read-only (ALTER SYSTEM)</span></li>
+          <li class="tl-step"><span class="tl-step-icon pass">✔</span><span><strong>B-3</strong> pg_basebackup from DR VM → pg-primary (30774 kB, standby.signal written) 17:34:23Z</span></li>
+          <li class="tl-step"><span class="tl-step-icon pass">✔</span><span><strong>B-4/B-5</strong> pg-primary started as standby, streaming from DR VM at 0 lag</span></li>
+          <li class="tl-step"><span class="tl-step-icon pass">✔</span><span><strong>B-7</strong> pg_promote() on pg-primary → pg_is_in_recovery=f at 17:40:33Z</span></li>
+          <li class="tl-step"><span class="tl-step-icon pass">✔</span><span><strong>B-8/B-9</strong> DR VM rebuilt via pg_basebackup from pg-primary — streaming 0 lag restored</span></li>
+          <li class="tl-step"><span class="tl-step-icon pass">✔</span><span><strong>B-10/B-11/B-12</strong> VIP 10.0.96.10 returned · On-prem app started · /health 200 at 17:51:49Z</span></li>
+        </ul>
+        <div class="tl-result">✔ pg-primary restored · DR VM replica rebuilt · On-prem app healthy · RPO 0 bytes · RTO 20m 53s</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ METRICS ════════════════════════════════════════════════ -->
+<section id="metrics">
+  <div class="page">
+    <div class="section-header">
+      <div class="section-eyebrow">04 · Metrics</div>
+      <h2>RTO / RPO results</h2>
+    </div>
+
+    <div class="card-grid card-grid-4" style="margin-bottom:1.5rem;">
+      <div class="metric-card green">
+        <div class="metric-label">On-prem failover RTO</div>
+        <div class="metric-value green">&lt;1s</div>
+        <div class="metric-sub">VRRP VIP move · &lt;5s app-confirmed</div>
+      </div>
+      <div class="metric-card blue">
+        <div class="metric-label">On-prem fallback</div>
+        <div class="metric-value blue">24s</div>
+        <div class="metric-sub">Replication resumed automatically</div>
+      </div>
+      <div class="metric-card amber">
+        <div class="metric-label">Full-site failover RTO</div>
+        <div class="metric-value amber">48m 42s</div>
+        <div class="metric-sub">Operational · &lt;5 min clean (SSH issue)</div>
+      </div>
+      <div class="metric-card purple">
+        <div class="metric-label">Full-site failback RTO</div>
+        <div class="metric-value purple">20m 53s</div>
+        <div class="metric-sub">1253s · pg_basebackup + promote cycle</div>
+      </div>
+    </div>
+
+    <div class="card-grid card-grid-4">
+      <div class="metric-card green">
+        <div class="metric-label">RPO — all tests</div>
+        <div class="metric-value green">0</div>
+        <div class="metric-sub">bytes · zero data loss confirmed</div>
+      </div>
+      <div class="metric-card green">
+        <div class="metric-label">Evidence files</div>
+        <div class="metric-value green">33</div>
+        <div class="metric-sub">committed to git main branch</div>
+      </div>
+      <div class="metric-card blue">
+        <div class="metric-label">Runbooks executed</div>
+        <div class="metric-value blue">2</div>
+        <div class="metric-sub">Failover + Failback · EXECUTED status</div>
+      </div>
+      <div class="metric-card blue">
+        <div class="metric-label">Replication lag at DR</div>
+        <div class="metric-value blue">0</div>
+        <div class="metric-sub">bytes before every promotion</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="card mt-md">
+      <h4>Failover RTO note — SSH interruption</h4>
+      <p>
+        The operational failover RTO of <strong style="color:var(--text)">48m 42s</strong> was caused by WSL losing its network route to PVE
+        mid-execution after the SSH ControlMaster socket was cleared. The remaining steps were completed
+        via Azure run-command (significant per-call latency). The promotion itself succeeded;
+        only the confirmation step was delayed. Under uninterrupted SSH access, the estimated clean
+        RTO is <strong style="color:var(--green)">&lt;5 minutes</strong>. All acceptance criteria were met.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ PROOF ══════════════════════════════════════════════════ -->
+<section id="proof">
+  <div class="page">
+    <div class="section-header">
+      <div class="section-eyebrow">05 · Live Evidence</div>
+      <h2>Actual /health responses from each phase</h2>
+    </div>
+
+    <div class="proof-grid">
+
+      <!-- Proof 1: On-prem normal -->
+      <div class="evidence-block">
+        <div class="evidence-header">
+          <span class="dot green"></span>
+          Pre-test baseline · On-prem primary active
+          <span class="tag tag-green" style="margin-left:auto;">NORMAL</span>
+        </div>
+        <div class="evidence-body"><span class="hl-key">{
+  "status"</span>: <span class="hl-ok">"ok"</span>,
+  <span class="hl-key">"db"</span>: <span class="hl-str">"ok"</span>,
+  <span class="hl-key">"db_host"</span>: <span class="hl-str">"10.0.96.10"</span>,
+  <span class="hl-key">"pg_is_in_recovery"</span>: <span class="hl-false">false</span>,
+  <span class="hl-key">"app_env"</span>: <span class="hl-str">"dev"</span>,
+  <span class="hl-key">"ts"</span>: <span class="hl-ts">"2026-03-14T14:29:18Z"</span>
+}</div>
+      </div>
+
+      <!-- Proof 2: On-prem failover - standby serving -->
+      <div class="evidence-block">
+        <div class="evidence-header">
+          <span class="dot amber"></span>
+          On-prem failover · Standby serving via VIP
+          <span class="tag tag-amber" style="margin-left:auto;">DEGRADED</span>
+        </div>
+        <div class="evidence-body"><span class="hl-key">{
+  "status"</span>: <span class="hl-ok">"ok"</span>,
+  <span class="hl-key">"db"</span>: <span class="hl-str">"ok"</span>,
+  <span class="hl-key">"db_host"</span>: <span class="hl-str">"10.0.96.10"</span>,
+  <span class="hl-key">"pg_is_in_recovery"</span>: <span class="hl-true">true</span>,  <span class="hl-ts">← VIP on pg-standby</span>
+  <span class="hl-key">"app_env"</span>: <span class="hl-str">"dev"</span>,
+  <span class="hl-key">"ts"</span>: <span class="hl-ts">"2026-03-14T15:49:13Z"</span>
+}</div>
+      </div>
+
+      <!-- Proof 3: On-prem fallback complete -->
+      <div class="evidence-block">
+        <div class="evidence-header">
+          <span class="dot green"></span>
+          On-prem fallback · Primary restored
+          <span class="tag tag-green" style="margin-left:auto;">RESTORED</span>
+        </div>
+        <div class="evidence-body"><span class="hl-key">{
+  "status"</span>: <span class="hl-ok">"ok"</span>,
+  <span class="hl-key">"db"</span>: <span class="hl-str">"ok"</span>,
+  <span class="hl-key">"db_host"</span>: <span class="hl-str">"10.0.96.10"</span>,
+  <span class="hl-key">"pg_is_in_recovery"</span>: <span class="hl-false">false</span>,  <span class="hl-ts">← VIP back on pg-primary</span>
+  <span class="hl-key">"app_env"</span>: <span class="hl-str">"dev"</span>,
+  <span class="hl-key">"ts"</span>: <span class="hl-ts">"2026-03-14T15:52:38Z"</span>
+}</div>
+      </div>
+
+      <!-- Proof 4: Azure DR active -->
+      <div class="evidence-block">
+        <div class="evidence-header">
+          <span class="dot amber"></span>
+          Full-site failover · Azure DR VM promoted
+          <span class="tag tag-amber" style="margin-left:auto;">DR ACTIVE</span>
+        </div>
+        <div class="evidence-body"><span class="hl-key">{
+  "status"</span>: <span class="hl-ok">"ok"</span>,
+  <span class="hl-key">"db"</span>: <span class="hl-str">"ok"</span>,
+  <span class="hl-key">"db_host"</span>: <span class="hl-str">"127.0.0.1"</span>,  <span class="hl-ts">← host-mode Docker on DR VM</span>
+  <span class="hl-key">"pg_is_in_recovery"</span>: <span class="hl-false">false</span>,  <span class="hl-ts">← Azure VM is now primary</span>
+  <span class="hl-key">"app_env"</span>: <span class="hl-str">"dr-azure"</span>,
+  <span class="hl-key">"ts"</span>: <span class="hl-ts">"2026-03-15T16:32:45Z"</span>
+}</div>
+      </div>
+
+      <!-- Proof 5: Final failback -->
+      <div class="evidence-block">
+        <div class="evidence-header">
+          <span class="dot green"></span>
+          Full-site failback · On-prem restored
+          <span class="tag tag-green" style="margin-left:auto;">RESTORED</span>
+        </div>
+        <div class="evidence-body"><span class="hl-key">{
+  "status"</span>: <span class="hl-ok">"ok"</span>,
+  <span class="hl-key">"db"</span>: <span class="hl-str">"ok"</span>,
+  <span class="hl-key">"db_host"</span>: <span class="hl-str">"10.0.96.10"</span>,  <span class="hl-ts">← VIP back on pg-primary</span>
+  <span class="hl-key">"pg_is_in_recovery"</span>: <span class="hl-false">false</span>,  <span class="hl-ts">← on-prem primary restored</span>
+  <span class="hl-key">"app_env"</span>: <span class="hl-str">"dev"</span>,
+  <span class="hl-key">"ts"</span>: <span class="hl-ts">"2026-03-15T17:55:52Z"</span>
+}</div>
+      </div>
+
+      <!-- Proof 6: pg_basebackup -->
+      <div class="evidence-block">
+        <div class="evidence-header">
+          <span class="dot blue"></span>
+          Failback B-7 · pg_promote() on pg-primary
+          <span class="tag tag-blue" style="margin-left:auto;">DB LEVEL</span>
+        </div>
+        <div class="evidence-body"><span class="hl-ts">-- Promoting pg-primary at 2026-03-15T17:40:33Z</span>
+
+ pg_promote
+------------
+ <span class="hl-true">t</span>
+
+ pg_is_in_recovery | pg_current_wal_lsn
+-------------------+--------------------
+ <span class="hl-false">f</span>                 | <span class="hl-num">0/7000228</span>
+
+<span class="hl-ts">ls: standby.signal: No such file or directory</span>
+<span class="hl-pass">-- standby.signal absent → promotion confirmed</span></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ FINAL STATE ═══════════════════════════════════════════ -->
+<section id="state">
+  <div class="page">
+    <div class="section-header">
+      <div class="section-eyebrow">06 · Final System State</div>
+      <h2>Post-failback snapshot · 2026-03-15T17:55Z</h2>
+    </div>
+
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:10px; overflow:hidden;">
+      <table class="state-table">
+        <thead>
+          <tr>
+            <th>Component</th>
+            <th>Host / IP</th>
+            <th>Status</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>pg-primary</td>
+            <td class="text-muted">10.0.96.11</td>
+            <td><span class="status-dot green"></span><span class="text-green font-bold">PRIMARY</span></td>
+            <td class="text-muted">pg_is_in_recovery=f · Keepalived MASTER · VIP 10.0.96.10 active · WAL LSN 0/9000148</td>
+          </tr>
+          <tr>
+            <td>vm-pg-dr-fce</td>
+            <td class="text-muted">10.200.0.2</td>
+            <td><span class="status-dot blue"></span><span class="text-blue font-bold">REPLICA</span></td>
+            <td class="text-muted">pg_is_in_recovery=t · streaming from pg-primary · 0 bytes lag · WireGuard 15s handshake</td>
+          </tr>
+          <tr>
+            <td>app-onprem</td>
+            <td class="text-muted">10.0.96.13:8080</td>
+            <td><span class="status-dot green"></span><span class="text-green font-bold">HEALTHY</span></td>
+            <td class="text-muted">docker-app-1 running · /health 200 · db_host=10.0.96.10 · pg_is_in_recovery=false</td>
+          </tr>
+          <tr>
+            <td>pg-standby</td>
+            <td class="text-muted">10.0.96.14</td>
+            <td><span class="status-dot amber"></span><span class="text-amber font-bold">NEEDS REBUILD</span></td>
+            <td class="text-muted">PostgreSQL active · stuck at LSN 0/542FD18 (pre-failover timeline) · Keepalived BACKUP · maintenance item</td>
+          </tr>
+          <tr>
+            <td>clopr2-app-dr</td>
+            <td class="text-muted">vm-pg-dr-fce</td>
+            <td><span class="status-dot muted"></span><span class="text-muted">STOPPED</span></td>
+            <td class="text-muted">Container removed as part of failback FB-1. DR app only runs during active Azure DR.</td>
+          </tr>
+          <tr>
+            <td>WireGuard tunnel</td>
+            <td class="text-muted">10.200.0.x</td>
+            <td><span class="status-dot green"></span><span class="text-green font-bold">ACTIVE</span></td>
+            <td class="text-muted">Handshake 15s · 34.25 MiB rx / 39.78 MiB tx · persistent keepalive 25s</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ FOLLOW-UP ═════════════════════════════════════════════ -->
+<section id="followup">
+  <div class="page">
+    <div class="section-header">
+      <div class="section-eyebrow">07 · Follow-up Items</div>
+      <h2>Post-drill maintenance</h2>
+    </div>
+
+    <div class="followup-item">
+      <div class="followup-icon">🔄</div>
+      <div class="followup-body">
+        <div class="followup-title">Rebuild pg-standby (10.0.96.14) as streaming replica</div>
+        <div class="followup-desc">
+          pg-standby is active but stuck at LSN <span class="text-mono">0/542FD18</span> — the pre-failover timeline.
+          When pg-primary was stopped during full-site failover, pg-standby lost its replication feed
+          and cannot automatically rejoin the new timeline after pg-primary was promoted from the DR VM.
+          Fix: run <span class="text-mono">pg_basebackup</span> on pg-standby from the restored pg-primary,
+          then start PostgreSQL with <span class="text-mono">standby.signal</span>.
+          Not a gate item — on-prem HA degrades to single-node primary until resolved.
+        </div>
+      </div>
+    </div>
+
+    <div class="followup-item">
+      <div class="followup-icon">📋</div>
+      <div class="followup-body">
+        <div class="followup-title">Document SSH ControlMaster socket management in runbook</div>
+        <div class="followup-desc">
+          The WSL SSH ControlMaster socket at <span class="text-mono">~/.ssh/ctl/pve</span> goes stale when WSL
+          changes network. Add a mandatory pre-execution check: <span class="text-mono">rm -f ~/.ssh/ctl/pve && ssh pve echo ok</span>
+          to both the failover and failback runbooks as a pre-step.
+        </div>
+      </div>
+    </div>
+
+    <div class="followup-item">
+      <div class="followup-icon">💰</div>
+      <div class="followup-body">
+        <div class="followup-title">Azure auto-shutdown re-enabled on vm-pg-dr-fce</div>
+        <div class="followup-desc">
+          Auto-shutdown was disabled during the DR drill to prevent the DR VM from being stopped
+          mid-execution. Verify it has been re-enabled at the desired schedule to control Azure costs.
+        </div>
+      </div>
+    </div>
+
+    <div class="followup-item" style="border-color:rgba(34,197,94,.3); background:rgba(34,197,94,.04);">
+      <div class="followup-icon">✅</div>
+      <div class="followup-body">
+        <div class="followup-title" style="color:var(--green);">S4-09 COMPLETE — all acceptance criteria met</div>
+        <div class="followup-desc">
+          Failover PASS (commit c8063d4) · Failback PASS (commit d59b7ae) · RPO 0 bytes · 33 evidence files ·
+          ClickUp task 86c8u3pwy updated. Full-site DR validation signed off.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ FOOTER ════════════════════════════════════════════════ -->
+<footer>
+  <div class="page">
+    <p style="max-width:none; text-align:center;">
+      <strong>CLOPR2 Secure Hybrid DR Gateway (IaC Edition)</strong> ·
+      Owner: <strong>KATAR711</strong> · Team: <strong>BCLC24</strong> ·
+      Validated: <strong>2026-03-14 / 2026-03-15</strong>
+    </p>
+    <p style="max-width:none; text-align:center; margin-top:.4rem;">
+      Proxmox on-prem · Azure francecentral · PostgreSQL 16 · WireGuard · Keepalived · Terraform · Ansible
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>

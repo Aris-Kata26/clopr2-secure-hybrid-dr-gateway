@@ -1,7 +1,7 @@
 # Full Site DR Validation — Evidence Checklist
 <!-- CLOPR2 Secure Hybrid DR Gateway | Owner: KATAR711 | Team: BCLC24 -->
 
-## Status: PENDING — not yet executed
+## Status: IN PROGRESS — pre-deployment complete 2026-03-15; failover execution pending
 
 Evidence directory: `docs/05-evidence/full-site-dr-validation/`
 Failover runbook: `docs/03-operations/full-site-failover-runbook.md` v1.0
@@ -13,12 +13,12 @@ Failback runbook: `docs/03-operations/full-site-failback-runbook.md` v1.0
 
 | # | File | Source host | Content | Status |
 |---|---|---|---|---|
-| D-1 | `predeployment-drvm-docker.txt` | vm-pg-dr-fce | `docker --version` — Docker CE installed | [ ] |
-| D-2 | `predeployment-app-image.txt` | vm-pg-dr-fce | `docker image ls clopr2-app:dr` — image present | [ ] |
-| D-3 | `predeployment-app-env.txt` | vm-pg-dr-fce | `cat /home/azureuser/clopr2-app/.env` — DB_HOST=127.0.0.1 | [ ] |
-| D-4 | `predeployment-ssh-chain.txt` | local | `ssh vm-pg-dr-fce 'hostname && whoami'` — chain works | [ ] |
-| D-5 | `predeployment-wg-active.txt` | pg-primary | `sudo wg show` — peer handshake < 3 min | [ ] |
-| D-6 | `predeployment-replication.txt` | pg-primary | `pg_stat_replication` — 10.200.0.2 streaming | [ ] |
+| D-1 | `predeployment-drvm-docker.txt` | vm-pg-dr-fce | `docker --version` — Docker CE installed | [x] |
+| D-2 | `predeployment-app-image.txt` | vm-pg-dr-fce | `docker image ls clopr2-app:dr` — image present | [x] |
+| D-3 | `predeployment-app-env.txt` | vm-pg-dr-fce | `cat /home/azureuser/clopr2-app/.env` — DB_HOST=127.0.0.1 | [x] |
+| D-4 | `predeployment-ssh-chain.txt` | local | `ssh vm-pg-dr-fce 'hostname && whoami'` — chain works | [x] |
+| D-5 | `predeployment-wg-active.txt` | pg-primary | `sudo wg show` — peer handshake < 3 min | [x] |
+| D-6 | `predeployment-replication.txt` | pg-primary | `pg_stat_replication` — 10.200.0.2 streaming | [x] |
 
 ---
 

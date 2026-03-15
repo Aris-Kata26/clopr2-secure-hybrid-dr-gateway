@@ -1,0 +1,7 @@
+vm-pg-dr-fce
+azureuser
+ pg_is_in_recovery 
+-------------------
+ t
+(1 row)
+

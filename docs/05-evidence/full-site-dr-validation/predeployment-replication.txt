@@ -1,0 +1,6 @@
+ client_addr |   state   | sent_lsn  | replay_lsn | bytes_lag 
+-------------+-----------+-----------+------------+-----------
+ 10.0.96.14  | streaming | 0/542FCA0 | 0/542FCA0  |         0
+ 10.200.0.2  | streaming | 0/542FCA0 | 0/542FCA0  |         0
+(2 rows)
+

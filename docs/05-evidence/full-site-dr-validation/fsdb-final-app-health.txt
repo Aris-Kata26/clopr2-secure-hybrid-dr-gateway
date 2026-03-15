@@ -1,0 +1,8 @@
+FINAL APP HEALTH — 2026-03-15T17:55:52Z
+
+curl http://10.0.96.13:8080/health (via WSL SSH tunnel through pg-primary)
+
+{"status":"ok","db":"ok","db_host":"10.0.96.10","pg_is_in_recovery":false,"app_env":"dev","ts":"2026-03-15T17:55:52Z"}
+
+PASS: status=ok, db=ok, db_host=10.0.96.10 (VIP), pg_is_in_recovery=false (primary), app_env=dev
+Failback confirmed: on-prem app connected to pg-primary via VIP.

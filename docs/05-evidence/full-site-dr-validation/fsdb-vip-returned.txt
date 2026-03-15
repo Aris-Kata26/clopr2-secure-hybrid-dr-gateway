@@ -1,0 +1,7 @@
+     Active: active (running) since Sun 2026-03-15 17:50:24 UTC; 8s ago
+Mar 15 17:50:24 pg-primary Keepalived_vrrp[899413]: (pg_ha) Warning - nopreempt will not work with initial state MASTER - clearing
+Mar 15 17:50:24 pg-primary Keepalived_vrrp[899413]: (pg_ha) Entering BACKUP STATE (init)
+Mar 15 17:50:27 pg-primary Keepalived_vrrp[899413]: (pg_ha) Entering MASTER STATE
+    inet 10.0.96.11/16 brd 10.0.255.255 scope global eth0
+    inet 10.0.96.10/16 scope global secondary eth0
+    inet6 fe80::be24:11ff:fe47:c333/64 scope link 

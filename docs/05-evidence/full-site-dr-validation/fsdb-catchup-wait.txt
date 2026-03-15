@@ -1,0 +1,18 @@
+Enable succeeded: 
+[stdout]
+
+[stderr]
+ERROR:  syntax error at or near ".0"
+LINE 1: ...lag FROM pg_stat_replication WHERE client_addr = 10.200.0.1;
+                                                                  ^
+
+Enable succeeded: 
+[stdout]
+ client_addr | bytes_lag 
+-------------+-----------
+ 10.200.0.1  |         0
+(1 row)
+
+
+[stderr]
+

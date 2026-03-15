@@ -1,0 +1,14 @@
+● postgresql.service - PostgreSQL RDBMS
+     Loaded: loaded (/usr/lib/systemd/system/postgresql.service; enabled; preset: enabled)
+     Active: active (exited) since Sun 2026-03-15 17:35:36 UTC; 6s ago
+    Process: 897245 ExecStart=/bin/true (code=exited, status=0/SUCCESS)
+   Main PID: 897245 (code=exited, status=0/SUCCESS)
+        CPU: 4ms
+
+Mar 15 17:35:36 pg-primary systemd[1]: Starting postgresql.service - PostgreSQL RDBMS...
+Mar 15 17:35:36 pg-primary systemd[1]: Finished postgresql.service - PostgreSQL RDBMS.
+ pg_is_in_recovery 
+-------------------
+ t
+(1 row)
+

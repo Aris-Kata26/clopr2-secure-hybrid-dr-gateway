@@ -1,0 +1,1 @@
+{"status":"ok","db":"ok","db_host":"10.0.96.10","pg_is_in_recovery":false,"app_env":"dev","ts":"2026-03-15T17:51:49Z"}

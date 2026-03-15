@@ -1,0 +1,18 @@
+WARNING: Unable to encode the output with cp1252 encoding. Unsupported characters are discarded.
+Enable succeeded: 
+[stdout]
+ALTER SYSTEM
+ pg_reload_conf 
+----------------
+ t
+(1 row)
+
+Read-only set at: 6-03-15T17:32:54Z
+ default_transaction_read_only 
+-------------------------------
+ on
+(1 row)
+
+
+[stderr]
+

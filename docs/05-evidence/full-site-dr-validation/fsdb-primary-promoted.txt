@@ -1,0 +1,13 @@
+Promoting pg-primary at: \2026-03-15T17:40:33Z
+ pg_promote 
+------------
+ t
+(1 row)
+
+ pg_is_in_recovery | pg_current_wal_lsn 
+-------------------+--------------------
+ f                 | 0/7000228
+(1 row)
+
+ls: cannot access '/var/lib/postgresql/16/main/standby.signal': Permission denied
+ls: cannot access '/var/lib/postgresql/16/main/standby.signal': No such file or directory

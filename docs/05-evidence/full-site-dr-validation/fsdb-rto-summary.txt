@@ -1,0 +1,14 @@
+FAILBACK COMPLETE
+FSB_START (failback start):           2026-03-15T17:30:56Z
+Azure app stopped (FB-1):             2026-03-15T17:32:10Z
+pg_basebackup complete (FB-3):        2026-03-15T17:34:23Z
+pg-primary standby start (FB-4):      2026-03-15T17:35:42Z
+pg-primary promoted (FB-7):           2026-03-15T17:40:33Z
+DR VM rebuilt as standby (FB-8):      2026-03-15T17:49:42Z
+VIP returned to pg-primary (FB-10):   2026-03-15T17:50:27Z
+On-prem app healthy (FB-12):          2026-03-15T17:51:49Z
+FSB_END:                              2026-03-15T17:52:06Z
+
+Failback RTO (start -> on-prem app healthy): 1253s (20m 53s)
+
+RPO: 0 bytes (planned switchover with 0 lag before pg_promote)

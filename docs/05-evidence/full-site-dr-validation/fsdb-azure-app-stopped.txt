@@ -1,0 +1,10 @@
+WARNING: Unable to encode the output with cp1252 encoding. Unsupported characters are discarded.
+Enable succeeded: 
+[stdout]
+clopr2-app-dr
+clopr2-app-dr
+App stopped at: 6-03-15T17:32:10Z
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+
+[stderr]
+

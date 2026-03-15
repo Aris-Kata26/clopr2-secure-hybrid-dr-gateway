@@ -7,7 +7,7 @@
 |---|---|
 | Version | 1.0 |
 | Created | 2026-03-15 |
-| Status | DRAFT — not yet executed |
+| Status | EXECUTED — 2026-03-15 — failback PASS |
 | Sprint | S5-01 |
 | Prerequisite | Full site failover completed and validated (full-site-failover-runbook.md) |
 | Companion | `full-site-failover-runbook.md` |

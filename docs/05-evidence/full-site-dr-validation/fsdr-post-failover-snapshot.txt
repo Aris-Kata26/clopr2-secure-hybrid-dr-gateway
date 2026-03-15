@@ -1,0 +1,12 @@
+Enable succeeded: 
+[stdout]
+{"status":"ok","db":"ok","db_host":"127.0.0.1","pg_is_in_recovery":false,"app_env":"dr-azure","ts":"2026-03-15T16:52:18Z"}CONTAINER ID   IMAGE           COMMAND                  CREATED          STATUS          PORTS     NAMES
+9b18c2134f17   clopr2-app:dr   "uvicorn main:app --…"   20 minutes ago   Up 20 minutes             clopr2-app-dr
+ pg_is_in_recovery 
+-------------------
+ f
+(1 row)
+
+
+[stderr]
+

@@ -1,0 +1,10 @@
+=== DR VM PRE-CHECK ===
+Timestamp: \2026-03-15T15:38:56Z
+ pg_is_in_recovery | lag 
+-------------------+-----
+ t                 | 
+(1 row)
+
+IMAGE           ID             DISK USAGE   CONTENT SIZE   EXTRA
+clopr2-app:dr   c0bb2a87e32d        261MB         63.2MB        
+WARNING: This output is designed for human readability. For machine-readable output, please use --format.

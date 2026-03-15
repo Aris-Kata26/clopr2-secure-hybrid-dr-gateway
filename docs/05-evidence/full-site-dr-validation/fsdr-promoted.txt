@@ -1,0 +1,22 @@
+WARNING: Unable to encode the output with cp1252 encoding. Unsupported characters are dismux_client_request_stdio_fwd: read from master failed: Broken pipe
+tamp: 6-03-15T16:21:33Z
+
+--- pg_is_in_recovery ---
+ pg_is_in_recovery 
+-------------------
+ f
+(1 row)
+
+
+--- pg_current_wal_lsn ---
+ pg_current_wal_lsn |              now              
+--------------------+-------------------------------
+ 0/542FE30          | 2026-03-15 16:21:43.849233+00
+(1 row)
+
+
+--- standby.signal ---
+ls: cannot access '/var/lib/postgresql/16/main/standby.signal': No such file or directory
+
+[stderr]
+

@@ -1,0 +1,55 @@
+=== FULL SITE FAILOVER PRE-CHECK ===
+Timestamp: \2026-03-15T15:37:08Z
+
+--- pg_stat_replication ---
+ client_addr |   state   | sync_state | primary_lsn | sent_lsn  | replay_lsn | bytes_lag 
+-------------+-----------+------------+-------------+-----------+------------+-----------
+ 10.0.96.14  | streaming | async      | 0/542FCA0   | 0/542FCA0 | 0/542FCA0  |         0
+ 10.200.0.2  | streaming | async      | 0/542FCA0   | 0/542FCA0 | 0/542FCA0  |         0
+(2 rows)
+
+
+--- WireGuard ---
+interface: wg0
+  public key: Eux0XtJyGX6tdI+5J0ePgU+cgA2OZuuMUbBNG1wksjQ=
+  private key: (hidden)
+  listening port: 49306
+
+peer: aRTHX9qS0UbWgi/MKBw6UqE3KGSEpsrVhdt1cU+eIkQ=
+  endpoint: 20.216.128.32:51820
+  allowed ips: 10.200.0.2/32
+  latest handshake: 5 seconds ago
+  transfer: 391.25 KiB received, 6.60 MiB sent
+  persistent keepalive: every 25 seconds
+
+--- Keepalived ---
+● keepalived.service - Keepalive Daemon (LVS and VRRP)
+     Loaded: loaded (/usr/lib/systemd/system/keepalived.service; enabled; preset: enabled)
+     Active: active (running) since Sat 2026-03-14 15:52:25 UTC; 23h ago
+       Docs: man:keepalived(8)
+             man:keepalived.conf(5)
+             man:genhash(1)
+             https://keepalived.org
+   Main PID: 626232 (keepalived)
+      Tasks: 2 (limit: 1081)
+     Memory: 6.8M (peak: 15.0M)
+        CPU: 50min 54.144s
+     CGroup: /system.slice/keepalived.service
+             ├─626232 /usr/sbin/keepalived --dont-fork
+             └─626236 /usr/sbin/keepalived --dont-fork
+
+Mar 14 15:52:26 pg-primary Keepalived_vrrp[626236]: VRRP_Script(chk_postgresql) succeeded
+Mar 14 15:52:26 pg-primary Keepalived_vrrp[626236]: (pg_ha) received lower priority (90) advert from 10.0.96.14 - discarding
+Mar 14 15:52:27 pg-primary Keepalived_vrrp[626236]: (pg_ha) received lower priority (90) advert from 10.0.96.14 - discarding
+Mar 14 15:52:28 pg-primary Keepalived_vrrp[626236]: (pg_ha) received lower priority (90) advert from 10.0.96.14 - discarding
+Mar 14 15:52:29 pg-primary Keepalived_vrrp[626236]: (pg_ha) Entering MASTER STATE
+Mar 15 10:40:08 pg-primary Keepalived_vrrp[626236]: Track script chk_postgresql is already running, expect idle - skipping run
+Mar 15 10:40:12 pg-primary Keepalived_vrrp[626236]: VRRP_Script(chk_postgresql) timed_out
+Mar 15 10:40:13 pg-primary Keepalived_vrrp[626236]: (pg_ha) Changing effective priority from 100 to 80
+Mar 15 10:40:14 pg-primary Keepalived_vrrp[626236]: VRRP_Script(chk_postgresql) succeeded
+Mar 15 10:40:14 pg-primary Keepalived_vrrp[626236]: (pg_ha) Changing effective priority from 80 to 100
+
+--- VIP ---
+    inet 10.0.96.11/16 brd 10.0.255.255 scope global eth0
+    inet 10.0.96.10/16 scope global secondary eth0
+    inet6 fe80::be24:11ff:fe47:c333/64 scope link 

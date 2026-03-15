@@ -7,7 +7,7 @@
 |---|---|
 | Version | 1.0 |
 | Created | 2026-03-15 |
-| Status | DRAFT — not yet executed |
+| Status | EXECUTED — 2026-03-15 — failover PASS |
 | Sprint | S5-01 |
 | Failover type | Full site failover — DB promotion + Azure-side app activation |
 | Prerequisite | S4-03 PASSED (on-prem HA validated, commit db432bb) |
@@ -406,12 +406,16 @@ Save terminal output to `/tmp/fsdr-write-test.txt`.
 
 ### Step FS-7: Start app on vm-pg-dr-fce
 
+> **Note (from execution 2026-03-15):** Use `--network host` so that `DB_HOST=127.0.0.1` in the .env resolves to the host's PostgreSQL.
+> Without `--network host`, Docker bridge mode isolates the container's loopback from the host, causing `Connection refused` on port 5432.
+> With `--network host`, the app port is exposed directly on the host (port 8000, not 8080), so health checks use `localhost:8000`.
+
 ```bash
 # On vm-pg-dr-fce — start app container
 sudo docker run -d \
     --name clopr2-app-dr \
     --restart unless-stopped \
-    -p 8080:8000 \
+    --network host \
     --env-file /home/azureuser/clopr2-app/.env \
     clopr2-app:dr
 
@@ -423,7 +427,7 @@ sudo docker ps --filter name=clopr2-app-dr
 
 ```bash
 # On vm-pg-dr-fce
-curl -s http://localhost:8080/health | tee /tmp/fsdr-app-health-drvm.txt
+curl -s http://localhost:8000/health | tee /tmp/fsdr-app-health-drvm.txt
 
 # Expected JSON:
 # {
@@ -445,11 +449,11 @@ This provides external validation without opening the DR VM's app port in the NS
 
 ```bash
 # Local WSL — forward DR VM port 8080 to local 18080
-ssh -L 18080:localhost:8080 -N vm-pg-dr-fce &
+ssh -L 18000:localhost:8000 -N vm-pg-dr-fce &
 PORT_FWD_PID=$!
 sleep 2
 
-curl -s http://localhost:18080/health | tee /tmp/fsdr-app-health-local.txt
+curl -s http://localhost:18000/health | tee /tmp/fsdr-app-health-local.txt
 
 kill $PORT_FWD_PID
 ```
@@ -490,7 +494,7 @@ FSO_END=$(date -u +%Y-%m-%dT%H:%M:%SZ)
     sudo docker ps --filter name=clopr2-app-dr
     echo ""
     echo "--- App /health ---"
-    curl -s http://localhost:8080/health
+    curl -s http://localhost:8000/health
 } | tee /tmp/fsdr-post-failover-snapshot.txt
 ```
 

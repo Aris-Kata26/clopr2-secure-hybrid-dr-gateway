@@ -1,7 +1,7 @@
 # Full Site DR Validation — Evidence Checklist
 <!-- CLOPR2 Secure Hybrid DR Gateway | Owner: KATAR711 | Team: BCLC24 -->
 
-## Status: IN PROGRESS — pre-deployment complete 2026-03-15; failover execution pending
+## Status: IN PROGRESS — failover PASS 2026-03-15; failback pending
 
 Evidence directory: `docs/05-evidence/full-site-dr-validation/`
 Failover runbook: `docs/03-operations/full-site-failover-runbook.md` v1.0
@@ -26,10 +26,10 @@ Failback runbook: `docs/03-operations/full-site-failback-runbook.md` v1.0
 
 | # | File | Source host | Content | Status |
 |---|---|---|---|---|
-| P-1 | `fsdr-precheck-primary.txt` | pg-primary | pg_stat_replication, WireGuard show, Keepalived status, VIP on eth0 | [ ] |
-| P-2 | `fsdr-precheck-app-health.txt` | WSL | `/health` HTTP 200, `pg_is_in_recovery: false` (on-prem primary active) | [ ] |
-| P-3 | `fsdr-precheck-drvm.txt` | vm-pg-dr-fce | `pg_is_in_recovery()=t`, replication lag < 5 min, Docker image listed | [ ] |
-| P-4 | `fsdr-start-timestamp.txt` | local | ISO timestamp at failover start | [ ] |
+| P-1 | `fsdr-precheck-primary.txt` | pg-primary | pg_stat_replication, WireGuard show, Keepalived status, VIP on eth0 | [x] |
+| P-2 | `fsdr-precheck-app-health.txt` | WSL | `/health` HTTP 200, `pg_is_in_recovery: false` (on-prem primary active) | [x] |
+| P-3 | `fsdr-precheck-drvm.txt` | vm-pg-dr-fce | `pg_is_in_recovery()=t`, replication lag < 5 min, Docker image listed | [x] |
+| P-4 | `fsdr-start-timestamp.txt` | local | ISO timestamp at failover start | [x] |
 
 ---
 
@@ -37,16 +37,16 @@ Failback runbook: `docs/03-operations/full-site-failback-runbook.md` v1.0
 
 | # | File | Source host | Content | Status |
 |---|---|---|---|---|
-| F-1 | `fsdr-app-stopped.txt` | app-onprem | `docker compose down` — app container stopped | [ ] |
-| F-2 | `fsdr-final-lsn.txt` | pg-primary | `pg_current_wal_lsn()` + bytes_lag to DR VM — final WAL position before stop | [ ] |
-| F-3 | `fsdr-primary-stopped.txt` | pg-primary | `systemctl status postgresql` and keepalived — both inactive (dead) | [ ] |
-| F-4 | `fsdr-replay-wait.txt` | vm-pg-dr-fce | Replay LSN progression loop — shows DR VM consuming remaining WAL | [ ] |
-| F-5 | `fsdr-promoted.txt` | vm-pg-dr-fce | `pg_is_in_recovery()=f`, `pg_current_wal_lsn()` returned, standby.signal absent | [ ] |
-| F-6 | `fsdr-write-test.txt` | vm-pg-dr-fce | CREATE/INSERT/DROP on promoted DB — INSERT 0 1 without error | [ ] |
-| F-7 | `fsdr-app-health-drvm.txt` | vm-pg-dr-fce | `/health` HTTP 200, `pg_is_in_recovery: false`, `app_env: dr-azure` | [ ] |
-| F-8 | `fsdr-app-health-local.txt` | WSL | `/health` via SSH port-forward — same result confirmed externally | [ ] |
-| F-9 | `fsdr-rto-summary.txt` | local | FSO_START, FSO_END timestamps; RTO delta; RPO bytes at promotion | [ ] |
-| F-10 | `fsdr-post-failover-snapshot.txt` | vm-pg-dr-fce | Full post-failover state: PG role, pg_stat_replication, container, /health | [ ] |
+| F-1 | `fsdr-app-stopped.txt` | app-onprem | `docker compose down` — app container stopped | [x] |
+| F-2 | `fsdr-final-lsn.txt` | pg-primary | `pg_current_wal_lsn()` + bytes_lag to DR VM — final WAL position before stop | [x] |
+| F-3 | `fsdr-primary-stopped.txt` | pg-primary | `systemctl status postgresql` and keepalived — both inactive (dead) | [x] |
+| F-4 | `fsdr-replay-wait.txt` | vm-pg-dr-fce | Replay LSN progression loop — shows DR VM consuming remaining WAL | [x] |
+| F-5 | `fsdr-promoted.txt` | vm-pg-dr-fce | `pg_is_in_recovery()=f`, `pg_current_wal_lsn()` returned, standby.signal absent | [x] |
+| F-6 | `fsdr-write-test.txt` | vm-pg-dr-fce | CREATE/INSERT/DROP on promoted DB — INSERT 0 1 without error | [x] |
+| F-7 | `fsdr-app-health-drvm.txt` | vm-pg-dr-fce | `/health` HTTP 200, `pg_is_in_recovery: false`, `app_env: dr-azure` | [x] |
+| F-8 | `fsdr-app-health-local.txt` | WSL | `/health` via SSH port-forward — same result confirmed externally | [x] |
+| F-9 | `fsdr-rto-summary.txt` | local | FSO_START, FSO_END timestamps; RTO delta; RPO bytes at promotion | [x] |
+| F-10 | `fsdr-post-failover-snapshot.txt` | vm-pg-dr-fce | Full post-failover state: PG role, pg_stat_replication, container, /health | [x] |
 
 ---
 

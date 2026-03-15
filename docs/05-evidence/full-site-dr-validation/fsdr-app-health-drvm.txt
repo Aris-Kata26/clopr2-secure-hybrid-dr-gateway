@@ -1,0 +1,5 @@
+Enable succeeded: 
+[stdout]
+{"status":"ok","db":"ok","db_host":"127.0.0.1","pg_is_in_recovery":false,"app_env":"dr-azure","ts":"2026-03-15T16:32:45Z"}
+[stderr]
+

@@ -1,0 +1,32 @@
+=== pg-standby Rebuild Summary ===
+Timestamp: 2026-03-16T13:21:00Z
+Owner: KATAR711 | Team: BCLC24
+
+Root Cause:
+  pg-standby was stuck on WAL segment 000000020000000000000005 (timeline 2)
+  while pg-primary had advanced to timeline 3 (after S4-09 promotion cycle).
+  Direct TCP from pg-primary to pg-standby port 22 was also blocked by a
+  stale ARP entry on pg-primary (MAC 38:4b:76:f1:5e:61 vs actual bc:24:11:55:1d:5e).
+
+Resolution Steps:
+  1. Flushed stale ARP on pg-primary: sudo ip neigh del 10.0.96.14 dev eth0
+  2. Stopped PostgreSQL on pg-standby: sudo systemctl stop postgresql
+  3. Cleared data directory: /var/lib/postgresql/16/main (empty)
+  4. Created .pgpass for postgres user on pg-standby:
+       10.0.96.11:5432:replication:replicator:<redacted>
+       chmod 600, owned by postgres:postgres
+  5. Ran pg_basebackup:
+       sudo -u postgres pg_basebackup -h 10.0.96.11 -U replicator \
+         -D /var/lib/postgresql/16/main -Xs -P -R --checkpoint=fast --verbose
+     Result: base backup completed (WAL start 0/A000028, end 0/A000138, timeline 3)
+  6. Fixed postgresql.auto.conf (removed duplicate stale Azure primary_conninfo):
+       primary_conninfo = 'user=replicator passfile=/var/lib/postgresql/.pgpass host=10.0.96.11 port=5432 sslmode=prefer'
+  7. Started PostgreSQL: sudo systemctl start postgresql
+
+Post-Rebuild Verification:
+  pg-standby pg_is_in_recovery()  = t (PASS)
+  pg-primary pg_stat_replication:
+    10.0.96.14  | streaming | 0/B000060 | 0/B000060 | 0/B000060 | async (PASS)
+    10.200.0.2  | streaming | 0/B000060 | 0/B000060 | 0/B000060 | async (unchanged)
+
+On-prem HA baseline restored: CONFIRMED

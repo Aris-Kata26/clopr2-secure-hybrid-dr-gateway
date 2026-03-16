@@ -1,0 +1,3 @@
+pg-primary VIP check at: $(date -u +%Y-%m-%dT%H:%M:%SZ)
+    inet 10.0.96.11/16 brd 10.0.255.255 scope global eth0
+    inet6 fe80::be24:11ff:fe47:c333/64 scope link 

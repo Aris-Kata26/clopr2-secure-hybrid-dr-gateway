@@ -1,0 +1,5 @@
+Services stopped at: $(date -u +%Y-%m-%dT%H:%M:%SZ)
+inactive
+postgresql: inactive
+inactive
+keepalived: inactive

@@ -1,0 +1,7 @@
+Replication state at: $(date -u +%Y-%m-%dT%H:%M:%SZ)
+ client_addr |   state   | sync_state | bytes_lag 
+-------------+-----------+------------+-----------
+ 10.0.96.14  | streaming | async      |         0
+ 10.200.0.2  | streaming | async      |         0
+(2 rows)
+

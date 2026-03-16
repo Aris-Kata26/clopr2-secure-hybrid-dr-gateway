@@ -1,0 +1,7 @@
+ON-PREM HA FAILOVER COMPLETE
+FS_START:   2026-03-16T13:22:08Z
+FS_TRIGGER: 2026-03-16T13:22:22Z  (keepalived stop on pg-primary)
+FS_END:     2026-03-16T13:22:26Z
+
+PASS — VIP moved to pg-standby, app serving via standby
+RTO: sub-second (VRRP election) + <5s app-confirmed

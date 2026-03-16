@@ -1,0 +1,12 @@
+VIP returned at: $(date -u +%Y-%m-%dT%H:%M:%SZ)
+    inet 10.0.96.11/16 brd 10.0.255.255 scope global eth0
+    inet 10.0.96.10/16 scope global secondary eth0
+    inet6 fe80::be24:11ff:fe47:c333/64 scope link 
+● keepalived.service - Keepalive Daemon (LVS and VRRP)
+     Loaded: loaded (/usr/lib/systemd/system/keepalived.service; enabled; preset: enabled)
+     Active: active (running) since Mon 2026-03-16 13:22:52 UTC; 6s ago
+       Docs: man:keepalived(8)
+             man:keepalived.conf(5)
+             man:genhash(1)
+             https://keepalived.org
+   Main PID: 1176411 (keepalived)

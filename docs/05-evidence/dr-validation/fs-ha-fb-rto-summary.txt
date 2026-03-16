@@ -1,0 +1,5 @@
+ON-PREM HA FALLBACK COMPLETE
+FSB_START: 2026-03-16T13:22:44Z
+FSB_END:   2026-03-16T13:23:00Z
+
+PASS — VIP returned to pg-primary, replication resumed, app serving primary

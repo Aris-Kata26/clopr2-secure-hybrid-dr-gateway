@@ -1,0 +1,6 @@
+ client_addr |   state   | sent_lsn  | write_lsn | replay_lsn | write_lag | replay_lag | sync_state 
+-------------+-----------+-----------+-----------+------------+-----------+------------+------------
+ 10.0.96.14  | streaming | 0/B000060 | 0/B000060 | 0/B000060  |           |            | async
+ 10.200.0.2  | streaming | 0/B000060 | 0/B000060 | 0/B000060  |           |            | async
+(2 rows)
+

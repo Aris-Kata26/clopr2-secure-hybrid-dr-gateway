@@ -1,0 +1,11 @@
+=== pg-standby state post-failover ===
+Timestamp: 2026-03-16T13:22:27Z
+ pg_is_in_recovery | pg_last_wal_replay_lsn 
+-------------------+------------------------
+ t                 | 0/B0001C0
+(1 row)
+
+ pid | usesysid | usename | application_name | client_addr | client_hostname | client_port | backend_start | backend_xmin | state | sent_lsn | write_lsn | flush_lsn | replay_lsn | write_lag | flush_lag | replay_lag | sync_priority | sync_state | reply_time 
+-----+----------+---------+------------------+-------------+-----------------+-------------+---------------+--------------+-------+----------+-----------+-----------+------------+-----------+-----------+------------+---------------+------------+------------
+(0 rows)
+

@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #0a0f1a;
+  --surface: #111827;
+  --surface2: #1e293b;
+  --border: #1f2d40;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: #e2e8f0;
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Animated replication stream on SVG paths */
+.stream-path {
+  stroke-dasharray: 8 4;
+  animation: dash-flow 1.6s linear infinite;
+}
+
+.stream-path-slow {
+  stroke-dasharray: 10 6;
+  animation: dash-flow 3s linear infinite;
+}
+
+@keyframes dash-flow {
+  to { stroke-dashoffset: -24; }
+}
+
+/* Glow effects */
+.glow-green { filter: drop-shadow(0 0 6px rgba(34,197,94,0.6)); }
+.glow-blue  { filter: drop-shadow(0 0 6px rgba(56,189,248,0.6)); }
+.glow-amber { filter: drop-shadow(0 0 6px rgba(245,158,11,0.6)); }
+.glow-red   { filter: drop-shadow(0 0 6px rgba(239,68,68,0.6)); }
+
+/* Evidence code block */
+.evidence-code {
+  font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+  font-size: 12.5px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #475569; }

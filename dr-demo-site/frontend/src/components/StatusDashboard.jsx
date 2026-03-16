@@ -1,0 +1,193 @@
+import { motion } from 'framer-motion'
+
+const STATUS_COLORS = {
+  healthy:       { dot: 'bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]', text: 'text-emerald-400', label: 'HEALTHY' },
+  degraded:      { dot: 'bg-amber-400  shadow-[0_0_6px_rgba(251,191,36,0.8)]',  text: 'text-amber-400',  label: 'DEGRADED' },
+  stopped:       { dot: 'bg-slate-500',                                           text: 'text-slate-400',  label: 'STOPPED' },
+  active:        { dot: 'bg-sky-400    shadow-[0_0_6px_rgba(56,189,248,0.6)]',   text: 'text-sky-400',    label: 'ACTIVE' },
+  needs_rebuild: { dot: 'bg-amber-400  shadow-[0_0_6px_rgba(251,191,36,0.8)]',   text: 'text-amber-400',  label: 'NEEDS REBUILD' },
+}
+
+const FALLBACK_STATUS = {
+  components: {
+    pg_primary: { host: '10.0.96.11', role: 'primary', status: 'healthy',
+      detail: 'pg_is_in_recovery=f · Keepalived MASTER · VIP active · LSN 0/9000148' },
+    vm_pg_dr:   { host: '10.200.0.2', role: 'replica',  status: 'healthy',
+      detail: 'pg_is_in_recovery=t · streaming 0 lag from pg-primary' },
+    app_onprem: { host: '10.0.96.13:8080', status: 'healthy',
+      detail: 'docker-app-1 running · /health 200' },
+    pg_standby: { host: '10.0.96.14', role: 'needs_rebuild', status: 'needs_rebuild',
+      detail: 'Stuck at LSN 0/542FD18 (pre-failover timeline) · maintenance required' },
+    wireguard:  { status: 'active', detail: 'Handshake 15s · 34.25 MiB rx / 39.78 MiB tx · keepalive 25s' },
+  },
+  drill_summary: {
+    last_failover_date: '2026-03-15', last_failover_verdict: 'PASS',
+    last_failback_date: '2026-03-15', last_failback_verdict: 'PASS',
+    rpo_bytes: 0, current_mode: 'normal',
+  },
+  as_of: '2026-03-15T17:55:52Z',
+  source: 'evidence',
+}
+
+export default function StatusDashboard({ status }) {
+  const data = status || FALLBACK_STATUS
+  const comps = data.components
+  const drill = data.drill_summary
+
+  const cards = [
+    {
+      key: 'pg_primary', title: 'pg-primary', icon: '🐘',
+      status: comps.pg_primary.status,
+      meta: [
+        { k: 'Host',        v: comps.pg_primary.host },
+        { k: 'Role',        v: 'PRIMARY' },
+        { k: 'Keepalived',  v: 'MASTER' },
+        { k: 'VIP',         v: '10.0.96.10 ●' },
+        { k: 'WG handshake',v: '15s ago' },
+      ],
+      detail: comps.pg_primary.detail,
+    },
+    {
+      key: 'vm_pg_dr', title: 'vm-pg-dr-fce', icon: '☁',
+      status: comps.vm_pg_dr.status,
+      meta: [
+        { k: 'Host',    v: comps.vm_pg_dr.host },
+        { k: 'Role',    v: 'REPLICA' },
+        { k: 'Lag',     v: '0 bytes' },
+        { k: 'Provider',v: 'Azure francecentral' },
+      ],
+      detail: comps.vm_pg_dr.detail,
+    },
+    {
+      key: 'app_onprem', title: 'app-onprem', icon: '⚡',
+      status: comps.app_onprem.status,
+      meta: [
+        { k: 'Host',     v: comps.app_onprem.host },
+        { k: 'DB host',  v: '10.0.96.10 (VIP)' },
+        { k: 'Recovery', v: 'false (on primary)' },
+        { k: 'Env',      v: 'dev' },
+      ],
+      detail: comps.app_onprem.detail,
+      healthJson: comps.app_onprem.health,
+    },
+    {
+      key: 'pg_standby', title: 'pg-standby', icon: '⚠',
+      status: comps.pg_standby.status,
+      meta: [
+        { k: 'Host', v: comps.pg_standby.host },
+        { k: 'LSN',  v: '0/542FD18' },
+        { k: 'State',v: 'Timeline mismatch' },
+        { k: 'Action',v: 'pg_basebackup needed' },
+      ],
+      detail: comps.pg_standby.detail,
+    },
+    {
+      key: 'wireguard', title: 'WireGuard', icon: '🔐',
+      status: comps.wireguard.status,
+      meta: [
+        { k: 'Endpoint',  v: '20.216.128.32:51820' },
+        { k: 'Handshake', v: '15s ago' },
+        { k: 'Rx',        v: '34.25 MiB' },
+        { k: 'Tx',        v: '39.78 MiB' },
+      ],
+      detail: comps.wireguard.detail,
+    },
+    {
+      key: 'drill', title: 'Last DR Drills', icon: '✅',
+      status: 'healthy',
+      meta: [
+        { k: 'Failover',  v: `${drill.last_failover_verdict} — ${drill.last_failover_date}` },
+        { k: 'Failback',  v: `${drill.last_failback_verdict} — ${drill.last_failback_date}` },
+        { k: 'RPO',       v: `${drill.rpo_bytes} bytes` },
+        { k: 'Mode',      v: 'Normal operation' },
+      ],
+      detail: 'All acceptance criteria met. Failover + Failback PASS.',
+    },
+  ]
+
+  return (
+    <div>
+      <div className="flex items-center gap-3 mb-5">
+        <span className="text-xs text-slate-500">
+          Data as of: <span className="text-slate-300 font-mono">{data.as_of}</span>
+        </span>
+        <span className={`text-xs px-2 py-0.5 rounded font-semibold ${
+          data.source === 'live'
+            ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
+            : 'bg-slate-800 text-slate-400'
+        }`}>
+          {data.source === 'live' ? '● LIVE' : '● FROM EVIDENCE'}
+        </span>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {cards.map((card, i) => (
+          <StatusCard key={card.key} card={card} index={i} />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function StatusCard({ card, index }) {
+  const sc = STATUS_COLORS[card.status] || STATUS_COLORS.stopped
+
+  return (
+    <motion.div
+      className="rounded-xl border border-white/8 p-4"
+      style={{ background: 'rgba(17,24,39,0.8)' }}
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: .35, delay: index * .06 }}
+    >
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <span className="text-base">{card.icon}</span>
+          <span className="font-mono text-sm font-semibold text-white">{card.title}</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className={`w-2 h-2 rounded-full ${sc.dot}`} />
+          <span className={`text-xs font-bold ${sc.text}`}>{sc.label}</span>
+        </div>
+      </div>
+
+      <div className="space-y-1 mb-3">
+        {card.meta.map(m => (
+          <div key={m.k} className="flex justify-between text-xs">
+            <span className="text-slate-500">{m.k}</span>
+            <span className="text-slate-300 font-mono text-right ml-2 truncate max-w-[160px]">{m.v}</span>
+          </div>
+        ))}
+      </div>
+
+      {card.healthJson && (
+        <div className="mt-2 p-2 rounded-md text-xs font-mono overflow-x-auto"
+             style={{ background: 'rgba(0,0,0,0.4)' }}>
+          <JsonHighlight obj={card.healthJson} />
+        </div>
+      )}
+
+      <p className="text-xs text-slate-500 mt-2 leading-snug">{card.detail}</p>
+    </motion.div>
+  )
+}
+
+function JsonHighlight({ obj }) {
+  const lines = JSON.stringify(obj, null, 2).split('\n')
+  return (
+    <pre className="leading-relaxed">
+      {lines.map((line, i) => {
+        const isKey   = /"[\w_]+":/
+        const isTrue  = /:\s*true/
+        const isFalse = /:\s*false/
+        const isStr   = /:\s*"[^"]+"/
+        let colored = line
+          .replace(/"([\w_]+)":/g, (m, k) => `<span class="text-sky-300">"${k}":</span>`)
+          .replace(/:\s*(true)/g,   (m, v) => `: <span class="text-emerald-400 font-bold">${v}</span>`)
+          .replace(/:\s*(false)/g,  (m, v) => `: <span class="text-red-400 font-bold">${v}</span>`)
+          .replace(/:\s*"([^"]+)"/g,(m, v) => `: <span class="text-emerald-300">"${v}"</span>`)
+        return <span key={i} dangerouslySetInnerHTML={{ __html: colored + '\n' }} />
+      })}
+    </pre>
+  )
+}

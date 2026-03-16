@@ -1,8 +1,27 @@
 services:
-  dr-demo:
-    build: .
-    image: clopr2-dr-demo:latest
-    container_name: clopr2-dr-demo
+  backend:
+    build: ./backend
+    container_name: clopr2-demo-api
+    environment:
+      - EVIDENCE_DIR=/app/evidence
+      - APP_HEALTH_URL=${APP_HEALTH_URL:-}
+    volumes:
+      - ../docs/05-evidence:/app/evidence:ro
+    networks:
+      - demo
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: clopr2-demo-ui
     ports:
       - "8888:80"
+    depends_on:
+      - backend
+    networks:
+      - demo
     restart: unless-stopped
+
+networks:
+  demo:
+    driver: bridge

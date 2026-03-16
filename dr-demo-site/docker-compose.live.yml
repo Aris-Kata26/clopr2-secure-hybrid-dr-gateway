@@ -1,0 +1,29 @@
+# docker-compose.live.yml — Live mode overlay for CLOPR2 DR demo site
+# Usage: docker compose -f docker-compose.yml -f docker-compose.live.yml up --build
+#
+# Prerequisites:
+#   - SSH connectivity verified: ssh pg-primary 'echo ok'
+#   - DR SSH key exists at ~/.ssh/id_ed25519_dr_onprem
+#   - scripts/dr/ scripts are functional (fullsite-failover.sh etc.)
+#
+# LIVE_ACTION_SCOPE controls which actions are enabled:
+#   onprem  = pre-checks + on-prem failover/fallback + export (DEFAULT, safe)
+#   all     = also enables fullsite_failover + fullsite_fallback (DESTRUCTIVE)
+
+services:
+  backend:
+    environment:
+      - LIVE_MODE_ENABLED=true
+      - LIVE_ACTION_SCOPE=${LIVE_ACTION_SCOPE:-onprem}
+      - SCRIPTS_DIR=/app/scripts
+      # Optional: DR_SSH_DIR defaults to ~/.ssh; override if keys are elsewhere
+      - DR_SSH_DIR=${DR_SSH_DIR:-}
+    volumes:
+      - ../scripts/dr:/app/scripts:ro
+      - ${DR_SSH_DIR:-~/.ssh}:/root/.ssh:ro
+    # Note: backend stays on the 'demo' bridge network.
+    # SSH commands inside scripts reach on-prem hosts IF Docker can route to
+    # 10.0.96.x / 10.200.0.x (true on WSL2 when host routing is configured).
+    # If SSH fails from inside the container, run backend natively:
+    #   cd dr-demo-site/backend && uvicorn main:app --host 127.0.0.1 --port 8000
+    # and remove backend from docker-compose.yml services.

@@ -18,3 +18,176 @@ Goal: Catch deletion completion OR flag if still locked
   → pg-standby state changed! ✓
   → app-onprem state changed! ✓
 
+[3/30] 2026-03-13T16:05:58Z
+  pg-standby  | AMA: Deleting | DEP: Deleting
+  app-onprem  | AMA: Creating | DEP: Creating
+  → pg-standby state changed! ✓
+  → app-onprem state changed! ✓
+
+[4/30] 2026-03-13T16:07:08Z
+  pg-standby  | AMA: Deleting | DEP: Deleting
+  app-onprem  | AMA: Creating | DEP: Creating
+  → pg-standby state changed! ✓
+  → app-onprem state changed! ✓
+
+[5/30] 2026-03-13T16:08:17Z
+  pg-standby  | AMA: Deleting | DEP: Deleting
+  app-onprem  | AMA: Creating | DEP: Creating
+  → pg-standby state changed! ✓
+  → app-onprem state changed! ✓
+
+[6/30] 2026-03-13T16:09:26Z
+  pg-standby  | AMA: Deleting | DEP: Deleting
+  app-onprem  | AMA: Creating | DEP: Creating
+  → pg-standby state changed! ✓
+  → app-onprem state changed! ✓
+
+[7/30] 2026-03-13T16:10:36Z
+  pg-standby  | AMA: Deleting | DEP: Deleting
+  app-onprem  | AMA: Creating | DEP: Creating
+  → pg-standby state changed! ✓
+  → app-onprem state changed! ✓
+
+[8/30] 2026-03-13T16:11:45Z
+  pg-standby  | AMA: Deleting | DEP: Deleting
+  app-onprem  | AMA: Creating | DEP: Creating
+  → pg-standby state changed! ✓
+  → app-onprem state changed! ✓
+
+[9/30] 2026-03-13T16:12:55Z
+  pg-standby  | AMA: Deleting | DEP: Deleting
+  app-onprem  | AMA: Creating | DEP: Creating
+  → pg-standby state changed! ✓
+  → app-onprem state changed! ✓
+
+[10/30] 2026-03-13T16:14:05Z
+  pg-standby  | AMA: Deleting | DEP: Deleting
+  app-onprem  | AMA: Creating | DEP: Creating
+  → pg-standby state changed! ✓
+  → app-onprem state changed! ✓
+
+[11/30] 2026-03-13T16:15:13Z
+  pg-standby  | AMA: Deleting | DEP: Deleting
+  app-onprem  | AMA: Creating | DEP: Creating
+  → pg-standby state changed! ✓
+  → app-onprem state changed! ✓
+
+[12/30] 2026-03-13T16:16:23Z
+  pg-standby  | AMA: Deleting | DEP: Deleting
+  app-onprem  | AMA: Creating | DEP: Creating
+  → pg-standby state changed! ✓
+  → app-onprem state changed! ✓
+
+[13/30] 2026-03-13T16:17:33Z
+  pg-standby  | AMA: Deleting | DEP: Deleting
+  app-onprem  | AMA: Creating | DEP: Creating
+  → pg-standby state changed! ✓
+  → app-onprem state changed! ✓
+
+[14/30] 2026-03-13T16:18:47Z
+  pg-standby  | AMA: Deleting | DEP: Deleting
+  app-onprem  | AMA: Creating | DEP: Creating
+  → pg-standby state changed! ✓
+  → app-onprem state changed! ✓
+
+[15/30] 2026-03-13T16:19:55Z
+  pg-standby  | AMA: Deleting | DEP: Deleting
+  app-onprem  | AMA: Creating | DEP: Creating
+  → pg-standby state changed! ✓
+  → app-onprem state changed! ✓
+
+[16/30] 2026-03-13T16:21:05Z
+  pg-standby  | AMA: Deleting | DEP: Deleting
+  app-onprem  | AMA: Creating | DEP: Creating
+  → pg-standby state changed! ✓
+  → app-onprem state changed! ✓
+
+[17/30] 2026-03-13T16:22:15Z
+  pg-standby  | AMA: Deleting | DEP: Deleting
+  app-onprem  | AMA: Creating | DEP: Creating
+  → pg-standby state changed! ✓
+  → app-onprem state changed! ✓
+
+[18/30] 2026-03-13T16:23:24Z
+  pg-standby  | AMA: Deleting | DEP: Deleting
+  app-onprem  | AMA: Creating | DEP: Creating
+  → pg-standby state changed! ✓
+  → app-onprem state changed! ✓
+
+[19/30] 2026-03-13T16:24:33Z
+  pg-standby  | AMA: Deleting | DEP: Deleting
+  app-onprem  | AMA: Creating | DEP: Creating
+  → pg-standby state changed! ✓
+  → app-onprem state changed! ✓
+
+[20/30] 2026-03-13T16:25:42Z
+  pg-standby  | AMA: Deleting | DEP: Deleting
+  app-onprem  | AMA: Creating | DEP: Creating
+  → pg-standby state changed! ✓
+  → app-onprem state changed! ✓
+
+[21/30] 2026-03-13T16:26:52Z
+  pg-standby  | AMA: Deleting | DEP: Deleting
+  app-onprem  | AMA: Creating | DEP: Creating
+  → pg-standby state changed! ✓
+  → app-onprem state changed! ✓
+
+[22/30] 2026-03-13T16:28:02Z
+  pg-standby  | AMA: Deleting | DEP: Deleting
+  app-onprem  | AMA: Creating | DEP: Creating
+  → pg-standby state changed! ✓
+  → app-onprem state changed! ✓
+
+[23/30] 2026-03-13T16:29:11Z
+  pg-standby  | AMA: Deleting | DEP: Deleting
+  app-onprem  | AMA: Creating | DEP: Creating
+  → pg-standby state changed! ✓
+  → app-onprem state changed! ✓
+
+[24/30] 2026-03-13T16:30:21Z
+  pg-standby  | AMA: Deleting | DEP: Deleting
+  app-onprem  | AMA: Creating | DEP: Creating
+  → pg-standby state changed! ✓
+  → app-onprem state changed! ✓
+
+[25/30] 2026-03-13T16:31:30Z
+  pg-standby  | AMA: Deleting | DEP: Deleting
+  app-onprem  | AMA: Creating | DEP: Creating
+  → pg-standby state changed! ✓
+  → app-onprem state changed! ✓
+
+[26/30] 2026-03-13T16:32:39Z
+  pg-standby  | AMA: Deleting | DEP: Deleting
+  app-onprem  | AMA: Creating | DEP: Creating
+  → pg-standby state changed! ✓
+  → app-onprem state changed! ✓
+
+[27/30] 2026-03-13T16:33:49Z
+  pg-standby  | AMA: Deleting | DEP: Deleting
+  app-onprem  | AMA: Creating | DEP: Creating
+  → pg-standby state changed! ✓
+  → app-onprem state changed! ✓
+
+[28/30] 2026-03-13T16:34:58Z
+  pg-standby  | AMA: Deleting | DEP: Deleting
+  app-onprem  | AMA: Creating | DEP: Creating
+  → pg-standby state changed! ✓
+  → app-onprem state changed! ✓
+
+[29/30] 2026-03-13T16:36:08Z
+  pg-standby  | AMA: Deleting | DEP: Deleting
+  app-onprem  | AMA: Creating | DEP: Creating
+  → pg-standby state changed! ✓
+  → app-onprem state changed! ✓
+
+[30/30] 2026-03-13T16:37:18Z
+  pg-standby  | AMA: Deleting | DEP: Deleting
+  app-onprem  | AMA: Creating | DEP: Creating
+  → pg-standby state changed! ✓
+  → app-onprem state changed! ✓
+
+---
+
+End: 2026-03-13T16:37:28Z
+
+Checkpoint window closed. Results to be evaluated.

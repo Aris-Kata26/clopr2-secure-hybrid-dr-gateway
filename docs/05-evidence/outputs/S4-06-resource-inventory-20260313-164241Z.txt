@@ -1,0 +1,25 @@
+Azure Arc Machines:
+Name
+----------
+pg-primary
+pg-standby
+app-onprem
+
+AKS Cluster:
+
+
+Log Analytics Workspace:
+Name                SKU
+------------------  ---------
+log-clopr2-dev-gwc  PerGB2018
+
+Key Vault:
+Name                   SKU
+---------------------  --------
+kvclopr2katarweu01gwc  standard
+
+Public IPs:
+
+
+Traffic Manager Profile:
+

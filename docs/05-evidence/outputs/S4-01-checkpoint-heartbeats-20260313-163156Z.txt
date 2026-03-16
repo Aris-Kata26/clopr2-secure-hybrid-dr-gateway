@@ -1,0 +1,2 @@
+=== Heartbeat Status (Last 5 minutes) ===
+  pg-primary:

@@ -1,0 +1,27 @@
+=== pg-primary ===
+{
+  "AgentVersion": null,
+  "LastStatusChange": null,
+  "Name": "pg-primary",
+  "OS": null,
+  "Status": null
+}
+
+=== pg-standby ===
+{
+  "AgentVersion": null,
+  "LastStatusChange": null,
+  "Name": "pg-standby",
+  "OS": null,
+  "Status": null
+}
+
+=== app-onprem ===
+{
+  "AgentVersion": null,
+  "LastStatusChange": null,
+  "Name": "app-onprem",
+  "OS": null,
+  "Status": null
+}
+

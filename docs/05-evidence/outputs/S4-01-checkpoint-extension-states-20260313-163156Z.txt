@@ -1,0 +1,13 @@
+=== Extension States - pg-standby-dr ===
+ERROR: Could not fetch pg-standby-dr extensions
+
+=== Extension States - app-onprem ===
+ERROR: Could not fetch app-onprem extensions
+
+=== Instance View - Provisioning State ===
+  pg-primary:
+    ERROR: Could not fetch instance view for pg-primary
+  pg-standby-dr:
+    ERROR: Could not fetch instance view for pg-standby-dr
+  app-onprem:
+    ERROR: Could not fetch instance view for app-onprem

@@ -1,12 +1,18 @@
-Enable succeeded: 
-[stdout]
-{"status":"ok","db":"ok","db_host":"127.0.0.1","pg_is_in_recovery":false,"app_env":"dr-azure","ts":"2026-03-15T16:52:18Z"}CONTAINER ID   IMAGE           COMMAND                  CREATED          STATUS          PORTS     NAMES
-9b18c2134f17   clopr2-app:dr   "uvicorn main:app --�"   20 minutes ago   Up 20 minutes             clopr2-app-dr
- pg_is_in_recovery 
--------------------
- f
+=== POST-FAILOVER STATE ===
+Timestamp: 2026-03-16T14:41:57Z
+--- PostgreSQL role ---
+ pg_is_in_recovery | pg_current_wal_lsn 
+-------------------+--------------------
+ f                 | 0/B0146A0
 (1 row)
 
+--- pg_stat_replication (no rows expected — on-prem is down) ---
+ pid | usesysid | usename | application_name | client_addr | client_hostname | client_port | backend_start | backend_xmin | state | sent_lsn | write_lsn | flush_lsn | replay_lsn | write_lag | flush_lag | replay_lag | sync_priority | sync_state | reply_time 
+-----+----------+---------+------------------+-------------+-----------------+-------------+---------------+--------------+-------+----------+-----------+-----------+------------+-----------+-----------+------------+---------------+------------+------------
+(0 rows)
 
-[stderr]
-
+--- App container ---
+CONTAINER ID   IMAGE           COMMAND                  CREATED          STATUS          PORTS     NAMES
+c3dddcedeaaa   clopr2-app:dr   "uvicorn main:app --…"   11 seconds ago   Up 10 seconds             clopr2-app-dr
+--- App /health ---
+{"status":"ok","db":"ok","db_host":"127.0.0.1","pg_is_in_recovery":false,"app_env":"dr-azure","ts":"2026-03-16T14:41:58Z"}

@@ -1,23 +1,10 @@
-Resetting read-only on DR VM
 ALTER SYSTEM
  pg_reload_conf 
 ----------------
  t
 (1 row)
 
-Stopping postgres at: 2026-03-15T17:49:35Z
-pg_basebackup from pg-primary at: 2026-03-15T17:49:35Z
-waiting for checkpoint
-   84/30764 kB (0%), 0/1 tablespace
- 8916/30764 kB (28%), 0/1 tablespace
-20809/30764 kB (67%), 0/1 tablespace
-29007/30764 kB (94%), 0/1 tablespace
-30774/30774 kB (100%), 0/1 tablespace
-30774/30774 kB (100%), 1/1 tablespace
-Basebackup complete at: 2026-03-15T17:49:42Z
+DR VM postgres stopped at: 2026-03-16T14:48:35Z
+DR VM pg_basebackup complete at: 2026-03-16T14:48:44Z
 /var/lib/postgresql/16/main/standby.signal
- pg_is_in_recovery 
--------------------
- t
-(1 row)
-
+t

@@ -108,6 +108,41 @@ ssh vm-pg-dr-fce "echo 'host replication replicator 10.200.0.1/32 scram-sha-256'
 
 ## 4. Pre-failback checks
 
+### PB-0: MANDATORY — SSH ControlMaster pre-check
+
+> **THIS STEP IS MANDATORY. DO NOT PROCEED IF IT FAILS.**
+
+Clear any stale ControlMaster socket and verify the full SSH chain before touching
+any infrastructure. A stale socket on the PVE mux will silently hang all subsequent
+SSH commands, corrupting the operation mid-execution.
+
+```bash
+# Clear stale socket and verify PVE is reachable
+rm -f ~/.ssh/ctl/pve
+ssh pve 'echo "PVE OK"'
+# Expected: PVE OK within 5 seconds
+# If it hangs or errors: STOP. Fix WSL networking or SSH config before continuing.
+```
+
+Verify the full chain:
+
+```bash
+ssh pg-primary 'echo "pg-primary OK"'
+ssh vm-pg-dr-fce 'echo "DR VM OK"'
+# Expected: both return within 10 seconds
+# vm-pg-dr-fce requires WireGuard active on pg-primary (pg-primary OS must be running)
+```
+
+If `vm-pg-dr-fce` is unreachable, check WireGuard:
+
+```bash
+ssh pg-primary 'sudo wg show'
+# Expected: peer 20.216.128.32:51820, latest-handshake < 3 min
+# If stale: ssh pg-primary 'sudo systemctl restart wg-quick@wg0'
+```
+
+**Do not continue to PB-1 until all three hosts respond.**
+
 ### PB-1: Confirm Azure primary state before starting
 
 ```bash

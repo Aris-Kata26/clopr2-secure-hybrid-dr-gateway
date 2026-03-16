@@ -212,6 +212,44 @@ ssh vm-pg-dr-fce '
 
 Run all pre-checks in sequence. Record all output.
 
+### PC-0: MANDATORY — SSH ControlMaster pre-check
+
+> **THIS STEP IS MANDATORY. DO NOT PROCEED IF IT FAILS.**
+
+The SSH ControlMaster socket for PVE (`~/.ssh/ctl/pve`) goes stale when WSL changes
+network context (sleep, VPN reconnect, network switch). A stale socket causes all
+subsequent SSH commands to hang silently, adding 45+ minutes to RTO. This was the
+sole cause of the 48m 42s RTO observed in S4-09. The actual operation is ~3 minutes.
+
+**Run this before anything else:**
+
+```bash
+# Clear the stale socket and verify PVE is reachable
+rm -f ~/.ssh/ctl/pve
+ssh pve 'echo "PVE OK"'
+# Expected: PVE OK within 5 seconds
+# If it hangs or errors: STOP. Fix WSL networking or SSH config before continuing.
+```
+
+Then verify the full SSH chain is alive:
+
+```bash
+ssh pg-primary 'echo "pg-primary OK"'
+ssh vm-pg-dr-fce 'echo "DR VM OK"'
+# Expected: both return within 10 seconds
+# vm-pg-dr-fce requires WireGuard to be active on pg-primary
+```
+
+If `vm-pg-dr-fce` check fails, verify WireGuard first:
+
+```bash
+ssh pg-primary 'sudo wg show'
+# Expected: peer 20.216.128.32:51820, latest-handshake < 3 min
+# If stale: ssh pg-primary 'sudo systemctl restart wg-quick@wg0'
+```
+
+**Do not continue to PC-1 until all three hosts respond.**
+
 ### PC-1: Capture baseline timestamps and replication state
 
 ```bash

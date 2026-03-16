@@ -1,35 +1,11 @@
-Services stopped at: \2026-03-15T15:44:03Z
+Services stopped at: 2026-03-16T14:41:24Z
+--- postgresql ---
 ○ postgresql.service - PostgreSQL RDBMS
      Loaded: loaded (/usr/lib/systemd/system/postgresql.service; enabled; preset: enabled)
-     Active: inactive (dead) since Sun 2026-03-15 15:44:12 UTC; 1s ago
-   Duration: 23h 51min 50.492s
-    Process: 626164 ExecStart=/bin/true (code=exited, status=0/SUCCESS)
-   Main PID: 626164 (code=exited, status=0/SUCCESS)
-        CPU: 1ms
-
-Mar 14 15:52:22 pg-primary systemd[1]: Starting postgresql.service - PostgreSQL RDBMS...
-Mar 14 15:52:22 pg-primary systemd[1]: Finished postgresql.service - PostgreSQL RDBMS.
-Mar 15 15:44:12 pg-primary systemd[1]: postgresql.service: Deactivated successfully.
-Mar 15 15:44:12 pg-primary systemd[1]: Stopped postgresql.service - PostgreSQL RDBMS.
+     Active: inactive (dead) since Mon 2026-03-16 14:41:22 UTC; 1s ago
+   Duration: 1h 18min 31.445s
+--- keepalived ---
 ○ keepalived.service - Keepalive Daemon (LVS and VRRP)
      Loaded: loaded (/usr/lib/systemd/system/keepalived.service; enabled; preset: enabled)
-     Active: inactive (dead) since Sun 2026-03-15 15:44:14 UTC; 2s ago
-   Duration: 23h 51min 46.874s
-       Docs: man:keepalived(8)
-             man:keepalived.conf(5)
-             man:genhash(1)
-             https://keepalived.org
-    Process: 626232 ExecStart=/usr/sbin/keepalived --dont-fork $DAEMON_ARGS (code=exited, status=0/SUCCESS)
-   Main PID: 626232 (code=exited, status=0/SUCCESS)
-        CPU: 51min 8.714s
-
-Mar 15 10:40:13 pg-primary Keepalived_vrrp[626236]: (pg_ha) Changing effective priority from 100 to 80
-Mar 15 10:40:14 pg-primary Keepalived_vrrp[626236]: VRRP_Script(chk_postgresql) succeeded
-Mar 15 10:40:14 pg-primary Keepalived_vrrp[626236]: (pg_ha) Changing effective priority from 80 to 100
-Mar 15 15:44:12 pg-primary systemd[1]: Stopping keepalived.service - Keepalive Daemon (LVS and VRRP)...
-Mar 15 15:44:12 pg-primary Keepalived[626232]: Stopping
-Mar 15 15:44:13 pg-primary Keepalived_vrrp[626236]: Stopped
-Mar 15 15:44:14 pg-primary Keepalived[626232]: Stopped Keepalived v2.2.8 (04/04,2023), git commit v2.2.7-154-g292b299e+
-Mar 15 15:44:14 pg-primary systemd[1]: keepalived.service: Deactivated successfully.
-Mar 15 15:44:14 pg-primary systemd[1]: Stopped keepalived.service - Keepalive Daemon (LVS and VRRP).
-Mar 15 15:44:14 pg-primary systemd[1]: keepalived.service: Consumed 51min 8.714s CPU time, 15.0M memory peak, 0B memory swap peak.
+     Active: inactive (dead) since Mon 2026-03-16 14:41:24 UTC; 2s ago
+   Duration: 1h 18min 30.275s

@@ -1,24 +1,19 @@
 === FAILBACK PRE-CHECK ===
-Timestamp: \2026-03-15T17:31:03Z
-Enable succeeded: 
-[stdout]
---- DR VM state ---
+FSB_START: 2026-03-16T14:47:55Z
+--- DR VM PostgreSQL state ---
  pg_is_in_recovery | pg_current_wal_lsn |              now              
 -------------------+--------------------+-------------------------------
- f                 | 0/54497C8          | 2026-03-15 17:31:25.865902+00
+ f                 | 0/D000060          | 2026-03-16 14:47:56.781949+00
 (1 row)
 
---- pg_stat_replication ---
+--- pg_stat_replication (expect empty) ---
  pid | usesysid | usename | application_name | client_addr | client_hostname | client_port | backend_start | backend_xmin | state | sent_lsn | write_lsn | flush_lsn | replay_lsn | write_lag | flush_lag | replay_lag | sync_priority | sync_state | reply_time 
 -----+----------+---------+------------------+-------------+-----------------+-------------+---------------+--------------+-------+----------+-----------+-----------+------------+-----------+-----------+------------+---------------+------------+------------
 (0 rows)
 
---- App ---
+--- App running ---
 CONTAINER ID   IMAGE           COMMAND                  CREATED          STATUS          PORTS     NAMES
-9b18c2134f17   clopr2-app:dr   "uvicorn main:app --…"   59 minutes ago   Up 59 minutes             clopr2-app-dr
-
-[stderr]
-
+5b998006159b   clopr2-app:dr   "uvicorn main:app --â€¦"   24 seconds ago   Up 23 seconds             clopr2-app-dr
 --- pg-primary services ---
 inactive
 inactive
@@ -31,9 +26,9 @@ interface: wg0
 peer: aRTHX9qS0UbWgi/MKBw6UqE3KGSEpsrVhdt1cU+eIkQ=
   endpoint: 20.216.128.32:51820
   allowed ips: 10.200.0.2/32
-  latest handshake: 3 seconds ago
-  transfer: 427.63 KiB received, 6.65 MiB sent
+  latest handshake: 25 seconds ago
+  transfer: 69.36 MiB received, 75.61 MiB sent
   persistent keepalive: every 25 seconds
 --- Disk ---
 Filesystem      Size  Used Avail Use% Mounted on
-/dev/sda1        14G  4.3G  9.2G  32% /
+/dev/sda1        14G  4.5G  9.1G  34% /

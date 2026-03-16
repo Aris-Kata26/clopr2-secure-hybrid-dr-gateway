@@ -1,8 +1,2 @@
- Network docker_default Creating 
- Network docker_default Created 
- Container docker-app-1 Creating 
- Container docker-app-1 Created 
- Container docker-app-1 Starting 
- Container docker-app-1 Started 
 CONTAINER ID   IMAGE                       COMMAND                  CREATED          STATUS                             PORTS                                         NAMES
-48f4dee66d31   clopr2-prototype-a:latest   "uvicorn main:app --…"   21 seconds ago   Up 17 seconds (health: starting)   0.0.0.0:8080->8000/tcp, [::]:8080->8000/tcp   docker-app-1
+36418182c982   clopr2-prototype-a:latest   "uvicorn main:app --…"   15 seconds ago   Up 11 seconds (health: starting)   0.0.0.0:8080->8000/tcp, [::]:8080->8000/tcp   docker-app-1

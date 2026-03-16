@@ -1,41 +1,34 @@
-POST-FAILBACK SNAPSHOT — 2026-03-15T17:55:18Z
+=== POST-FAILBACK STATE ===
+Timestamp: 2026-03-16T14:49:39Z
+--- VIP ---
+    inet 10.0.96.11/16 brd 10.0.255.255 scope global eth0
+    inet 10.0.96.10/16 scope global secondary eth0
+    inet6 fe80::be24:11ff:fe47:c333/64 scope link 
+--- PostgreSQL role ---
+ pg_is_in_recovery | pg_current_wal_lsn 
+-------------------+--------------------
+ f                 | 0/11000060
+(1 row)
 
-=== pg-primary (10.0.96.11) ===
+--- Keepalived ---
+     Active: active (running) since Mon 2026-03-16 14:48:57 UTC; 43s ago
+Mar 16 14:48:57 pg-primary Keepalived_vrrp[1199198]: (pg_ha) Warning - nopreempt will not work with initial state MASTER - clearing
+Mar 16 14:49:00 pg-primary Keepalived_vrrp[1199198]: (pg_ha) Entering MASTER STATE
+--- Replication ---
+ client_addr |   state   | sync_state 
+-------------+-----------+------------
+ 10.200.0.2  | streaming | async
+(1 row)
 
-PostgreSQL:
-  postgresql: active
-  pg_is_in_recovery: f (PRIMARY)
-  pg_current_wal_lsn: 0/9000148
+--- WireGuard ---
+interface: wg0
+  public key: Eux0XtJyGX6tdI+5J0ePgU+cgA2OZuuMUbBNG1wksjQ=
+  private key: (hidden)
+  listening port: 49306
 
-Replication:
-  client_addr | state     | sent_lsn  | write_lsn | replay_lsn | sync_state
-  10.200.0.2  | streaming | 0/9000148 | 0/9000148 | 0/9000148  | async
-  → DR VM (vm-pg-dr-fce) streaming at 0 bytes lag
-
-Keepalived:
-  keepalived: active (MASTER)
-  inet 10.0.96.11/16 (host IP)
-  inet 10.0.96.10/16 (VIP — active on pg-primary)
-
-WireGuard:
-  interface: wg0
-  peer endpoint: 20.216.128.32:51820
-  latest handshake: 15 seconds ago
-  transfer: 34.25 MiB received, 39.78 MiB sent
+peer: aRTHX9qS0UbWgi/MKBw6UqE3KGSEpsrVhdt1cU+eIkQ=
+  endpoint: 20.216.128.32:51820
+  allowed ips: 10.200.0.2/32
+  latest handshake: 7 seconds ago
+  transfer: 103.53 MiB received, 108.73 MiB sent
   persistent keepalive: every 25 seconds
-
-=== DR VM (vm-pg-dr-fce, 10.200.0.2) ===
-  PostgreSQL standby (pg_is_in_recovery=t)
-  streaming from pg-primary at 0/9000060, 0 bytes lag (per fsdb-replication-restored.txt)
-  clopr2-app-dr: STOPPED (removed in FB-1)
-
-=== app-onprem (10.0.96.13) ===
-  docker-app-1: RUNNING (per fsdb-app-health.txt)
-  /health: {"status":"ok","db_host":"10.0.96.10","pg_is_in_recovery":false,"app_env":"dev"}
-
-=== VERDICT ===
-Full-site failback COMPLETE.
-pg-primary is the active PostgreSQL primary.
-VIP 10.0.96.10 is on pg-primary.
-DR VM is streaming standby at 0 lag.
-On-prem app is live and healthy.

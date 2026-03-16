@@ -1,15 +1,11 @@
-15:45:32 replay_lsn=0/542FD18
-15:45:34 replay_lsn=0/542FD18
-15:45:36 replay_lsn=0/542FD18
-15:45:38 replay_lsn=0/542FD18
-15:45:40 replay_lsn=0/542FD18
-15:45:42 replay_lsn=0/542FD18
-15:45:44 replay_lsn=0/542FD18
-15:45:46 replay_lsn=0/542FD18
-15:45:48 replay_lsn=0/542FD18
-15:45:50 replay_lsn=0/542FD18
-15:45:52 replay_lsn=0/542FD18
-15:45:54 replay_lsn=0/542FD18
-15:45:56 replay_lsn=0/542FD18
-15:45:58 replay_lsn=0/542FD18
-15:46:00 replay_lsn=0/542FD18
+=== WAL REPLAY STABILISATION WAIT ===
+FS3_START: 2026-03-16T14:41:21Z
+
+14:41:27Z  replay_lsn=0/B000358  stable=0
+14:41:29Z  replay_lsn=0/B000358  stable=0
+14:41:32Z  replay_lsn=0/B000358  stable=1
+14:41:35Z  replay_lsn=0/B000358  stable=2
+
+FINAL_PRIMARY_LSN:  0/B0002E0
+FINAL_REPLAY_LSN:   0/B000358
+RPO_BYTES:          0

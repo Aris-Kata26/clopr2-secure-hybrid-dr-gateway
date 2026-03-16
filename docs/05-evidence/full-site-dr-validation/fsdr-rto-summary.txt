@@ -1,21 +1,15 @@
-FAILOVER COMPLETE
-FSO_START (test start):          2026-03-15T15:40:54Z
-Services stopped (pg+keepalived): 2026-03-15T15:44:03Z
-App /health 200 (Azure):          2026-03-15T16:32:45Z
-FSO_END (script end):            2026-03-15T16:34:56Z
+=== FULL-SITE FAILOVER SUMMARY ===
+FSO_START:         2026-03-16T14:40:40Z
+FS3_START:         2026-03-16T14:41:21Z   (pg-primary stopped — outage begins)
+APP_HEALTH_OK:     2026-03-16T14:41:53Z   (app /health 200 on DR VM)
+FSO_END:           2026-03-16T14:41:55Z
 
-RTO (services stopped -> Azure app healthy): 2922s (48m 42s)
-Wall clock (test start -> end):  3242s
+FINAL_PRIMARY_LSN: 0/B0002E0
+FINAL_REPLAY_LSN:  0/B000358
+RPO_BYTES:         0
 
-RPO: 0 bytes
-  final_lsn at pg-primary stop: 0/542FCA0
-  DR VM replay_lsn at promotion: 0/542FD18
-  DR VM had replayed MORE WAL than the final captured LSN (0 data loss)
+RTO: measured from FS3_START to APP_HEALTH_OK_TS
+     (seconds from pg-primary stopped to Azure app health confirmed)
+RPO: 0 bytes (WAL not applied at promotion time)
 
-Network interruption note:
-  SSH access lost at ~15:47Z (WSL lost route to PVE after ControlMaster cleared).
-  Promotion verified and app health confirmed via Azure run-command instead of SSH.
-  This did NOT affect the failover outcome - all operations completed successfully.
-  Time between pg_promote() issue (15:46Z approx) and health confirmation (16:32:45Z)
-  was extended by ~45 min due to switching to Azure run-command access method.
-  Operational RTO under normal SSH access would be < 5 min.
+RESULT: PASS

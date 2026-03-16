@@ -1,13 +1,8 @@
-Enable succeeded: 
-[stdout]
 CREATE TABLE
 INSERT 0 1
               ts               
 -------------------------------
- 2026-03-15 16:22:41.657957+00
+ 2026-03-16 14:41:45.435551+00
 (1 row)
 
 DROP TABLE
-
-[stderr]
-

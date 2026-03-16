@@ -14,7 +14,7 @@
 #   onprem-ha-failover    On-prem HA failover drill evidence
 #   onprem-ha-fallback    On-prem HA fallback drill evidence
 #   fullsite-failover     Full-site failover to Azure evidence
-#   fullsite-failback     Full-site failback to on-prem evidence
+#   fullsite-fallback     Full-site failback to on-prem evidence
 #
 # OPTIONS:
 #   --dry-run    Print what would be collected without copying files
@@ -40,7 +40,7 @@ REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 # ── argument parsing ──────────────────────────────────────────────────────────
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    onprem-ha-failover|onprem-ha-fallback|fullsite-failover|fullsite-failback)
+    onprem-ha-failover|onprem-ha-fallback|fullsite-failover|fullsite-fallback)
       PHASE="$1" ;;
     --dry-run)   DRY_RUN=true ;;
     --dest)      shift; CUSTOM_DEST="$1" ;;
@@ -59,7 +59,7 @@ done
 
 if [[ -z "$PHASE" ]]; then
   echo "Error: phase is required" >&2
-  echo "Usage: $0 <onprem-ha-failover|onprem-ha-fallback|fullsite-failover|fullsite-failback>" >&2
+  echo "Usage: $0 <onprem-ha-failover|onprem-ha-fallback|fullsite-failover|fullsite-fallback>" >&2
   exit 2
 fi
 
@@ -73,7 +73,7 @@ case "$PHASE" in
     EVIDENCE_SUBDIR="full-site-dr-validation"
     FILE_PREFIX="fsdr"
     ;;
-  fullsite-failback)
+  fullsite-fallback)
     EVIDENCE_SUBDIR="full-site-dr-validation"
     FILE_PREFIX="fsdb"
     ;;
@@ -237,47 +237,49 @@ case "$PHASE" in
     ;;
 
   fullsite-failover)
+    # All files written locally via ssh_run ... | tee /tmp/fsdr-*.txt in fullsite-failover.sh
     echo "  --- Pre-checks ---"
-    collect "pg-primary"   "fsdr-precheck-primary.txt"
-    collect_local          "/tmp/fsdr-precheck-app-health.txt"
-    collect "vm-pg-dr-fce" "fsdr-precheck-drvm.txt"
     collect_local          "/tmp/fsdr-start-timestamp.txt"
+    collect_local          "/tmp/fsdr-precheck-primary.txt"
+    collect_local          "/tmp/fsdr-precheck-app-health.txt"
+    collect_local          "/tmp/fsdr-precheck-drvm.txt"
 
     echo ""
     echo "  --- Failover execution ---"
-    collect "app-onprem"   "fsdr-app-stopped.txt"
-    collect "pg-primary"   "fsdr-final-lsn.txt"
-    collect "pg-primary"   "fsdr-primary-stopped.txt"
-    collect "vm-pg-dr-fce" "fsdr-replay-wait.txt"
-    collect "vm-pg-dr-fce" "fsdr-promoted.txt"
-    collect "vm-pg-dr-fce" "fsdr-write-test.txt"
-    collect "vm-pg-dr-fce" "fsdr-app-health-drvm.txt"
+    collect_local          "/tmp/fsdr-app-stopped.txt"
+    collect_local          "/tmp/fsdr-final-lsn.txt"
+    collect_local          "/tmp/fsdr-primary-stopped.txt"
+    collect_local          "/tmp/fsdr-replay-wait.txt"
+    collect_local          "/tmp/fsdr-promoted.txt"
+    collect_local          "/tmp/fsdr-write-test.txt"
+    collect_local          "/tmp/fsdr-app-health-drvm.txt"
     collect_local          "/tmp/fsdr-app-health-local.txt"
     collect_local          "/tmp/fsdr-rto-summary.txt"
-    collect "vm-pg-dr-fce" "fsdr-post-failover-snapshot.txt"
+    collect_local          "/tmp/fsdr-post-failover-snapshot.txt"
     ;;
 
-  fullsite-failback)
+  fullsite-fallback)
+    # All files written locally via ssh_run ... | tee /tmp/fsdb-*.txt in fullsite-fallback.sh
     echo "  --- Pre-checks ---"
-    collect "vm-pg-dr-fce" "fsdb-precheck.txt"
+    collect_local          "/tmp/fsdb-precheck.txt"
     collect_local          "/tmp/fsdb-start-timestamp.txt"
 
     echo ""
     echo "  --- Failback execution ---"
-    collect "vm-pg-dr-fce" "fsdb-azure-app-stopped.txt"
-    collect "vm-pg-dr-fce" "fsdb-drvm-readonly.txt"
-    collect "pg-primary"   "fsdb-pg-basebackup.txt"
-    collect "pg-primary"   "fsdb-primary-standby-start.txt"
-    collect "vm-pg-dr-fce" "fsdb-drvm-replication.txt"
-    collect "vm-pg-dr-fce" "fsdb-catchup-wait.txt"
-    collect "pg-primary"   "fsdb-primary-promoted.txt"
-    collect "vm-pg-dr-fce" "fsdb-drvm-rebuild.txt"
-    collect "pg-primary"   "fsdb-replication-restored.txt"
-    collect "pg-primary"   "fsdb-vip-returned.txt"
-    collect "app-onprem"   "fsdb-app-started.txt"
+    collect_local          "/tmp/fsdb-azure-app-stopped.txt"
+    collect_local          "/tmp/fsdb-drvm-readonly.txt"
+    collect_local          "/tmp/fsdb-pg-basebackup.txt"
+    collect_local          "/tmp/fsdb-primary-standby-start.txt"
+    collect_local          "/tmp/fsdb-drvm-replication.txt"
+    collect_local          "/tmp/fsdb-catchup-wait.txt"
+    collect_local          "/tmp/fsdb-primary-promoted.txt"
+    collect_local          "/tmp/fsdb-drvm-rebuild.txt"
+    collect_local          "/tmp/fsdb-replication-restored.txt"
+    collect_local          "/tmp/fsdb-vip-returned.txt"
+    collect_local          "/tmp/fsdb-app-started.txt"
     collect_local          "/tmp/fsdb-app-health.txt"
     collect_local          "/tmp/fsdb-rto-summary.txt"
-    collect "pg-primary"   "fsdb-post-failback-snapshot.txt"
+    collect_local          "/tmp/fsdb-post-failback-snapshot.txt"
     collect_local          "/tmp/fsdb-final-app-health.txt"
     ;;
 esac

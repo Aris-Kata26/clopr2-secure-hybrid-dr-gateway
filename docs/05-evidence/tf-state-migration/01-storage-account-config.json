@@ -1,0 +1,10 @@
+{
+  "https": null,
+  "kind": "StorageV2",
+  "location": "germanywestcentral",
+  "name": "clopr2tfstatekatar",
+  "publicAccess": false,
+  "resourceGroup": "rg-clopr2-tfstate",
+  "sku": "Standard_LRS",
+  "tls": "TLS1_2"
+}

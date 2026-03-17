@@ -1,0 +1,7 @@
+[
+  {
+    "principalId": "e2574e42-1061-4f17-ac57-2872677e738e",
+    "role": "Storage Blob Data Contributor",
+    "scope": "/subscriptions/94e5704a-b411-402b-a8f3-ef46309fe5fb/resourceGroups/rg-clopr2-tfstate"
+  }
+]

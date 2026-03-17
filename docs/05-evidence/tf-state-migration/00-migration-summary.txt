@@ -1,0 +1,51 @@
+# Terraform State Migration Evidence
+# CLOPR2 Secure Hybrid DR Gateway
+# Migration Date: 2026-03-17
+# Performed by: KATAR711
+
+## Summary
+All 4 active Terraform environments successfully migrated from local backend to
+Azure Blob Storage remote backend (clopr2tfstatekatar / rg-clopr2-tfstate).
+
+## Pre-Migration State (local tfstate files)
+dr-fce    : 1172 lines, 21 resources, WireGuard privkey in custom_data CONFIRMED
+dev       : 982 lines,  19 resources, Key Vault secret references
+swe-aks   : 376 lines,   4 resources
+onprem    : 923 lines,   3 resources (Proxmox VMs)
+
+## Post-Migration State (Azure Blob Storage)
+Container  | Blob                | Size (bytes) | LastModified
+-----------|---------------------|--------------|----------------------------
+dr-fce     | terraform.tfstate   | 50824        | 2026-03-17T21:34:58+00:00
+dev        | terraform.tfstate   | 41619        | 2026-03-17T21:41:11+00:00
+swe-aks    | terraform.tfstate   | 43563        | 2026-03-17T21:39:25+00:00
+onprem     | terraform.tfstate   | 24515        | 2026-03-17T21:27:50+00:00
+
+## Validation Results
+dr-fce   : terraform state list = 21 resources ACCESSIBLE from remote
+dev      : terraform state list = 19 resources ACCESSIBLE from remote
+swe-aks  : terraform state list =  4 resources ACCESSIBLE from remote
+onprem   : terraform state list =  3 resources ACCESSIBLE from remote
+
+## Plan Validation
+swe-aks  : terraform plan -refresh=false = exit 0 (minor output change, pre-existing)
+dev      : terraform plan -refresh=false = exit 0 (pre-existing pending resources)
+dr-fce   : terraform state list = 21 resources confirmed (plan requires real sensitive vars)
+onprem   : state list confirmed (plan requires Proxmox connectivity)
+
+## Security Improvement
+BEFORE: WireGuard private key stored in dr-fce/terraform.tfstate (local file, gitignored
+        but accessible to anyone with repo access or local disk access)
+AFTER:  State stored in Azure Blob with RBAC access control (Storage Blob Data Contributor
+        required). No credentials accessible without Azure AD authentication.
+
+## Locking
+Azure Blob lease-based locking active on all containers.
+Concurrent terraform apply operations will be rejected automatically.
+
+## Versioning
+Blob versioning enabled. Every apply creates a new blob version for rollback.
+
+## Backups
+Pre-migration backups stored in: docs/05-evidence/tf-state-migration/backups/
+Files: *-terraform.tfstate.20260317T211649Z.bak (gitignored via *.tfstate.*)

@@ -1,0 +1,58 @@
+Terraform State Lists — Remote Backend Validation
+Captured: Tue Mar 17 21:59:50 UTC 2026
+
+=== Environment: dr-fce ===
+data.azurerm_client_config.current
+azurerm_consumption_budget_resource_group.dr
+azurerm_dev_test_global_vm_shutdown_schedule.pg_dr[0]
+azurerm_key_vault.dr
+azurerm_key_vault_secret.pg_replication_password
+azurerm_linux_virtual_machine.pg_dr
+azurerm_log_analytics_workspace.dr
+azurerm_monitor_data_collection_rule.pg_dr
+azurerm_monitor_data_collection_rule_association.pg_dr
+azurerm_network_interface.pg_dr
+azurerm_network_security_group.dr
+azurerm_network_security_rule.dr_postgres[0]
+azurerm_network_security_rule.dr_ssh[0]
+azurerm_network_security_rule.dr_wireguard
+azurerm_public_ip.pg_dr_wg
+azurerm_resource_group.dr
+azurerm_role_assignment.pg_dr_kv_secrets_user
+azurerm_subnet.dr_mgmt
+azurerm_subnet_network_security_group_association.dr_mgmt
+azurerm_virtual_machine_extension.pg_dr_ama
+azurerm_virtual_network.dr
+
+=== Environment: dev ===
+data.azurerm_client_config.current
+azurerm_backup_policy_vm.pg_dr[0]
+azurerm_container_registry.this
+azurerm_key_vault_secret.pg_replication_password
+azurerm_monitor_data_collection_rule.pg_dr
+azurerm_network_interface.pg_dr
+azurerm_network_security_rule.pg_dr_postgres[0]
+azurerm_network_security_rule.pg_dr_ssh[0]
+azurerm_recovery_services_vault.pg_dr[0]
+azurerm_resource_group.this
+module.keyvault.azurerm_key_vault.this
+module.loganalytics.azurerm_log_analytics_workspace.this
+module.network.azurerm_network_security_group.this["aks-subnet"]
+module.network.azurerm_network_security_group.this["mgmt-subnet"]
+module.network.azurerm_subnet.this["aks-subnet"]
+module.network.azurerm_subnet.this["mgmt-subnet"]
+module.network.azurerm_subnet_network_security_group_association.this["aks-subnet"]
+module.network.azurerm_subnet_network_security_group_association.this["mgmt-subnet"]
+module.network.azurerm_virtual_network.this
+
+=== Environment: swe-aks ===
+data.azurerm_container_registry.acr
+azurerm_kubernetes_cluster.this
+azurerm_resource_group.aks
+azurerm_role_assignment.aks_acr_pull
+
+=== Environment: onprem ===
+proxmox_virtual_environment_vm.app
+proxmox_virtual_environment_vm.pg_primary
+proxmox_virtual_environment_vm.pg_standby
+

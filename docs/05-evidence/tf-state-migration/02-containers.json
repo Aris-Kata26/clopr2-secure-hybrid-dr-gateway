@@ -1,0 +1,22 @@
+[
+  {
+    "leaseState": null,
+    "name": "dev",
+    "publicAccess": null
+  },
+  {
+    "leaseState": null,
+    "name": "dr-fce",
+    "publicAccess": null
+  },
+  {
+    "leaseState": null,
+    "name": "onprem",
+    "publicAccess": null
+  },
+  {
+    "leaseState": null,
+    "name": "swe-aks",
+    "publicAccess": null
+  }
+]

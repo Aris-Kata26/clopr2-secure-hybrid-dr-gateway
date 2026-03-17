@@ -1,0 +1,34 @@
+Captured: Tue Mar 17 21:59:27 UTC 2026
+
+--- Container: dr-fce ---
+{
+  "etag": "\"0x8DE846D09FBD4B0\"",
+  "lastModified": "2026-03-17T21:34:58+00:00",
+  "name": "terraform.tfstate",
+  "size": 50824
+}
+
+--- Container: dev ---
+{
+  "etag": "\"0x8DE846DE7EC4B8B\"",
+  "lastModified": "2026-03-17T21:41:11+00:00",
+  "name": "terraform.tfstate",
+  "size": 41619
+}
+
+--- Container: swe-aks ---
+{
+  "etag": "\"0x8DE846DA93AF9AD\"",
+  "lastModified": "2026-03-17T21:39:25+00:00",
+  "name": "terraform.tfstate",
+  "size": 43563
+}
+
+--- Container: onprem ---
+{
+  "etag": "\"0x8DE846C0B02088F\"",
+  "lastModified": "2026-03-17T21:27:50+00:00",
+  "name": "terraform.tfstate",
+  "size": 24515
+}
+

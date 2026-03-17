@@ -1,15 +1,19 @@
 # =============================================================================
-# envs/dev/backend.tf — Remote state backend (Azure Storage)
+# envs/onprem/backend.tf — Remote state backend (Azure Storage)
 # CLOPR2 Secure Hybrid DR Gateway | Owner: KATAR711 | Team: BCLC24
 #
 # Backend: Azure Blob Storage
 #   Resource Group : rg-clopr2-tfstate
 #   Storage Account: clopr2tfstatekatar (germanywestcentral, Standard_LRS)
-#   Container      : dev
+#   Container      : onprem
 #   State Key      : terraform.tfstate
 #
+# Note: This environment uses the bpg/proxmox provider, not azurerm.
+# The remote state backend is still Azure Storage — only the state storage
+# location is Azure; the infrastructure itself remains on-premises Proxmox.
+#
 # Authentication: Azure AD (az login)
-#   Requires Storage Blob Data Contributor on the dev container.
+#   Requires Storage Blob Data Contributor on the onprem container.
 #
 # State locking: Automatic via Azure Blob lease (built-in to azurerm backend).
 # State versioning: Enabled on storage account — supports rollback.
@@ -27,7 +31,7 @@ terraform {
   backend "azurerm" {
     resource_group_name  = "rg-clopr2-tfstate"
     storage_account_name = "clopr2tfstatekatar"
-    container_name       = "dev"
+    container_name       = "onprem"
     key                  = "terraform.tfstate"
     use_azuread_auth     = true
   }

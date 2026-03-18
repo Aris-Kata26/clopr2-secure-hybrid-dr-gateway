@@ -85,7 +85,7 @@
     marker: "# {mark} ANSIBLE MANAGED — replication"
     block: |
       host    replication     {{ pg_replication_user }}      10.0.0.0/16         scram-sha-256
-      host    all             all                            10.0.0.0/16         scram-sha-256
+      host    appdb           appuser                        10.0.96.13/32       scram-sha-256
   notify: restart postgresql
 
 - name: Flush handlers to apply config before primary/standby roles

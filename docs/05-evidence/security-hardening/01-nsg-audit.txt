@@ -1,0 +1,49 @@
+NSG Audit — dr-fce and dev Terraform Environments
+===================================================
+Captured: 2026-03-18 | Auditor: KATAR711
+
+=== Environment: envs/dr-fce ===
+
+Source: infra/terraform/envs/dr-fce/terraform.tfvars
+
+pg_dr_bootstrap_ssh_cidrs = []           — CLEARED (bootstrap SSH rule not deployed)
+pg_dr_allowed_ssh_cidrs   = ["10.200.0.1/32"]   — SSH from WireGuard peer only
+pg_dr_onprem_cidrs        = ["10.200.0.1/32"]   — On-prem access from tunnel peer only
+
+NSG rules on DR VM (vm-pg-dr):
+  Inbound SSH (port 22):     source 10.200.0.1/32 only
+  Inbound PostgreSQL (5432): source 10.200.0.1/32 only
+  Bootstrap SSH rule:        NOT deployed (list is empty → count=0)
+  WireGuard (UDP 51820):     inbound from internet (required for VPN endpoint)
+  Outbound:                  allow all (default Azure)
+
+Finding: DR VM is not reachable from public internet (SSH/PG restricted to WireGuard peer).
+Bootstrap rule was already cleared in a previous sprint. No action required.
+
+=== Environment: envs/dev ===
+
+Source: infra/terraform/envs/dev/terraform.tfvars
+
+AKS cluster: aks-b2clc-katar-gwc (Standard_D2ads_v7 nodes)
+ACR: acrb2clckatargwc (Basic tier)
+pg-dr VM: present in dev env for replication testing
+
+NSG for dev pg-dr VM:
+  SSH: same pattern as dr-fce (restricted to tunnel peer)
+  No public SSH exposure
+
+AKS NSG (managed by AKS):
+  AKS-required inbound rules only (load balancer, node communication)
+  No application-level public inbound rules in Terraform
+
+Finding: Dev environment NSG posture acceptable for dev/demo scope.
+
+=== Summary ===
+
+| Rule                    | dr-fce        | dev           | Status |
+|-------------------------|---------------|---------------|--------|
+| Bootstrap SSH cleared   | YES (empty []) | YES           | PASS   |
+| SSH restricted to VPN   | YES /32        | YES /32        | PASS   |
+| PG port restricted      | YES /32        | YES /32        | PASS   |
+| No public inbound PG    | YES            | YES            | PASS   |
+| WireGuard public UDP    | YES (required) | N/A            | OK     |

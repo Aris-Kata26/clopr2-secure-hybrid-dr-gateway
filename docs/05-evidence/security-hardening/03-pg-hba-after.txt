@@ -1,0 +1,40 @@
+pg_hba.conf — State AFTER Tightening + Validation
+===================================================
+Captured: 2026-03-18 on pg-primary (10.0.96.11)
+
+=== Changes Applied ===
+
+Live change method: sed in-place on pg-primary, then systemctl reload postgresql
+  sudo sed -i 's/^host[[:space:]]\+all[[:space:]]\+all[[:space:]]\+\(10\.0\.0\.0\/16\|10\.200\.0\.0\/30\)[[:space:]]\+scram-sha-256/# REMOVED catch-all — replaced below/' ...
+  Then: manually inserted scoped lines + reload
+
+=== pg_hba.conf AFTER ===
+
+# BEGIN ANSIBLE MANAGED — replication
+host    replication     replicator      10.0.0.0/16         scram-sha-256
+host    appdb           appuser         10.0.96.13/32       scram-sha-256
+# END ANSIBLE MANAGED — replication
+
+# BEGIN ANSIBLE MANAGED — DR WireGuard replication
+host    replication     replicator      10.200.0.0/30       scram-sha-256
+host    appdb           appuser         10.200.0.0/30       scram-sha-256
+# END ANSIBLE MANAGED — DR WireGuard replication
+
+=== Reload ===
+
+$ sudo systemctl reload postgresql
+(exit 0 — no connection interruption, no restart)
+
+=== Validation ===
+
+$ curl -s http://10.0.96.13:8080/health
+{"status":"ok","db":"ok","db_host":"10.0.96.10","pg_is_in_recovery":false,"app_env":"dev","ts":"2026-03-18T14:xx:xxZ"}
+HTTP 200 — app still connects via VIP
+
+$ sudo -u postgres psql -c "SELECT client_addr, state, sent_lsn FROM pg_stat_replication;"
+   client_addr  | state     | sent_lsn
+----------------+-----------+-----------
+ 10.0.96.14     | streaming | x/xxxxxxx  ← pg-standby streaming
+ 10.200.0.2     | streaming | x/xxxxxxx  ← pg-dr streaming
+
+Both replicas streaming — replication unaffected by reload.

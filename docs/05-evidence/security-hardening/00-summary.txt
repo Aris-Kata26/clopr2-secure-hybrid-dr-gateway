@@ -1,0 +1,47 @@
+S5-07 Infrastructure Security Hardening — Evidence Summary
+===========================================================
+Task:       S5-07 | ClickUp: 86c8wyxjt
+Completed:  2026-03-18
+Owner:      KATAR711 | Team: BCLC24
+
+Scope
+-----
+1. NSG audit (dr-fce, dev Terraform environments)
+2. pg_hba.conf tightening on pg-primary (on-prem)
+3. Ansible update: postgres role + pg_dr.yml WireGuard blocks
+4. Secrets handling review (terraform.tfvars)
+
+Acceptance Criteria Results
+----------------------------
+AC1 NSG audit documented — PASS
+  - dr-fce NSG: pg_dr_bootstrap_ssh_cidrs=[] (bootstrap rule cleared)
+  - dr-fce NSG: SSH restricted to 10.200.0.1/32 (WireGuard peer only)
+  - dr-fce NSG: onprem CIDR restricted to 10.200.0.1/32
+  - dev NSG: no public inbound rules beyond AKS-required
+
+AC2 pg_hba.conf catch-all removed — PASS
+  Before: host all all 10.0.0.0/16 scram-sha-256  (any user, any db, /16 subnet)
+  After:  host appdb appuser 10.0.96.13/32 scram-sha-256  (exact app IP, appdb only)
+  Before: host all all 10.200.0.0/30 scram-sha-256  (any user/db over WireGuard)
+  After:  host appdb appuser 10.200.0.0/30 scram-sha-256  (appdb only over tunnel)
+  Reload: systemctl reload postgresql (no connection interruption)
+
+AC3 Replication and app connectivity not broken — PASS
+  Replication slots after reload: 2 (pg-standby 10.0.96.14, pg-dr 10.200.0.2)
+  App /health after reload: HTTP 200, db=ok, pg_is_in_recovery=false
+
+AC4 Ansible updated to reflect live config — PASS
+  infra/ansible/roles/postgres/tasks/main.yml — on-prem HA pg_hba block updated
+  infra/ansible/playbooks/pg_dr.yml — WireGuard pg_hba block updated (2 occurrences)
+
+AC5 Secrets handling noted — PASS (documented limitation)
+  infra/terraform/envs/dev/terraform.tfvars: plaintext pg_replication_password
+  File is gitignored (*.tfvars in .gitignore) — not committed to git
+  Annotated with TODO comment; future: Key Vault reference or TF_VAR_ env var
+
+Evidence Files
+--------------
+01-nsg-audit.txt        NSG rule inventory for dr-fce and dev
+02-pg-hba-before.txt    pg_hba.conf state before tightening
+03-pg-hba-after.txt     pg_hba.conf state after tightening + validation
+04-replication-check.txt  pg_stat_replication output post-reload

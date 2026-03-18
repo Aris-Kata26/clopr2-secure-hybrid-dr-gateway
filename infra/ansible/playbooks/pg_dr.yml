@@ -32,7 +32,7 @@
         marker: "# {mark} ANSIBLE MANAGED — DR WireGuard replication"
         block: |
           host    replication     replicator      10.200.0.0/30       scram-sha-256
-          host    all             all             10.200.0.0/30       scram-sha-256
+          host    appdb           appuser         10.200.0.0/30       scram-sha-256
       notify: reload postgresql
 
     - name: Ensure pg-primary is listening and up to date
@@ -96,7 +96,7 @@
         marker: "# {mark} ANSIBLE MANAGED — DR WireGuard replication"
         block: |
           host    replication     replicator      10.200.0.0/30       scram-sha-256
-          host    all             all             10.200.0.0/30       scram-sha-256
+          host    appdb           appuser         10.200.0.0/30       scram-sha-256
       notify: reload postgresql
 
   handlers:

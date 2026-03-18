@@ -1,0 +1,24 @@
+pg_hba.conf — State BEFORE Tightening
+======================================
+Captured: 2026-03-18 on pg-primary (10.0.96.11)
+Method: ssh pg-primary 'sudo cat /etc/postgresql/16/main/pg_hba.conf'
+
+--- ANSIBLE MANAGED BLOCK (replication — postgres role) ---
+# BEGIN ANSIBLE MANAGED — replication
+host    replication     replicator      10.0.0.0/16         scram-sha-256
+host    all             all             10.0.0.0/16         scram-sha-256   ← CATCH-ALL
+# END ANSIBLE MANAGED — replication
+
+--- ANSIBLE MANAGED BLOCK (DR WireGuard — pg_dr.yml) ---
+# BEGIN ANSIBLE MANAGED — DR WireGuard replication
+host    replication     replicator      10.200.0.0/30       scram-sha-256
+host    all             all             10.200.0.0/30       scram-sha-256   ← CATCH-ALL
+# END ANSIBLE MANAGED — DR WireGuard replication
+
+Issue: Two catch-all rules permit ANY database user to connect from:
+  - 10.0.0.0/16 (entire on-prem subnet — ~65K addresses)
+  - 10.200.0.0/30 (WireGuard tunnel)
+
+Risk: Any valid PostgreSQL user (e.g., postgres superuser) with the correct
+password could connect from any on-prem host or over the WireGuard tunnel —
+not just appuser/appdb as intended.

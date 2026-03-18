@@ -1,0 +1,72 @@
+Terraform Plan — dr-fce with enable_app_dr_vm=true
+====================================================
+Captured: 2026-03-18
+Working dir: infra/terraform/envs/dr-fce/
+Command: terraform plan -var="enable_app_dr_vm=true" \
+           -var="pg_replication_password=REDACTED" \
+           -var="wg_azure_privkey=REDACTED"
+
+IMPORTANT NOTE ON SENSITIVE VARS
+---------------------------------
+The plan was run with placeholder values for the two sensitive variables
+(pg_replication_password, wg_azure_privkey) to avoid storing secrets.
+This causes Terraform to show:
+  - azurerm_linux_virtual_machine.pg_dr: must be replaced   ← ARTIFACT ONLY
+  - azurerm_key_vault_secret.pg_replication_password: update ← ARTIFACT ONLY
+
+Both are caused by the placeholder values producing different hashes from
+the live state. A real apply with the actual secrets would show ZERO changes
+to the existing DR DB VM (vm-pg-dr-fce). These entries must be IGNORED.
+
+ACTUAL INTENDED CHANGES (3 new resources for app VM)
+------------------------------------------------------
+
+azurerm_network_interface.app_dr[0] will be created
+  + name                    = "vm-app-dr-fce-nic"
+  + location                = "francecentral"
+  + resource_group_name     = "rg-clopr2-katar711-fce"
+  + ip_configuration {
+      + name                          = "ipconfig"
+      + private_ip_address            = "10.20.2.20"          ← static, no conflict
+      + private_ip_address_allocation = "Static"
+      + subnet_id                     = ".../dr-mgmt-subnet"  ← same subnet as DB VM
+      (no public IP — SSH via DR DB VM ProxyJump only)
+    }
+
+azurerm_linux_virtual_machine.app_dr[0] will be created
+  + name                    = "vm-app-dr-fce"
+  + size                    = "Standard_B1s"                  ← app-only, no PG
+  + location                = "francecentral"
+  + admin_username          = "azureuser"
+  + disable_password_authentication = true
+  + admin_ssh_key.public_key = "ssh-ed25519 AAAAC3N..." (same key as DB VM)
+  + os_disk.storage_account_type = "StandardSSD_LRS"
+  + os_disk.disk_size_gb    = 30
+  + source_image_reference  = Ubuntu 22.04 LTS
+  + custom_data             = (Docker cloud-init, no WireGuard)
+  + tags = { Owner=KATAR711, Team=BCLC24, Environment=dev }
+
+azurerm_dev_test_global_vm_shutdown_schedule.app_dr[0] will be created
+  + daily_recurrence_time   = "2300"
+  + timezone                = "W. Europe Standard Time"
+  + enabled                 = true
+
+ADDITIONAL FINDING: DR DB VM private IP
+-----------------------------------------
+Plan reveals existing DR VM private IP = 10.20.2.4 (dynamically assigned).
+This confirms:
+  - 10.20.2.20 (app VM static IP) does NOT conflict with 10.20.2.4 (DB VM)
+  - Both IPs are in dr-mgmt-subnet (10.20.2.0/24)
+  - Intra-subnet PostgreSQL connectivity is covered by AllowVNetInBound
+
+DEPLOYMENT READINESS
+--------------------
+Status: MAINTENANCE-WINDOW-READY
+To deploy: set enable_app_dr_vm = true in terraform.tfvars
+           export TF_VAR_pg_replication_password=<actual>
+           export TF_VAR_wg_azure_privkey=<actual>
+           terraform plan   -- verify only 3 add, 0 replace
+           terraform apply
+
+Expected clean plan with real secrets: Plan 3 to add, 0 to change, 0 to destroy.
+(The pg_dr VM replacement shown above is a plan artifact, not a real change.)

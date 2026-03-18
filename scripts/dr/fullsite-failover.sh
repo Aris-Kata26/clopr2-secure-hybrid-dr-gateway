@@ -91,8 +91,11 @@ ssh_run() {
       ;;
     vm-app-dr-fce|10.20.2.20)
       # App VM has no public IP — reached via DR DB VM as ProxyJump (intra-VNet).
+      # StrictHostKeyChecking=accept-new: automatically accept on first connection
+      # (new VM, host key not yet in known_hosts). BatchMode alone would fail here.
       ssh -o ConnectTimeout=15 -o BatchMode=yes \
-          -o "ProxyCommand=ssh -W %h:%p -o BatchMode=yes -o ConnectTimeout=8 vm-pg-dr-fce" \
+          -o StrictHostKeyChecking=accept-new \
+          -o "ProxyCommand=ssh -W %h:%p -o BatchMode=yes -o StrictHostKeyChecking=accept-new -o ConnectTimeout=8 vm-pg-dr-fce" \
           "azureuser@${host}" "$cmd"
       ;;
     *)

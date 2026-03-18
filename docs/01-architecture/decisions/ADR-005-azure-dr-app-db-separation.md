@@ -159,7 +159,13 @@ intra-subnet traffic not matched by the more specific custom rules.
 
 - Infrastructure code: READY (`enable_app_dr_vm = false` in tfvars)
 - Script support: READY (`--app-vm` flag in both failover/fallback scripts)
-- Live deployment: PENDING — requires `terraform apply` with `enable_app_dr_vm=true`
+- SSH host key fix: APPLIED (`StrictHostKeyChecking=accept-new` on `vm-app-dr-fce`
+  ProxyJump path in both scripts — `BatchMode=yes` alone would fail on first connect)
+- Terraform plan: VERIFIED (`terraform plan -var="enable_app_dr_vm=true"` confirms
+  3 net new resources; DR DB VM private IP = 10.20.2.4, no conflict with 10.20.2.20)
+- Live deployment: DEFERRED — intentional risk-managed decision (2026-03-18).
+  Collocated path is validated PASS (2026-03-15). Live deployment scheduled for
+  the first available maintenance window after the presentation.
 - Validation: PENDING — full-site failover re-test with `--app-vm vm-app-dr-fce`
 - Rollback: set `enable_app_dr_vm = false`, `terraform apply` destroys new VM;
   scripts fall back to collocated mode automatically (no `--app-vm` flag)

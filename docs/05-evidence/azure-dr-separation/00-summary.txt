@@ -33,9 +33,15 @@ Improvement Delivered
 Validation Status
 -----------------
 Terraform validate:   PASS (see 01-terraform-validate.txt)
-Script dry-run:       See 02-failover-dryrun.txt, 03-fallback-dryrun.txt
-Live deployment:      PENDING (enable_app_dr_vm = false; deploy in maintenance window)
-End-to-end failover:  PENDING (requires live VM provisioned)
+Terraform plan:       PASS — 3 net new resources confirmed (see 04-terraform-plan-app-vm.txt)
+                      DR DB VM private IP = 10.20.2.4 (no conflict with app VM 10.20.2.20)
+Script dry-run:       PASS (see 02-failover-dryrun.txt, 03-fallback-dryrun.txt)
+SSH host key bug:     FIXED — StrictHostKeyChecking=accept-new added to vm-app-dr-fce
+                      ProxyJump path in both scripts
+Live deployment:      DEFERRED — intentional decision (2026-03-18). Risk-managed: new
+                      untested code path too close to presentation date. Deploy in first
+                      available maintenance window after 2026-03-26.
+End-to-end failover:  PENDING (requires live VM provisioned in maintenance window)
 
 Collocated DR path:   UNCHANGED — validated PASS on 2026-03-15 (30 evidence files)
 

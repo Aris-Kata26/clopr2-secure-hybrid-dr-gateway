@@ -49,6 +49,12 @@ CONFIRMED_DESTRUCTIVE_PRIMARY=false
 CONFIRMED_DESTRUCTIVE_DRVM=false
 DRY_RUN=false
 
+# Optional: hostname/IP of the separate Azure app VM used during failover.
+# Must match the --app-vm value used with fullsite-failover.sh.
+# When set, FB-1 stops the app on this VM; H-2 checks this VM for clopr2-app-dr.
+# Default (empty): collocated mode — app is on the DR DB VM.
+APP_VM_HOST=""
+
 LAG_CATCHUP_TIMEOUT=120   # seconds to wait for pg-primary lag -> near-zero
 STREAM_WAIT_TIMEOUT=60    # seconds to wait for streaming in pg_stat_replication
 APP_WAIT_TIMEOUT=60       # seconds to poll on-prem app health
@@ -71,6 +77,7 @@ while [[ $# -gt 0 ]]; do
           echo "Valid targets: pg-primary, dr-vm" >&2
           exit 2 ;;
       esac ;;
+    --app-vm) shift; APP_VM_HOST="$1" ;;
     --dry-run) DRY_RUN=true ;;
     --help|-h)
       sed -n '/^# PURPOSE:/,/^[^#]/p' "$0" | head -20
@@ -106,6 +113,12 @@ ssh_run() {
           -o "ProxyCommand=ssh -W %h:%p -o BatchMode=yes -o ConnectTimeout=8 -i ${HOME}/.ssh/id_ed25519_dr_onprem katar711@10.0.96.11" \
           -i "${HOME}/.ssh/id_ed25519_dr_onprem" \
           "katar711@10.0.96.13" "$cmd"
+      ;;
+    vm-app-dr-fce|10.20.2.20)
+      # App VM has no public IP — reached via DR DB VM as ProxyJump (intra-VNet).
+      ssh -o ConnectTimeout=15 -o BatchMode=yes \
+          -o "ProxyCommand=ssh -W %h:%p -o BatchMode=yes -o ConnectTimeout=8 vm-pg-dr-fce" \
+          "azureuser@${host}" "$cmd"
       ;;
     *)
       ssh -o ConnectTimeout=15 -o BatchMode=yes "$host" "$cmd"
@@ -181,14 +194,15 @@ else
   log "[DRY-RUN] skip H-1 (vm-pg-dr-fce pg_is_in_recovery)"
 fi
 
-log "H-2: DR VM app clopr2-app-dr must be running..."
+log "H-2: app clopr2-app-dr must be running (host: ${APP_VM_HOST:-vm-pg-dr-fce})..."
 if ! $DRY_RUN; then
-  dr_app=$(ssh_run "vm-pg-dr-fce" \
+  APP_CHECK_HOST="${APP_VM_HOST:-vm-pg-dr-fce}"
+  dr_app=$(ssh_run "${APP_CHECK_HOST}" \
     "sudo docker ps --filter name=clopr2-app-dr --format '{{.Status}}'" 2>/dev/null || echo "")
   if echo "$dr_app" | grep -qi "up"; then
-    pass "H-2: clopr2-app-dr running: ${dr_app}"
+    pass "H-2: clopr2-app-dr running on ${APP_CHECK_HOST}: ${dr_app}"
   else
-    fail "H-2: clopr2-app-dr not running (status='${dr_app:-empty}')"
+    fail "H-2: clopr2-app-dr not running on ${APP_CHECK_HOST} (status='${dr_app:-empty}')"
     exit 1
   fi
 fi
@@ -305,10 +319,11 @@ if $DRY_RUN; then
   log "[DRY-RUN] GATE 1 (--confirm-destructive pg-primary) would be checked here"
 fi
 
-# ── FB-1: Stop app on DR VM ───────────────────────────────────────────────────
-step "FB-1: Stop app on vm-pg-dr-fce"
+# ── FB-1: Stop app ────────────────────────────────────────────────────────────
+FB1_APP_HOST="${APP_VM_HOST:-vm-pg-dr-fce}"
+step "FB-1: Stop app on ${FB1_APP_HOST}"
 if ! $DRY_RUN; then
-  ssh_run "vm-pg-dr-fce" "
+  ssh_run "${FB1_APP_HOST}" "
     sudo docker stop clopr2-app-dr 2>/dev/null || true
     sudo docker rm clopr2-app-dr 2>/dev/null || true
     echo \"App stopped at: \$(date -u +%Y-%m-%dT%H:%M:%SZ)\"
@@ -316,9 +331,9 @@ if ! $DRY_RUN; then
     sudo docker ps
   " | tee "${EVIDENCE_DIR}/fsdb-azure-app-stopped.txt"
   EVIDENCE_FILES+=("${EVIDENCE_DIR}/fsdb-azure-app-stopped.txt")
-  pass "FB-1: Azure app container stopped"
+  pass "FB-1: app container stopped on ${FB1_APP_HOST}"
 else
-  log "[DRY-RUN] ssh vm-pg-dr-fce 'sudo docker stop clopr2-app-dr && sudo docker rm clopr2-app-dr'"
+  log "[DRY-RUN] ssh ${FB1_APP_HOST} 'sudo docker stop clopr2-app-dr && sudo docker rm clopr2-app-dr'"
 fi
 
 # ── FB-2: Set DR VM to read-only ──────────────────────────────────────────────

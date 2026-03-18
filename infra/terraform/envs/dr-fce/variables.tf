@@ -255,3 +255,31 @@ variable "ops_alert_email" {
   description = "Email address for operational alert notifications (action group)."
   default     = "katar711@school.lu"
 }
+
+# ---------------------------------------------------------------------------
+# Azure DR App VM — separation of app and DB roles
+# ---------------------------------------------------------------------------
+
+variable "enable_app_dr_vm" {
+  type        = bool
+  description = "Provision a separate Azure app VM (vm-app-dr-fce) for the FastAPI container during full-site failover. When false, the app runs on the DB VM (legacy collocated mode)."
+  default     = false
+}
+
+variable "app_dr_vm_name" {
+  type        = string
+  description = "Name for the Azure DR app VM."
+  default     = "vm-app-dr-fce"
+}
+
+variable "app_dr_vm_size" {
+  type        = string
+  description = "VM SKU for the Azure DR app VM. B1s is sufficient (Docker only, no PostgreSQL)."
+  default     = "Standard_B1s"
+}
+
+variable "app_dr_vm_private_ip" {
+  type        = string
+  description = "Static private IP for the app VM within dr-mgmt-subnet (10.20.2.0/24). Must not conflict with the DB VM's dynamically assigned IP."
+  default     = "10.20.2.20"
+}

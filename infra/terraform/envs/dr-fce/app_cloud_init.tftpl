@@ -1,0 +1,13 @@
+#cloud-config
+# Bootstraps Docker on first boot for the Azure DR app VM (vm-app-dr-fce).
+# This VM hosts the FastAPI container during full-site failover.
+# No WireGuard — this VM is accessed via the DR DB VM as an SSH ProxyJump
+# (both VMs share the dr-mgmt-subnet; intra-VNet traffic is unrestricted).
+
+packages:
+  - docker.io
+
+runcmd:
+  - systemctl enable docker
+  - systemctl start docker
+  - usermod -aG docker azureuser

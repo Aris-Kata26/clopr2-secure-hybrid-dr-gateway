@@ -1,0 +1,30 @@
+fullsite-fallback.sh Dry-Run — Separated Mode (--app-vm vm-app-dr-fce)
+========================================================================
+Captured: 2026-03-18
+
+$ bash scripts/dr/fullsite-fallback.sh --dry-run --confirm \
+    --confirm-destructive pg-primary --confirm-destructive dr-vm \
+    --app-vm vm-app-dr-fce
+
+[fullsite-fallback] ===== STEP 1: Prerequisites H-1 through H-7 =====
+[fullsite-fallback] H-2: app clopr2-app-dr must be running (host: vm-app-dr-fce)...
+  → Correctly checks app VM (not DR DB VM) when --app-vm is set
+
+[fullsite-fallback] ===== FB-1: Stop app on vm-app-dr-fce =====
+[fullsite-fallback] [DRY-RUN] ssh vm-app-dr-fce 'sudo docker stop clopr2-app-dr && sudo docker rm clopr2-app-dr'
+  → Correctly stops app on the separate app VM
+
+[fullsite-fallback] FB-2 through FB-13: unchanged
+  → DB tier failback (pg_basebackup, promote, streaming) is identical in both modes
+  → On-prem app restart (FB-11) is identical in both modes
+
+[fullsite-fallback] FULL-SITE FAILBACK COMPLETE
+[fullsite-fallback] DRY-RUN complete — no changes made.
+
+Key observations:
+  H-2 shows "host: vm-app-dr-fce" — correct
+  FB-1 targets vm-app-dr-fce — correct (app VM stopped before PG teardown begins)
+  DB failback steps (FB-2 through FB-9) are host-agnostic — unchanged
+  On-prem restore (FB-10 through FB-13) — unchanged
+
+Backward compatibility confirmed: without --app-vm, H-2/FB-1 target vm-pg-dr-fce.

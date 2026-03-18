@@ -1,0 +1,35 @@
+Terraform Validate — dr-fce environment
+========================================
+Captured: 2026-03-18
+Working dir: infra/terraform/envs/dr-fce/
+
+$ terraform validate
+
+Success! The configuration is valid.
+
+New resources added (count = enable_app_dr_vm ? 1 : 0 — default false):
+  azurerm_network_interface.app_dr[0]
+  azurerm_linux_virtual_machine.app_dr[0]
+  azurerm_dev_test_global_vm_shutdown_schedule.app_dr[0]
+
+New files:
+  app_cloud_init.tftpl  — Docker-only cloud-init (install docker.io, enable service)
+
+New variables:
+  enable_app_dr_vm     = false   (deploy gate — set true to provision)
+  app_dr_vm_name       = "vm-app-dr-fce"
+  app_dr_vm_size       = "Standard_B1s"
+  app_dr_vm_private_ip = "10.20.2.20"
+
+To deploy the separated architecture:
+  1. Set enable_app_dr_vm = true in terraform.tfvars
+  2. terraform plan   -- review planned changes
+  3. terraform apply  -- provision vm-app-dr-fce
+
+Expected terraform plan output (when enable_app_dr_vm = true):
+  # azurerm_network_interface.app_dr[0] will be created
+  # azurerm_linux_virtual_machine.app_dr[0] will be created
+  # azurerm_dev_test_global_vm_shutdown_schedule.app_dr[0] will be created
+  Plan: 3 to add, 0 to change, 0 to destroy.
+
+No impact on existing resources (DR DB VM, NSG, VNet, Key Vault, etc.).

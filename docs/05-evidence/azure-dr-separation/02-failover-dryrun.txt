@@ -1,0 +1,39 @@
+fullsite-failover.sh Dry-Run — Separated Mode (--app-vm vm-app-dr-fce)
+========================================================================
+Captured: 2026-03-18
+
+$ bash scripts/dr/fullsite-failover.sh --dry-run --confirm --app-vm vm-app-dr-fce
+
+[fullsite-failover] ===== STEP 0: SSH pre-check [MANDATORY] =====
+[fullsite-failover] [DRY-RUN] would run ssh-precheck.sh
+
+[fullsite-failover] ===== STEP 1: Full preflight check =====
+[fullsite-failover] [DRY-RUN] would run dr-preflight.sh fullsite
+
+[fullsite-failover] ===== FS-7: Start app container on separate app VM vm-app-dr-fce [SEPARATED MODE] =====
+[fullsite-failover] [DRY-RUN] would transfer image from vm-pg-dr-fce to vm-app-dr-fce,
+  then docker run -p 8000:8000 -e DB_HOST=<dr-vm-private-ip> ...
+
+[fullsite-failover] ===== FS-8: Validate /health on vm-app-dr-fce (timeout=60s) =====
+[fullsite-failover] [DRY-RUN] would poll vm-app-dr-fce:8000/health until HTTP 200
+
+[fullsite-failover] ===== FS-9: Validate /health via SSH port-forward (external path) =====
+[fullsite-failover] [DRY-RUN] would open ssh -L 18000:vm-app-dr-fce:8000 vm-pg-dr-fce
+  and curl localhost:18000/health
+
+[fullsite-failover] FULL-SITE FAILOVER COMPLETE
+[fullsite-failover] DRY-RUN complete — no changes made.
+
+Key observations:
+  FS-7 label: "SEPARATED MODE" — correct
+  FS-7 shows image transfer from DB VM to app VM
+  FS-8 polls vm-app-dr-fce (not vm-pg-dr-fce)
+  FS-9 port-forward: ssh -L 18000:vm-app-dr-fce:8000 vm-pg-dr-fce (correct ProxyJump pattern)
+
+Backward compatibility check:
+$ bash scripts/dr/fullsite-failover.sh --dry-run --confirm
+  FS-7 label: "COLLOCATED MODE" — unchanged original behaviour
+  FS-7 shows: docker run --network host on vm-pg-dr-fce
+  FS-8 polls: vm-pg-dr-fce (original)
+  FS-9 port-fwd: ssh -L 18000:localhost:8000 vm-pg-dr-fce (original)
+Result: PASS — collocated path unchanged

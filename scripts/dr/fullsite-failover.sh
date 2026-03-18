@@ -34,12 +34,20 @@ WAL_LAG_THRESHOLD=1024    # bytes — promote only when DR VM lag <= this value
 WAL_REPLAY_TIMEOUT=120    # seconds to wait for WAL replay to stabilise
 APP_WAIT_TIMEOUT=60       # seconds to poll DR VM app health
 
+# Optional: hostname/IP of a separate Azure app VM (vm-app-dr-fce).
+# When set, FS-7 deploys the app on this VM instead of the DB VM.
+# This enables app/DB role separation — see ADR-005.
+# Set via: --app-vm vm-app-dr-fce  or  --app-vm 10.20.2.20
+# Default (empty): collocated mode — app runs on DR DB VM (legacy, validated).
+APP_VM_HOST=""
+
 # ── argument parsing ──────────────────────────────────────────────────────────
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --confirm)               CONFIRMED=true ;;
     --dry-run)               DRY_RUN=true ;;
     --wal-lag-threshold)     shift; WAL_LAG_THRESHOLD="$1" ;;
+    --app-vm)                shift; APP_VM_HOST="$1" ;;
     --help|-h)
       sed -n '/^# PURPOSE:/,/^[^#]/p' "$0" | head -20
       exit 0
@@ -80,6 +88,12 @@ ssh_run() {
           -o "ProxyCommand=ssh -W %h:%p -o BatchMode=yes -o ConnectTimeout=8 -i ${HOME}/.ssh/id_ed25519_dr_onprem katar711@10.0.96.11" \
           -i "${HOME}/.ssh/id_ed25519_dr_onprem" \
           "katar711@10.0.96.13" "$cmd"
+      ;;
+    vm-app-dr-fce|10.20.2.20)
+      # App VM has no public IP — reached via DR DB VM as ProxyJump (intra-VNet).
+      ssh -o ConnectTimeout=15 -o BatchMode=yes \
+          -o "ProxyCommand=ssh -W %h:%p -o BatchMode=yes -o ConnectTimeout=8 vm-pg-dr-fce" \
+          "azureuser@${host}" "$cmd"
       ;;
     *)
       ssh -o ConnectTimeout=15 -o BatchMode=yes "$host" "$cmd"
@@ -123,8 +137,8 @@ if ! $DRY_RUN && ! $CONFIRMED; then
   echo "    FS-4: Wait for DR VM WAL replay to stabilise"
   echo "    FS-5: Promote vm-pg-dr-fce to primary"
   echo "    FS-6: Confirm write capability"
-  echo "    FS-7: Start app container on vm-pg-dr-fce"
-  echo "    FS-8: Validate /health on DR VM"
+  echo "    FS-7: Start app container (on --app-vm host if set, else on DR DB VM)"
+  echo "    FS-8: Validate /health on app host"
   echo "    FS-9: Validate via SSH port-forward (external path)"
   echo "    FS-10: Record RTO/RPO and post-failover snapshot"
   echo ""
@@ -398,43 +412,106 @@ else
   log "[DRY-RUN] ssh vm-pg-dr-fce 'sudo -u postgres psql CREATE TABLE / INSERT / DROP'"
 fi
 
-# ── FS-7: Start app on vm-pg-dr-fce ──────────────────────────────────────────
-step "FS-7: Start app container on vm-pg-dr-fce"
-if ! $DRY_RUN; then
-  # Remove any existing container from a previous run
-  ssh_run "vm-pg-dr-fce" \
-    "sudo docker rm -f clopr2-app-dr 2>/dev/null || true"
-
-  app_start=$(ssh_run "vm-pg-dr-fce" "
-    sudo docker run -d \
-      --name clopr2-app-dr \
-      --restart unless-stopped \
-      --network host \
-      --env-file /home/azureuser/clopr2-app/.env \
-      clopr2-app:dr
-    sleep 5
-    echo '--- docker ps ---'
-    sudo docker ps --filter name=clopr2-app-dr
-    echo \"App started at: \$(date -u +%Y-%m-%dT%H:%M:%SZ)\"
-  ")
-  log "$app_start"
-  if ! echo "$app_start" | grep -q "clopr2-app-dr"; then
-    fail "FS-7: clopr2-app-dr container not found in docker ps"
-    exit 1
-  fi
-  pass "FS-7: app container started on vm-pg-dr-fce"
+# ── FS-7: Start app container ─────────────────────────────────────────────────
+# Two modes:
+#   Collocated (default, --app-vm not set): app runs on DR DB VM using --network
+#     host → connects to localhost:5432. Validated behaviour.
+#   Separated (--app-vm <host>): app runs on a dedicated Azure app VM → connects
+#     to DR DB VM private IP. Achieves app/DB role separation (ADR-005).
+if [[ -n "$APP_VM_HOST" ]]; then
+  step "FS-7: Start app container on separate app VM ${APP_VM_HOST} [SEPARATED MODE]"
 else
-  log "[DRY-RUN] ssh vm-pg-dr-fce 'sudo docker run -d --name clopr2-app-dr --network host ...'"
+  step "FS-7: Start app container on vm-pg-dr-fce [COLLOCATED MODE]"
 fi
 
-# ── FS-8: Validate app health on DR VM ───────────────────────────────────────
-step "FS-8: Validate /health on vm-pg-dr-fce (timeout=${APP_WAIT_TIMEOUT}s)"
+if ! $DRY_RUN; then
+  if [[ -n "$APP_VM_HOST" ]]; then
+    # ── Separated mode ───────────────────────────────────────────────────────
+    # Determine DR DB VM's private VNet IP (used as DB_HOST by the app VM).
+    DR_DB_PRIVATE_IP=$(ssh_run "vm-pg-dr-fce" "hostname -I | awk '{print \$1}'" | tr -d '[:space:]')
+    log "FS-7: DR DB VM private IP = ${DR_DB_PRIVATE_IP}"
+
+    # Read app credentials from DR VM's env file.
+    DB_APP_PW=$(ssh_run "vm-pg-dr-fce" \
+      "grep ^DB_PASSWORD /home/azureuser/clopr2-app/.env | cut -d= -f2- | tr -d '\r\n'" 2>/dev/null || echo "")
+
+    # Transfer Docker image from DR VM to app VM via SSH pipe (intra-VNet).
+    log "FS-7: Transferring Docker image from vm-pg-dr-fce to ${APP_VM_HOST}..."
+    ssh -o BatchMode=yes vm-pg-dr-fce "sudo docker save clopr2-app:dr" | \
+      ssh -o BatchMode=yes \
+          -o "ProxyCommand=ssh -W %h:%p -o BatchMode=yes vm-pg-dr-fce" \
+          "azureuser@${APP_VM_HOST}" "sudo docker load"
+    pass "FS-7: Docker image transferred to ${APP_VM_HOST}"
+
+    # Remove stale container and start app.
+    ssh_run "${APP_VM_HOST}" "sudo docker rm -f clopr2-app-dr 2>/dev/null || true"
+
+    app_start=$(ssh_run "${APP_VM_HOST}" "
+      sudo docker run -d \
+        --name clopr2-app-dr \
+        --restart unless-stopped \
+        -p 8000:8000 \
+        -e DB_HOST='${DR_DB_PRIVATE_IP}' \
+        -e DB_PORT=5432 \
+        -e DB_NAME=appdb \
+        -e DB_USER=appuser \
+        -e DB_PASSWORD='${DB_APP_PW}' \
+        -e APP_ENV=dr-azure \
+        clopr2-app:dr
+      sleep 5
+      echo '--- docker ps ---'
+      sudo docker ps --filter name=clopr2-app-dr
+      echo \"App started at: \$(date -u +%Y-%m-%dT%H:%M:%SZ)\"
+    ")
+    log "$app_start"
+    if ! echo "$app_start" | grep -q "clopr2-app-dr"; then
+      fail "FS-7: clopr2-app-dr not found in docker ps on ${APP_VM_HOST}"
+      exit 1
+    fi
+    pass "FS-7: app container started on ${APP_VM_HOST} (DB_HOST=${DR_DB_PRIVATE_IP})"
+
+  else
+    # ── Collocated mode (original validated behaviour) ────────────────────────
+    ssh_run "vm-pg-dr-fce" \
+      "sudo docker rm -f clopr2-app-dr 2>/dev/null || true"
+
+    app_start=$(ssh_run "vm-pg-dr-fce" "
+      sudo docker run -d \
+        --name clopr2-app-dr \
+        --restart unless-stopped \
+        --network host \
+        --env-file /home/azureuser/clopr2-app/.env \
+        clopr2-app:dr
+      sleep 5
+      echo '--- docker ps ---'
+      sudo docker ps --filter name=clopr2-app-dr
+      echo \"App started at: \$(date -u +%Y-%m-%dT%H:%M:%SZ)\"
+    ")
+    log "$app_start"
+    if ! echo "$app_start" | grep -q "clopr2-app-dr"; then
+      fail "FS-7: clopr2-app-dr container not found in docker ps"
+      exit 1
+    fi
+    pass "FS-7: app container started on vm-pg-dr-fce"
+  fi
+
+else
+  if [[ -n "$APP_VM_HOST" ]]; then
+    log "[DRY-RUN] would transfer image from vm-pg-dr-fce to ${APP_VM_HOST}, then docker run -p 8000:8000 -e DB_HOST=<dr-vm-private-ip> ..."
+  else
+    log "[DRY-RUN] ssh vm-pg-dr-fce 'sudo docker run -d --name clopr2-app-dr --network host ...'"
+  fi
+fi
+
+# ── FS-8: Validate app health ─────────────────────────────────────────────────
+APP_HEALTH_HOST="${APP_VM_HOST:-vm-pg-dr-fce}"
+step "FS-8: Validate /health on ${APP_HEALTH_HOST} (timeout=${APP_WAIT_TIMEOUT}s)"
 if ! $DRY_RUN; then
   app_health_ok=false
   elapsed=0
   health_response=""
   while [[ $elapsed -lt $APP_WAIT_TIMEOUT ]]; do
-    health_response=$(ssh_run "vm-pg-dr-fce" \
+    health_response=$(ssh_run "${APP_HEALTH_HOST}" \
       "curl -sf --max-time 5 http://localhost:8000/health" \
       2>/dev/null || echo "")
     if [[ -n "$health_response" ]]; then
@@ -463,20 +540,32 @@ d = json.load(sys.stdin)
 print(str(d.get('pg_is_in_recovery', 'MISSING')).lower())
 " 2>/dev/null || echo "parse-error")
   assert "FS-8: app pg_is_in_recovery=false (Azure DB is primary)" "false" "$dr_recovery_val"
-  pass "FS-8: app /health confirmed DR VM is primary"
+  pass "FS-8: app /health confirmed DR VM is primary (app host: ${APP_HEALTH_HOST})"
 else
-  log "[DRY-RUN] would poll vm-pg-dr-fce:8000/health until HTTP 200"
+  log "[DRY-RUN] would poll ${APP_HEALTH_HOST}:8000/health until HTTP 200"
   APP_HEALTH_OK_TS=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 fi
 
 # ── FS-9: Validate via SSH port-forward ──────────────────────────────────────
+# Collocated: forward directly to DR DB VM (localhost:8000).
+# Separated:  forward to app VM via DR DB VM as jump (DR VM is the SSH entry point).
 step "FS-9: Validate /health via SSH port-forward (external path)"
 if ! $DRY_RUN; then
-  ssh -L 18000:localhost:8000 -N \
-      -o ExitOnForwardFailure=yes \
-      -o ConnectTimeout=10 \
-      -o BatchMode=yes \
-      vm-pg-dr-fce &
+  if [[ -n "$APP_VM_HOST" ]]; then
+    # Separated: WSL → vm-pg-dr-fce → APP_VM_HOST:8000
+    ssh -L "18000:${APP_VM_HOST}:8000" -N \
+        -o ExitOnForwardFailure=yes \
+        -o ConnectTimeout=10 \
+        -o BatchMode=yes \
+        vm-pg-dr-fce &
+  else
+    # Collocated: WSL → vm-pg-dr-fce:8000
+    ssh -L 18000:localhost:8000 -N \
+        -o ExitOnForwardFailure=yes \
+        -o ConnectTimeout=10 \
+        -o BatchMode=yes \
+        vm-pg-dr-fce &
+  fi
   PF_PID=$!
   sleep 2
 
@@ -491,7 +580,11 @@ if ! $DRY_RUN; then
   log "Port-forward health: $pf_health"
   pass "FS-9: port-forward health check complete"
 else
-  log "[DRY-RUN] would open ssh -L 18000:localhost:8000 vm-pg-dr-fce and curl localhost:18000/health"
+  if [[ -n "$APP_VM_HOST" ]]; then
+    log "[DRY-RUN] would open ssh -L 18000:${APP_VM_HOST}:8000 vm-pg-dr-fce and curl localhost:18000/health"
+  else
+    log "[DRY-RUN] would open ssh -L 18000:localhost:8000 vm-pg-dr-fce and curl localhost:18000/health"
+  fi
 fi
 
 # ── FS-10: RTO/RPO summary + post-failover snapshot ──────────────────────────
@@ -518,18 +611,34 @@ if ! $DRY_RUN; then
   } | tee "${EVIDENCE_DIR}/fsdr-rto-summary.txt"
   EVIDENCE_FILES+=("${EVIDENCE_DIR}/fsdr-rto-summary.txt")
 
-  ssh_run "vm-pg-dr-fce" "
-    echo '=== POST-FAILOVER STATE ==='
-    echo \"Timestamp: \$(date -u +%Y-%m-%dT%H:%M:%SZ)\"
-    echo '--- PostgreSQL role ---'
-    sudo -u postgres psql -c \"SELECT pg_is_in_recovery(), pg_current_wal_lsn();\"
-    echo '--- pg_stat_replication (no rows expected — on-prem is down) ---'
-    sudo -u postgres psql -c \"SELECT * FROM pg_stat_replication;\"
-    echo '--- App container ---'
-    sudo docker ps --filter name=clopr2-app-dr
-    echo '--- App /health ---'
-    curl -s http://localhost:8000/health
-  " | tee "${EVIDENCE_DIR}/fsdr-post-failover-snapshot.txt"
+  {
+    echo "=== POST-FAILOVER STATE ==="
+    echo "App mode: ${APP_VM_HOST:+separated (app VM: ${APP_VM_HOST})}"
+    echo "App mode: ${APP_VM_HOST:-collocated (app on DR DB VM)}"
+    echo ""
+    ssh_run "vm-pg-dr-fce" "
+      echo '--- PostgreSQL role (DR DB VM) ---'
+      echo \"Timestamp: \$(date -u +%Y-%m-%dT%H:%M:%SZ)\"
+      sudo -u postgres psql -c \"SELECT pg_is_in_recovery(), pg_current_wal_lsn();\"
+      echo '--- pg_stat_replication (no rows expected — on-prem is down) ---'
+      sudo -u postgres psql -c \"SELECT * FROM pg_stat_replication;\"
+      echo '--- App container on DR DB VM ---'
+      sudo docker ps --filter name=clopr2-app-dr
+    "
+    if [[ -n "$APP_VM_HOST" ]]; then
+      ssh_run "${APP_VM_HOST}" "
+        echo '--- App container on separate app VM (${APP_VM_HOST}) ---'
+        sudo docker ps --filter name=clopr2-app-dr
+        echo '--- App /health ---'
+        curl -s http://localhost:8000/health
+      "
+    else
+      ssh_run "vm-pg-dr-fce" "
+        echo '--- App /health (collocated) ---'
+        curl -s http://localhost:8000/health
+      "
+    fi
+  } | tee "${EVIDENCE_DIR}/fsdr-post-failover-snapshot.txt"
   EVIDENCE_FILES+=("${EVIDENCE_DIR}/fsdr-post-failover-snapshot.txt")
 
   pass "FS-10: RTO/RPO recorded"

@@ -310,6 +310,92 @@ resource "azurerm_consumption_budget_resource_group" "dr" {
   }
 }
 
+# =============================================================================
+# Azure DR App VM — vm-app-dr-fce
+#
+# Separate VM for the FastAPI container during full-site failover.
+# Achieves app/DB role separation: the DB VM (vm-pg-dr-fce) handles PostgreSQL
+# exclusively; this VM handles the application tier.
+#
+# Connectivity:
+#   - Same subnet as DB VM (dr-mgmt-subnet 10.20.2.0/24)
+#   - No public IP — SSH via ProxyJump through vm-pg-dr-fce (intra-VNet)
+#   - PostgreSQL access: private IP of DB VM (intra-subnet, AllowVNetInBound)
+#   - No WireGuard — tunnel not required (DB VM is the tunnel endpoint)
+#
+# Enabled when: enable_app_dr_vm = true in terraform.tfvars
+# Default: false — collocated mode preserved for backward compatibility
+# =============================================================================
+
+resource "azurerm_network_interface" "app_dr" {
+  count               = var.enable_app_dr_vm ? 1 : 0
+  name                = "${var.app_dr_vm_name}-nic"
+  location            = var.location
+  resource_group_name = azurerm_resource_group.dr.name
+
+  ip_configuration {
+    name                          = "ipconfig"
+    subnet_id                     = azurerm_subnet.dr_mgmt.id
+    private_ip_address_allocation = "Static"
+    private_ip_address            = var.app_dr_vm_private_ip
+    # No public IP — accessed only via DR DB VM ProxyJump (intra-VNet)
+  }
+
+  tags = local.tags
+}
+
+resource "azurerm_linux_virtual_machine" "app_dr" {
+  count               = var.enable_app_dr_vm ? 1 : 0
+  name                = var.app_dr_vm_name
+  location            = var.location
+  resource_group_name = azurerm_resource_group.dr.name
+  size                = var.app_dr_vm_size
+  admin_username      = var.pg_dr_admin_username
+
+  network_interface_ids = [
+    azurerm_network_interface.app_dr[0].id,
+  ]
+
+  admin_ssh_key {
+    username   = var.pg_dr_admin_username
+    public_key = var.pg_dr_admin_ssh_public_key
+  }
+
+  disable_password_authentication = true
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "StandardSSD_LRS"
+    disk_size_gb         = 30
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-jammy"
+    sku       = "22_04-lts"
+    version   = "latest"
+  }
+
+  # cloud-init: install Docker only (no WireGuard, no PostgreSQL)
+  custom_data = base64encode(file("${path.module}/app_cloud_init.tftpl"))
+
+  tags = local.tags
+}
+
+resource "azurerm_dev_test_global_vm_shutdown_schedule" "app_dr" {
+  count              = var.enable_app_dr_vm ? 1 : 0
+  virtual_machine_id = azurerm_linux_virtual_machine.app_dr[0].id
+  location           = var.location
+  enabled            = true
+
+  daily_recurrence_time = var.auto_shutdown_time
+  timezone              = var.auto_shutdown_timezone
+
+  notification_settings {
+    enabled = false
+  }
+}
+
 resource "azurerm_subnet" "gateway" {
   count                = var.enable_vpn_gateway ? 1 : 0
   name                 = "GatewaySubnet"

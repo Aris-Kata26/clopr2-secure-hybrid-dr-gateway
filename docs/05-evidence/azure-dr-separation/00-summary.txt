@@ -1,0 +1,56 @@
+S5 Weakness #1 — Azure DR App/DB Separation
+============================================
+Sprint task: ClickUp (to be created)
+Completed:   2026-03-18
+Author:      KATAR711 | Team: BCLC24
+ADR:         docs/01-architecture/decisions/ADR-005-azure-dr-app-db-separation.md
+
+Weakness Addressed
+------------------
+During validated full-site failover (2026-03-15), the FastAPI app container ran
+ON the DR DB VM (vm-pg-dr-fce) using --network host. DB + App were collocated
+on the same Azure VM.
+
+Improvement Delivered
+---------------------
+1. Terraform: optional Azure app VM (vm-app-dr-fce, Standard_B1s) in dr-fce env
+   - Same subnet as DB VM (dr-mgmt-subnet 10.20.2.0/24)
+   - Static private IP 10.20.2.20
+   - Docker-only cloud-init (no WireGuard, no PostgreSQL)
+   - Auto-shutdown at 23:00
+   - Gated by enable_app_dr_vm = false (default) — deploy when ready
+
+2. fullsite-failover.sh: new --app-vm <host> flag
+   - FS-7 (separated): transfer image from DB VM to app VM, run with DB_HOST=<db-vm-private-ip>
+   - FS-8/FS-9: health checks routed to app VM host
+   - Without --app-vm: collocated behaviour unchanged (backward compatible)
+
+3. fullsite-fallback.sh: new --app-vm <host> flag
+   - H-2: checks app running on correct host
+   - FB-1: stops app on correct host
+   - Without --app-vm: collocated behaviour unchanged (backward compatible)
+
+Validation Status
+-----------------
+Terraform validate:   PASS (see 01-terraform-validate.txt)
+Script dry-run:       See 02-failover-dryrun.txt, 03-fallback-dryrun.txt
+Live deployment:      PENDING (enable_app_dr_vm = false; deploy in maintenance window)
+End-to-end failover:  PENDING (requires live VM provisioned)
+
+Collocated DR path:   UNCHANGED — validated PASS on 2026-03-15 (30 evidence files)
+
+Networking
+----------
+App VM → DB VM PostgreSQL (5432): AllowVNetInBound (no new NSG rules needed)
+SSH to app VM: ProxyJump through DB VM (intra-VNet, same pattern as on-prem relay)
+WSL health check: ssh -L 18000:<app-vm-ip>:8000 vm-pg-dr-fce (existing port-fwd pattern)
+
+Files Changed
+-------------
+infra/terraform/envs/dr-fce/variables.tf        — 4 new variables (enable_app_dr_vm, app_dr_vm_*)
+infra/terraform/envs/dr-fce/main.tf             — 3 new resources (NIC, VM, auto-shutdown)
+infra/terraform/envs/dr-fce/app_cloud_init.tftpl — Docker cloud-init for app VM
+infra/terraform/envs/dr-fce/terraform.tfvars    — enable_app_dr_vm = false + app VM values
+scripts/dr/fullsite-failover.sh                 — --app-vm flag, ssh_run case, FS-7/8/9
+scripts/dr/fullsite-fallback.sh                 — --app-vm flag, ssh_run case, H-2, FB-1
+docs/01-architecture/decisions/ADR-005-...md    — Architecture decision record

@@ -1,0 +1,67 @@
+CLOPR2 Secure Hybrid DR Gateway — Backup + PITR Hardening Evidence
+====================================================================
+Date:       2026-03-18
+Task:       S5-04 Backup + PITR Hardening (architecture hardening)
+ClickUp:    https://app.clickup.com/t/86c8wm1bu
+Implemented by: KATAR711
+
+ACCEPTANCE CRITERIA RESULTS
+============================
+[PASS] Azure Blob Storage backup target configured
+[PASS] pgBackRest 2.50 installed on pg-primary (Ubuntu 24.04)
+[PASS] pgBackRest configured with Azure repo (stanza: main)
+[PASS] WAL archiving enabled (archive_mode=on, archive_command set)
+[PASS] stanza-create completed successfully
+[PASS] pgbackrest check: WAL segment archived end-to-end
+[PASS] Full backup completed: label 20260318-083349F
+[PASS] Restore validation: 1,261 files restored to /tmp/pg-restore-test
+[PASS] Production cluster unaffected (pg_is_in_recovery()=f, 2 replicas)
+[PASS] IaC: backup.tf + Ansible role pgbackrest
+[PASS] Documentation: backup-architecture.md
+[PASS] Evidence: 12 evidence files
+
+BACKUP DETAILS
+==============
+Label:          20260318-083349F (Full)
+Start:          2026-03-18 08:33:49 UTC
+Stop:           2026-03-18 08:34:30 UTC
+Duration:       ~41 seconds
+Database size:  29.4MB
+Repo size:      3.9MB (compressed)
+Files:          1,261
+WAL segments:   000000050000000000000013 through 000000050000000000000015
+Azure blobs:    1,272 total
+
+RESTORE VALIDATION
+==================
+Command:   pgbackrest --stanza=main --pg1-path=/tmp/pg-restore-test restore
+Duration:  ~92 seconds
+Files:     29.4MB / 1,261 files restored
+recovery.signal: PRESENT
+postgresql.auto.conf: restore_command set
+pg_controldata: checkpoint LSN 0/15000060, timeline 5
+Result:    PASS — production cluster unaffected
+
+INFRASTRUCTURE
+==============
+Storage account: clopr2backupkatar (rg-clopr2-katar711-gwc, germanywestcentral)
+Container:       pgbackrest
+TLS:             1.2+ only
+Public access:   Disabled
+pgbackrest.conf: /etc/pgbackrest/pgbackrest.conf (640, root:postgres)
+Log path:        /var/log/pgbackrest/
+WAL archiving:   Enabled — archive_mode=on, archive_command configured
+
+IaC FILES
+=========
+  infra/terraform/envs/dev/backup.tf
+  infra/ansible/roles/pgbackrest/defaults/main.yml
+  infra/ansible/roles/pgbackrest/templates/pgbackrest.conf.j2
+  infra/ansible/roles/pgbackrest/tasks/main.yml
+  infra/ansible/pgbackrest.yml
+
+DOCUMENTATION
+=============
+  docs/03-operations/backup-architecture.md
+
+FINAL STATUS: PASS

@@ -1,0 +1,45 @@
+---
+# defaults/main.yml — pgBackRest role defaults
+# CLOPR2 Secure Hybrid DR Gateway | Owner: KATAR711 | Team: BCLC24
+
+# ---------------------------------------------------------------------------
+# pgBackRest version (installed via apt on Ubuntu 24.04)
+# ---------------------------------------------------------------------------
+pgbackrest_version: "2.50"
+
+# ---------------------------------------------------------------------------
+# Stanza name — matches the PostgreSQL cluster name
+# ---------------------------------------------------------------------------
+pgbackrest_stanza: "main"
+
+# ---------------------------------------------------------------------------
+# PostgreSQL data directory
+# ---------------------------------------------------------------------------
+pgbackrest_pg_path: "/var/lib/postgresql/16/main"
+
+# ---------------------------------------------------------------------------
+# Azure Blob Storage repository
+# Override via group_vars or host_vars (never hardcode in defaults)
+# ---------------------------------------------------------------------------
+pgbackrest_repo_type: "azure"
+pgbackrest_repo_azure_account: "clopr2backupkatar"
+pgbackrest_repo_azure_container: "pgbackrest"
+pgbackrest_repo_path: "/pgbackrest"
+# pgbackrest_repo_azure_key: — SET VIA VAULT or extra-vars (sensitive)
+
+# ---------------------------------------------------------------------------
+# Retention
+# ---------------------------------------------------------------------------
+pgbackrest_retention_full: 2
+
+# ---------------------------------------------------------------------------
+# Logging
+# ---------------------------------------------------------------------------
+pgbackrest_log_path: "/var/log/pgbackrest"
+pgbackrest_log_level_console: "info"
+pgbackrest_log_level_file: "detail"
+
+# ---------------------------------------------------------------------------
+# Performance
+# ---------------------------------------------------------------------------
+pgbackrest_process_max: 1

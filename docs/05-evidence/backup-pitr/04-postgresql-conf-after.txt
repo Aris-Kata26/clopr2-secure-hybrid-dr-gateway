@@ -1,0 +1,4 @@
+Warning: Permanently added '10.0.96.11' (ED25519) to the list of known hosts.
+psql: error: connection to server on socket "/var/run/postgresql/.s.PGSQL.5432" failed: FATAL:  database "archive_mode" does not exist
+bash: line 1: SHOW: command not found
+bash: line 1: SHOW: command not found

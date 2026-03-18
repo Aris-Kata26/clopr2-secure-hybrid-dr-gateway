@@ -1,0 +1,6 @@
+---
+# handlers/main.yml — pgBackRest role handlers
+- name: Restart PostgreSQL
+  ansible.builtin.systemd:
+    name: postgresql
+    state: restarted

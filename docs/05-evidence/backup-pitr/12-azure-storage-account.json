@@ -1,0 +1,9 @@
+{
+  "httpsOnly": true,
+  "kind": "StorageV2",
+  "location": "germanywestcentral",
+  "minTls": "TLS1_2",
+  "name": "clopr2backupkatar",
+  "publicAccess": false,
+  "sku": "Standard_LRS"
+}

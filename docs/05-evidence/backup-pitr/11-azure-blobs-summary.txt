@@ -1,0 +1,23 @@
+Total blobs: 1273
+Name                                                                                                                SizeBytes
+------------------------------------------------------------------------------------------------------------------  -----------
+pgbackrest/archive/main/16-1/0000000500000000/000000050000000000000013-c022f67c70d3c324d4a698742c8b07eaa4b8a0d5.gz  16622
+pgbackrest/archive/main/16-1/0000000500000000/000000050000000000000014-91d185febf516c5a3cfaace6401b7f2bd8b0552f.gz  16397
+pgbackrest/archive/main/16-1/0000000500000000/000000050000000000000015-adf1ff9446fd86dc0fa15280b1163845260f2a77.gz  16490
+pgbackrest/archive/main/16-1/0000000500000000/000000050000000000000015.00000028.backup                              374
+pgbackrest/archive/main/16-1/0000000500000000/000000050000000000000016-d77f2c888692e58f81044d0808c596c48eb5e322.gz  16576
+pgbackrest/archive/main/archive.info                                                                                253
+pgbackrest/archive/main/archive.info.copy                                                                           253
+pgbackrest/backup/main/20260318-083349F/backup.manifest                                                             214169
+pgbackrest/backup/main/20260318-083349F/backup.manifest.copy                                                        214169
+pgbackrest/backup/main/20260318-083349F/pg_data/PG_VERSION.gz                                                       23
+pgbackrest/backup/main/20260318-083349F/pg_data/backup_label.gz                                                     197
+pgbackrest/backup/main/20260318-083349F/pg_data/base/1/112.gz                                                       83
+pgbackrest/backup/main/20260318-083349F/pg_data/base/1/113.gz                                                       83
+pgbackrest/backup/main/20260318-083349F/pg_data/base/1/1247.gz                                                      13193
+pgbackrest/backup/main/20260318-083349F/pg_data/base/1/1247_fsm.gz                                                  154
+pgbackrest/backup/main/20260318-083349F/pg_data/base/1/1247_vm.gz                                                   69
+pgbackrest/backup/main/20260318-083349F/pg_data/base/1/1249.gz                                                      37240
+pgbackrest/backup/main/20260318-083349F/pg_data/base/1/1249_fsm.gz                                                  176
+pgbackrest/backup/main/20260318-083349F/pg_data/base/1/1249_vm.gz                                                   68
+pgbackrest/backup/main/20260318-083349F/pg_data/base/1/1255.gz                                                      103453

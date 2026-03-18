@@ -1,0 +1,31 @@
+Warning: Permanently added '10.0.96.11' (ED25519) to the list of known hosts.
+2026-03-18 08:37:06.624 P00 DETAIL: sync path '/tmp/pg-restore-test/base'
+2026-03-18 08:37:06.674 P00 DETAIL: sync path '/tmp/pg-restore-test/base/1'
+2026-03-18 08:37:06.691 P00 DETAIL: sync path '/tmp/pg-restore-test/base/16390'
+2026-03-18 08:37:06.708 P00 DETAIL: sync path '/tmp/pg-restore-test/base/4'
+2026-03-18 08:37:06.724 P00 DETAIL: sync path '/tmp/pg-restore-test/base/5'
+2026-03-18 08:37:06.741 P00 DETAIL: sync path '/tmp/pg-restore-test/pg_commit_ts'
+2026-03-18 08:37:06.758 P00 DETAIL: sync path '/tmp/pg-restore-test/pg_dynshmem'
+2026-03-18 08:37:06.775 P00 DETAIL: sync path '/tmp/pg-restore-test/pg_logical'
+2026-03-18 08:37:06.792 P00 DETAIL: sync path '/tmp/pg-restore-test/pg_logical/mappings'
+2026-03-18 08:37:06.808 P00 DETAIL: sync path '/tmp/pg-restore-test/pg_logical/snapshots'
+2026-03-18 08:37:06.825 P00 DETAIL: sync path '/tmp/pg-restore-test/pg_multixact'
+2026-03-18 08:37:06.842 P00 DETAIL: sync path '/tmp/pg-restore-test/pg_multixact/members'
+2026-03-18 08:37:06.859 P00 DETAIL: sync path '/tmp/pg-restore-test/pg_multixact/offsets'
+2026-03-18 08:37:06.875 P00 DETAIL: sync path '/tmp/pg-restore-test/pg_notify'
+2026-03-18 08:37:06.892 P00 DETAIL: sync path '/tmp/pg-restore-test/pg_replslot'
+2026-03-18 08:37:06.909 P00 DETAIL: sync path '/tmp/pg-restore-test/pg_serial'
+2026-03-18 08:37:06.926 P00 DETAIL: sync path '/tmp/pg-restore-test/pg_snapshots'
+2026-03-18 08:37:06.943 P00 DETAIL: sync path '/tmp/pg-restore-test/pg_stat'
+2026-03-18 08:37:06.960 P00 DETAIL: sync path '/tmp/pg-restore-test/pg_stat_tmp'
+2026-03-18 08:37:06.976 P00 DETAIL: sync path '/tmp/pg-restore-test/pg_subtrans'
+2026-03-18 08:37:06.993 P00 DETAIL: sync path '/tmp/pg-restore-test/pg_tblspc'
+2026-03-18 08:37:07.010 P00 DETAIL: sync path '/tmp/pg-restore-test/pg_twophase'
+2026-03-18 08:37:07.027 P00 DETAIL: sync path '/tmp/pg-restore-test/pg_wal'
+2026-03-18 08:37:07.044 P00 DETAIL: sync path '/tmp/pg-restore-test/pg_wal/archive_status'
+2026-03-18 08:37:07.060 P00 DETAIL: sync path '/tmp/pg-restore-test/pg_xact'
+2026-03-18 08:37:07.077 P00   INFO: restore global/pg_control (performed last to ensure aborted restores cannot be started)
+2026-03-18 08:37:07.077 P00 DETAIL: sync path '/tmp/pg-restore-test/global'
+2026-03-18 08:37:07.094 P00   INFO: restore size = 29.4MB, file total = 1261
+2026-03-18 08:37:07.095 P00 DETAIL: statistics: {"http.client":{"total":1},"http.request":{"total":2},"http.session":{"total":1},"socket.client":{"total":1},"socket.session":{"total":1},"tls.client":{"total":1},"tls.session":{"total":1}}
+2026-03-18 08:37:07.095 P00   INFO: restore command end: completed successfully (91923ms)

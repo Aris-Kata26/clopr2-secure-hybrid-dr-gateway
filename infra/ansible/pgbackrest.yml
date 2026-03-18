@@ -1,0 +1,18 @@
+---
+# pgbackrest.yml — Deploy pgBackRest on pg-primary
+# CLOPR2 Secure Hybrid DR Gateway | Owner: KATAR711 | Team: BCLC24
+#
+# USAGE:
+#   ansible-playbook infra/ansible/pgbackrest.yml \
+#     -i infra/ansible/inventories/dev/hosts.ini \
+#     -e pgbackrest_repo_azure_key="<storage-account-key>"
+#
+# NOTES:
+#   - Requires Azure Blob Storage account to exist (backup.tf in envs/dev)
+#   - Modifies postgresql.conf and restarts PostgreSQL
+#   - Idempotent: safe to re-run
+
+- hosts: pg_primary
+  become: true
+  roles:
+    - pgbackrest

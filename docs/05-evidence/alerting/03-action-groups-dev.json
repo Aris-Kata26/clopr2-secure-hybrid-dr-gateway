@@ -1,0 +1,10 @@
+[
+  {
+    "emailReceivers": [
+      "katar711@school.lu"
+    ],
+    "enabled": true,
+    "name": "ag-clopr2-ops",
+    "shortName": "clopr2ops"
+  }
+]

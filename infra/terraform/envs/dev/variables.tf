@@ -149,3 +149,9 @@ variable "backup_policy_name" {
   description = "Backup policy name for the PostgreSQL DR VM."
   default     = "policy-pg-dr"
 }
+
+variable "ops_alert_email" {
+  type        = string
+  description = "Email address for operational alert notifications (action group)."
+  default     = "katar711@school.lu"
+}

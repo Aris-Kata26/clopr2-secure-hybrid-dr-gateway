@@ -1,0 +1,127 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 1,
+      "content": {
+        "json": "# CLOPR2 DR Operational Dashboard\n**Secure Hybrid DR Gateway** | Owner: KATAR711 | Team: BCLC24\n\nReal-time visibility across the on-prem HA cluster and Azure DR environment.\n\n> **Coverage:** pg-primary, app-onprem (on-prem) | vm-pg-dr-fce (Azure DR)\n> **Gap:** pg-standby not visible — Arc extension (HCRP409) pending\n\n---"
+      },
+      "name": "header"
+    },
+    {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "parameters": [
+          {
+            "id": "timerange",
+            "version": "KqlParameterItem/1.0",
+            "name": "TimeRange",
+            "label": "Time Range",
+            "type": 4,
+            "value": { "durationMs": 3600000 },
+            "typeSettings": {
+              "selectableValues": [
+                { "durationMs": 900000 },
+                { "durationMs": 1800000 },
+                { "durationMs": 3600000 },
+                { "durationMs": 14400000 },
+                { "durationMs": 86400000 }
+              ]
+            }
+          }
+        ]
+      },
+      "name": "parameters"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "Heartbeat\n| where TimeGenerated > ago(10m)\n| summarize LastSeen = max(TimeGenerated), Count = count() by Computer\n| extend Status = iff(LastSeen > ago(5m), 'ONLINE', 'SILENT')\n| project Computer, Status, LastSeen, HeartbeatCount = Count\n| order by Computer asc",
+        "size": 1,
+        "title": "Host Availability — On-Prem Hosts (last 10 min)",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "table",
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "Status",
+              "formatter": 18,
+              "formatOptions": {
+                "thresholdsOptions": "icons",
+                "thresholdsGrid": [
+                  { "operator": "==", "thresholdValue": "ONLINE", "representation": "success", "text": "ONLINE" },
+                  { "operator": "Default", "thresholdValue": "", "representation": "2", "text": "SILENT" }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "name": "onprem-heartbeat"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "Syslog\n| where Computer == 'pg-primary'\n| where ProcessName == 'Keepalived_vrrp'\n| where TimeGenerated > ago(1h)\n| project TimeGenerated, Event = SyslogMessage\n| order by TimeGenerated desc\n| take 20",
+        "size": 1,
+        "title": "Keepalived VRRP Events — pg-primary (last 1h)",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "table"
+      },
+      "name": "keepalived-events"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "Syslog\n| where Computer == 'pg-primary'\n| where ProcessName == 'Keepalived_vrrp'\n| where TimeGenerated > ago(24h)\n| summarize\n    PriorityDrops = countif(SyslogMessage contains 'priority from 100 to 80'),\n    PriorityRestores = countif(SyslogMessage contains 'priority from 80 to 100'),\n    BackupEvents = countif(SyslogMessage contains 'Entering BACKUP')\n| extend PrimaryStatus = iff(BackupEvents > 0, 'BACKUP (VIP moved away)', 'MASTER (holding VIP)')",
+        "size": 1,
+        "title": "Keepalived HA Summary — pg-primary Status (last 24h)",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "table"
+      },
+      "name": "keepalived-summary"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "Syslog\n| where Computer == 'app-onprem'\n| where ProcessName == 'systemd'\n| where SyslogMessage has_any ('docker', 'Docker')\n| where TimeGenerated > ago(24h)\n| project TimeGenerated, SyslogMessage\n| order by TimeGenerated desc\n| take 10",
+        "size": 1,
+        "title": "App Service Health — Docker Events on app-onprem (last 24h)",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "table"
+      },
+      "name": "app-docker-events"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "Syslog\n| where TimeGenerated > ago(6h)\n| where SeverityLevel in ('err', 'crit', 'alert', 'emerg', 'warning')\n| where Computer in ('pg-primary', 'app-onprem')\n| summarize Count = count() by Computer, SeverityLevel, bin(TimeGenerated, 15m)\n| order by TimeGenerated desc",
+        "size": 1,
+        "title": "Syslog Error Trend — On-Prem Hosts (last 6h)",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "areachart"
+      },
+      "name": "syslog-errors"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "---\n## Monitoring Coverage\n\n| Host | Heartbeat | Syslog | VRRP Events | DR Role |\n|------|-----------|--------|-------------|---------|\n| pg-primary | Online | Yes | Yes | PostgreSQL Primary, Keepalived MASTER |\n| app-onprem | Online | Yes | N/A | FastAPI application host |\n| vm-pg-dr-fce | Online (dr-fce workspace) | Limited | N/A | Azure DR replica |\n| pg-standby | **Not available** | No | No | Arc extension gap (HCRP409) |\n\n**Active Alert Rules:** 5 total (4 in dev workspace + 1 in dr-fce workspace)\n\n| Alert | Severity | Signal | Trigger |\n|-------|----------|--------|---------|\n| alert-onprem-heartbeat-silence | Critical | Heartbeat | pg-primary or app-onprem silent > 10m |\n| alert-keepalived-priority-drop | High | Syslog VRRP | pg_isready fails (priority 100→80) |\n| alert-keepalived-vip-state-change | Critical | Syslog VRRP | pg-primary enters BACKUP state |\n| alert-app-docker-failure | High | Syslog systemd | Docker stopped on app-onprem |\n| alert-pgdr-heartbeat-silence | Critical | Heartbeat | Azure DR VM silent > 10m |\n\n**Notification:** ag-clopr2-ops (email) + ag-clopr2-ops-dr (email)\n**Governance:** docs/03-operations/alerting-architecture.md"
+      },
+      "name": "coverage-summary"
+    }
+  ],
+  "styleSettings": {},
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}

@@ -1,0 +1,9 @@
+[
+  {
+    "enabled": true,
+    "evaluationFrequency": "0:05:00",
+    "name": "alert-pgdr-heartbeat-silence",
+    "severity": 1,
+    "windowSize": "0:10:00"
+  }
+]

@@ -1,0 +1,32 @@
+WARNING: The command requires the extension scheduled-query. It will be installed first.
+WARNING: The installed extension 'scheduled-query' is in preview.
+[
+  {
+    "enabled": true,
+    "evaluationFrequency": "0:05:00",
+    "name": "alert-keepalived-vip-state-change",
+    "severity": 1,
+    "windowSize": "0:05:00"
+  },
+  {
+    "enabled": true,
+    "evaluationFrequency": "0:05:00",
+    "name": "alert-keepalived-priority-drop",
+    "severity": 2,
+    "windowSize": "0:05:00"
+  },
+  {
+    "enabled": true,
+    "evaluationFrequency": "0:05:00",
+    "name": "alert-app-docker-failure",
+    "severity": 2,
+    "windowSize": "0:10:00"
+  },
+  {
+    "enabled": true,
+    "evaluationFrequency": "0:05:00",
+    "name": "alert-onprem-heartbeat-silence",
+    "severity": 1,
+    "windowSize": "0:10:00"
+  }
+]

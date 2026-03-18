@@ -249,3 +249,9 @@ variable "vpn_connection_name" {
   description = "VPN connection name."
   default     = "conn-clopr2-dr-fce"
 }
+
+variable "ops_alert_email" {
+  type        = string
+  description = "Email address for operational alert notifications (action group)."
+  default     = "katar711@school.lu"
+}

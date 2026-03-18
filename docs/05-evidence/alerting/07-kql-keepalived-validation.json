@@ -1,0 +1,9 @@
+[
+  {
+    "BackupEvents": "0",
+    "PrimaryStatus": "MASTER (holding VIP)",
+    "PriorityDrops": "2",
+    "PriorityRestores": "2",
+    "TableName": "PrimaryResult"
+  }
+]

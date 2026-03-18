@@ -1,0 +1,16 @@
+[
+  {
+    "Computer": "app-onprem",
+    "HeartbeatCount": "9",
+    "LastSeen": "2026-03-18T07:33:01.2087329Z",
+    "Status": "ONLINE",
+    "TableName": "PrimaryResult"
+  },
+  {
+    "Computer": "pg-primary",
+    "HeartbeatCount": "9",
+    "LastSeen": "2026-03-18T07:33:02.3863109Z",
+    "Status": "ONLINE",
+    "TableName": "PrimaryResult"
+  }
+]

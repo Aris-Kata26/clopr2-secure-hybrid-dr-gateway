@@ -1,0 +1,59 @@
+CLOPR2 Secure Hybrid DR Gateway — Alerting + Dashboard Evidence
+=================================================================
+Date:       2026-03-18
+Task:       S5-03 Alerting + Dashboards (architecture hardening)
+ClickUp:    https://app.clickup.com/t/86c8wjpmu
+Implemented by: KATAR711
+
+RESOURCES DEPLOYED
+==================
+dev environment (rg-clopr2-katar711-gwc, germanywestcentral):
+  - ag-clopr2-ops               Action group (email: katar711@school.lu)
+  - alert-onprem-heartbeat-silence  Severity 1, PT5M eval, PT10M window
+  - alert-keepalived-priority-drop  Severity 2, PT5M eval, PT5M window
+  - alert-keepalived-vip-state-change  Severity 1, PT5M eval, PT5M window
+  - alert-app-docker-failure    Severity 2, PT5M eval, PT10M window
+  - wb-clopr2-dr-ops (GUID: e8e108e4-0468-4959-a3b9-6aa3c90c9d8c)  Workbook
+
+dr-fce environment (rg-clopr2-katar711-fce, francecentral):
+  - ag-clopr2-ops-dr            Action group (email: katar711@school.lu)
+  - alert-pgdr-heartbeat-silence  Severity 1, PT5M eval, PT10M window
+
+TERRAFORM APPLY RESULTS
+=======================
+dev/alerting.tf:     Apply complete! Resources: 5 added, 0 changed, 0 destroyed.
+dr-fce/alerting.tf:  Apply complete! Resources: 2 added, 0 changed, 0 destroyed.
+Workbook:            Deployed via az resource create (ARM API) — GUID assigned
+
+KQL VALIDATION (all 5 alert queries against live data)
+=======================================================
+Alert 1 (heartbeat silence):        0 silent hosts — pg-primary + app-onprem ONLINE
+Alert 2 (keepalived priority drop): 0 drops in last 5m
+Alert 3 (keepalived VIP change):    0 BACKUP events in last 5m
+Alert 4 (docker failure):           0 Docker failures in last 10m
+Alert 5 (dr heartbeat):             0 silent rows — vm-pg-dr-fce ONLINE (9 heartbeats in 10m)
+
+LIVE DATA CONFIRMED
+===================
+- pg-primary heartbeat: LastSeen 2026-03-18T07:33:02Z (9 beats in 10m)
+- app-onprem heartbeat: LastSeen 2026-03-18T07:33:01Z (9 beats in 10m)
+- vm-pg-dr-fce heartbeat: LastSeen 2026-03-18T07:29:31Z (9 beats in 10m)
+- Keepalived VRRP (24h): 2 priority drops, 2 restores (from S4-03 DR test), 0 BACKUP events
+  => pg-primary currently MASTER (holding VIP 10.0.96.10)
+
+KNOWN GAPS (documented)
+========================
+- pg-standby: Arc extension stuck (HCRP409) — no heartbeat or syslog from pg-standby
+- WireGuard handshakes: not logged continuously — Alert 5 proxies tunnel health
+- azurerm_monitor_workbook: not in azurerm ~4.0 — workbook deployed via CLI
+
+IaC FILES
+=========
+  infra/terraform/envs/dev/alerting.tf
+  infra/terraform/envs/dev/workbook-dr-ops.json
+  infra/terraform/envs/dr-fce/alerting.tf
+  scripts/dr/deploy-workbook.sh
+
+DOCUMENTATION
+=============
+  docs/03-operations/alerting-architecture.md

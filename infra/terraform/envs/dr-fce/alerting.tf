@@ -65,10 +65,11 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "pgdr_heartbeat_silenc
   location            = azurerm_resource_group.dr.location
   tags                = local.tags
 
-  evaluation_frequency = "PT5M"
-  window_duration      = "PT10M"
-  scopes               = [data.azurerm_log_analytics_workspace.dr.id]
-  severity             = 1
+  evaluation_frequency    = "PT5M"
+  window_duration         = "PT10M"
+  auto_mitigation_enabled = true
+  scopes                  = [data.azurerm_log_analytics_workspace.dr.id]
+  severity                = 1
   description          = "CRITICAL: vm-pg-dr-fce (Azure DR PostgreSQL replica) has not sent a heartbeat in 10 minutes. Azure DR VM may be down, AMA agent failed, or WireGuard tunnel may be broken. Check Azure VM status and WireGuard handshake on pg-primary."
 
   criteria {

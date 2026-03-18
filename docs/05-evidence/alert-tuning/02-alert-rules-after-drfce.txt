@@ -1,0 +1,3 @@
+Name                          AutoMitigate    WindowSize    EvalFreq    Severity
+----------------------------  --------------  ------------  ----------  ----------
+alert-pgdr-heartbeat-silence  True            0:10:00       0:05:00     1

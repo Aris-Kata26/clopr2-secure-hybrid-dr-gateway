@@ -201,6 +201,31 @@ All alert rules are `azurerm_monitor_scheduled_query_rules_alert_v2` resources. 
 
 ---
 
+## Alert Tuning — 2026-03-18
+
+**Problem:** All 5 alert rules were generating email noise — 61+ repeated instances over ~6 hours from 3 rules that had fired once and never resolved.
+
+**Root causes:**
+
+| # | Cause | Impact |
+|---|-------|--------|
+| 1 | `autoMitigate=false` (Azure default) on all 5 rules | New alert instance generated every 5 minutes indefinitely once fired, even when condition is no longer met. Primary driver of spam. |
+| 2 | `alert-app-docker-failure` window overlap: `window=PT10M` vs `eval=PT5M` | One event caught in two consecutive windows → 2 emails per event |
+| 3 | `"Stopped"` in Docker KQL `has_any` | Matched graceful Docker restarts, not only failures |
+
+**Changes applied (2026-03-18):**
+
+| Rule | Change |
+|------|--------|
+| All 5 rules | `auto_mitigation_enabled = true` — alert auto-resolves when condition is not met |
+| `alert-app-docker-failure` | `window_duration` PT10M → PT5M; `ago()` PT10M → PT5M; removed `"Stopped"` from `has_any` |
+
+**Outcome:** 61 stale "New" instances resolved; 0 New instances remaining.
+
+**Evidence:** `docs/05-evidence/alert-tuning/`
+
+---
+
 ## Evidence
 
 Deployment and validation evidence is in `docs/05-evidence/alerting/`:

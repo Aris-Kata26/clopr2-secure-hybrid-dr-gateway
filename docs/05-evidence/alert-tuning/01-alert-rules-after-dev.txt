@@ -1,0 +1,6 @@
+Name                               AutoMitigate    WindowSize    EvalFreq    Severity    Enabled
+---------------------------------  --------------  ------------  ----------  ----------  ---------
+alert-keepalived-vip-state-change  True            0:05:00       0:05:00     1           True
+alert-keepalived-priority-drop     True            0:05:00       0:05:00     2           True
+alert-app-docker-failure           True            0:05:00       0:05:00     2           True
+alert-onprem-heartbeat-silence     True            0:10:00       0:05:00     1           True

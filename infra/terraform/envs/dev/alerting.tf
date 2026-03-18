@@ -64,11 +64,12 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "onprem_heartbeat_sile
   location            = azurerm_resource_group.this.location
   tags                = local.tags
 
-  evaluation_frequency = "PT5M"
-  window_duration      = "PT10M"
-  scopes               = [data.azurerm_log_analytics_workspace.this.id]
-  severity             = 1
-  description          = "CRITICAL: pg-primary or app-onprem has not sent a heartbeat in 10 minutes. Host may be down or Arc agent has failed. Investigate immediately."
+  evaluation_frequency    = "PT5M"
+  window_duration         = "PT10M"
+  auto_mitigation_enabled = true
+  scopes                  = [data.azurerm_log_analytics_workspace.this.id]
+  severity                = 1
+  description             = "CRITICAL: pg-primary or app-onprem has not sent a heartbeat in 10 minutes. Host may be down or Arc agent has failed. Investigate immediately."
 
   criteria {
     query = <<-KQL
@@ -118,11 +119,12 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "keepalived_priority_d
   location            = azurerm_resource_group.this.location
   tags                = local.tags
 
-  evaluation_frequency = "PT5M"
-  window_duration      = "PT5M"
-  scopes               = [data.azurerm_log_analytics_workspace.this.id]
-  severity             = 2
-  description          = "HIGH: Keepalived on pg-primary has dropped priority from 100 to 80 — pg_isready failed 3 checks. PostgreSQL may be unresponsive. Check if VIP moves to pg-standby."
+  evaluation_frequency    = "PT5M"
+  window_duration         = "PT5M"
+  auto_mitigation_enabled = true
+  scopes                  = [data.azurerm_log_analytics_workspace.this.id]
+  severity                = 2
+  description             = "HIGH: Keepalived on pg-primary has dropped priority from 100 to 80 — pg_isready failed 3 checks. PostgreSQL may be unresponsive. Check if VIP moves to pg-standby."
 
   criteria {
     query = <<-KQL
@@ -166,11 +168,12 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "keepalived_vip_state_
   location            = azurerm_resource_group.this.location
   tags                = local.tags
 
-  evaluation_frequency = "PT5M"
-  window_duration      = "PT5M"
-  scopes               = [data.azurerm_log_analytics_workspace.this.id]
-  severity             = 1
-  description          = "CRITICAL: pg-primary Keepalived has entered BACKUP state. VIP 10.0.96.10 has moved to pg-standby. Production PostgreSQL traffic is now served by the standby. Confirm application health and begin failback procedure if unplanned."
+  evaluation_frequency    = "PT5M"
+  window_duration         = "PT5M"
+  auto_mitigation_enabled = true
+  scopes                  = [data.azurerm_log_analytics_workspace.this.id]
+  severity                = 1
+  description             = "CRITICAL: pg-primary Keepalived has entered BACKUP state. VIP 10.0.96.10 has moved to pg-standby. Production PostgreSQL traffic is now served by the standby. Confirm application health and begin failback procedure if unplanned."
 
   criteria {
     query = <<-KQL
@@ -215,11 +218,12 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "app_docker_failure" {
   location            = azurerm_resource_group.this.location
   tags                = local.tags
 
-  evaluation_frequency = "PT5M"
-  window_duration      = "PT10M"
-  scopes               = [data.azurerm_log_analytics_workspace.this.id]
-  severity             = 2
-  description          = "HIGH: Docker service on app-onprem has stopped or failed according to systemd. The FastAPI application (/health endpoint) is likely unavailable. Check app-onprem Docker status."
+  evaluation_frequency    = "PT5M"
+  window_duration         = "PT5M"
+  auto_mitigation_enabled = true
+  scopes                  = [data.azurerm_log_analytics_workspace.this.id]
+  severity                = 2
+  description             = "HIGH: Docker service on app-onprem has stopped or failed according to systemd. The FastAPI application (/health endpoint) is likely unavailable. Check app-onprem Docker status."
 
   criteria {
     query = <<-KQL
@@ -227,8 +231,8 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "app_docker_failure" {
       | where Computer == "app-onprem"
       | where ProcessName == "systemd"
       | where SyslogMessage has_any ("docker.service", "docker")
-        and SyslogMessage has_any ("failed", "Stopped", "Failed to start", "deactivating")
-      | where TimeGenerated > ago(10m)
+        and SyslogMessage has_any ("failed", "Failed to start", "deactivating")
+      | where TimeGenerated > ago(5m)
       | summarize Count = count()
     KQL
     time_aggregation_method = "Count"

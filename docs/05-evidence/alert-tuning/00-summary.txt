@@ -1,0 +1,59 @@
+CLOPR2 Secure Hybrid DR Gateway — Alert Noise Audit + Tuning Evidence
+======================================================================
+Date:       2026-03-18
+Task:       S5-05 Alert Noise Audit + Tuning
+ClickUp:    https://app.clickup.com/t/86c8wpdtb
+Implemented by: KATAR711
+
+ROOT CAUSES IDENTIFIED
+======================
+1. PRIMARY: autoMitigate=false on ALL 5 alert rules
+   - Azure Monitor Scheduled Query Rules v2 default: autoMitigate=false
+   - Effect: once an alert fires, it generates a NEW instance every evaluation
+     period (5 minutes) indefinitely, even when condition is no longer met
+   - Evidence: 61+ "New" alert instances found, all at ~5-minute intervals,
+     none in "Resolved" state, KQL queries returning Count=0 (no active events)
+
+2. SECONDARY: alert-app-docker-failure window overlap
+   - window_duration=PT10M + evaluation_frequency=PT5M
+   - A single event caught in TWO consecutive overlapping windows → 2 emails/event
+
+3. TERTIARY: "Stopped" in Docker KQL has_any
+   - Matched graceful Docker restarts (normal operations), not just failures
+   - Removed from has_any filter
+
+ALERT INSTANCE COUNTS (BEFORE TUNING)
+======================================
+  alert-keepalived-priority-drop:     17+ instances, state=New, ~5m intervals
+  alert-keepalived-vip-state-change:  17+ instances, state=New, ~5m intervals
+  alert-app-docker-failure:           17+ instances, state=New, ~5m intervals
+  Total "New" instances resolved:     61
+
+CHANGES APPLIED
+===============
+All 5 alert rules (dev + dr-fce):
+  - auto_mitigation_enabled = true  (PRIMARY FIX)
+
+alert-app-docker-failure (dev):
+  - window_duration: PT10M → PT5M  (eliminates overlap doubling)
+  - KQL ago(): ago(10m) → ago(5m)  (matches new window)
+  - has_any: removed "Stopped"  (was matching graceful restarts)
+
+INFRASTRUCTURE STATE AFTER TUNING
+===================================
+All 5 rules — autoMitigate=True:
+  alert-onprem-heartbeat-silence     (dev)  Sev1  window=PT10M  eval=PT5M
+  alert-keepalived-priority-drop     (dev)  Sev2  window=PT5M   eval=PT5M
+  alert-keepalived-vip-state-change  (dev)  Sev1  window=PT5M   eval=PT5M
+  alert-app-docker-failure           (dev)  Sev2  window=PT5M   eval=PT5M
+  alert-pgdr-heartbeat-silence       (dr)   Sev1  window=PT10M  eval=PT5M
+
+Alert instances resolved: 61 (changestate → Closed)
+Alert instances remaining New: 0
+
+IaC FILES CHANGED
+==================
+  infra/terraform/envs/dev/alerting.tf
+  infra/terraform/envs/dr-fce/alerting.tf
+
+FINAL STATUS: PASS

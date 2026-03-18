@@ -1,0 +1,43 @@
+[
+  {
+    "autoMitigate": true,
+    "enabled": true,
+    "evaluationFrequency": "0:05:00",
+    "name": "alert-keepalived-vip-state-change",
+    "severity": 1,
+    "windowSize": "0:05:00"
+  },
+  {
+    "autoMitigate": true,
+    "enabled": true,
+    "evaluationFrequency": "0:05:00",
+    "name": "alert-keepalived-priority-drop",
+    "severity": 2,
+    "windowSize": "0:05:00"
+  },
+  {
+    "autoMitigate": true,
+    "enabled": true,
+    "evaluationFrequency": "0:05:00",
+    "name": "alert-app-docker-failure",
+    "severity": 2,
+    "windowSize": "0:05:00"
+  },
+  {
+    "autoMitigate": true,
+    "enabled": true,
+    "evaluationFrequency": "0:05:00",
+    "name": "alert-onprem-heartbeat-silence",
+    "severity": 1,
+    "windowSize": "0:10:00"
+  }
+]
+[
+  {
+    "autoMitigate": true,
+    "evaluationFrequency": "0:05:00",
+    "name": "alert-pgdr-heartbeat-silence",
+    "severity": 1,
+    "windowSize": "0:10:00"
+  }
+]

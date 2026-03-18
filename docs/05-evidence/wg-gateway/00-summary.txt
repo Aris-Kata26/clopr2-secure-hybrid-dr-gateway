@@ -1,0 +1,87 @@
+S5 Weakness #2 — Dedicated WireGuard Gateway Architecture
+==========================================================
+Sprint task: ClickUp (to be created)
+Completed:   2026-03-18
+Author:      KATAR711 | Team: BCLC24
+ADR:         docs/01-architecture/decisions/ADR-006-dedicated-wg-gateway.md
+
+Weakness Addressed
+------------------
+WireGuard tunnel is co-hosted on pg-primary (10.0.96.11), the PostgreSQL
+primary VM. This creates a single-process coupling: if pg-primary is
+rebooted, crashes, or fails unexpectedly, both the replication channel
+(pg-primary -> DR VM) and the management SSH path (WSL -> DR VM) are
+lost simultaneously. The DR VM becomes an island with no inbound data
+and no management access.
+
+Audit Findings
+--------------
+See 01-audit-current-state.txt for full details.
+
+Tunnel endpoints today:
+  On-prem:  pg-primary (10.0.96.11)  — wg_is_listener=false, initiator
+  Azure:    vm-pg-dr-fce (10.200.0.2) — wg_is_listener=true,  listener/UDP 51820
+
+PostgreSQL replication flow:
+  pg-primary:10.200.0.1 --> [WireGuard tunnel] --> vm-pg-dr-fce:10.200.0.2
+  DR VM primary_conninfo: host=10.200.0.1 port=5432
+
+SSH control path:
+  WSL --> PVE (10.0.10.71) --> pg-primary (10.0.96.11)
+       --> [WireGuard tunnel] --> vm-pg-dr-fce (10.200.0.2)
+  All DR scripts (fullsite-failover.sh, fullsite-fallback.sh, ssh-precheck.sh)
+  and Ansible inventory depend on this chain.
+
+Key dependency in fullsite-failover.sh:
+  FS-3 stops postgresql + keepalived on pg-primary — WireGuard intentionally
+  stays up (separate wg-quick@wg0 service). Scripts from FS-4 to FS-10 reach
+  the DR VM through the tunnel. This works as designed for planned failover.
+
+What breaks on unexpected pg-primary crash/reboot:
+  - wg-quick@wg0 goes down with the VM
+  - Replication from DR VM to pg-primary stops (pg-primary is down, expected)
+  - SSH path WSL -> DR VM is lost (tunnel gone, VM unreachable)
+  - DR VM continues operating but becomes unmanageable until pg-primary recovers
+
+Target Architecture (ADR-006)
+------------------------------
+Dedicated on-prem WireGuard gateway VM (wg-gw-onprem):
+  - New lightweight Proxmox VM (Standard_B1/small), no PostgreSQL, no app
+  - Static IP: 10.0.96.15, same on-prem subnet
+  - Runs wg-quick@wg0 only — single responsibility
+  - pg-primary's WireGuard removed; replication continues unchanged except
+    source tunnel IP changes from 10.200.0.1 to new gateway tunnel IP
+  - DR VM remains the listener; only wg_peer_pubkey + primary_conninfo change
+
+See ADR-006 for full before/after diagram and migration plan.
+
+GO / NO-GO Decision
+-------------------
+Decision:    NO-GO for live implementation
+Date:        2026-03-18
+
+Rationale:
+  1. Migration requires changing active PostgreSQL replication config on a
+     live system (primary_conninfo on DR VM — requires postgresql reload).
+  2. Removing WireGuard from pg-primary creates a brief tunnel blackout
+     window; during that window DR VM has no SSH path and no replication.
+     Recovery from a failure mid-migration is complex (no SSH = no fix).
+  3. Estimated implementation + validation time: 2-3 hours minimum,
+     untested migration path.
+  4. Presentation deadline: 2026-03-26 (8 days). Risk/benefit does not
+     justify destabilizing the validated platform.
+  5. The weakness only manifests on UNEXPECTED pg-primary failure; all
+     planned DR operations (failover, fallback) are unaffected.
+
+Deliverables Produced (Design-Only)
+------------------------------------
+ADR-006:    Target architecture documented, migration steps specified
+            deploy-guide: set enable_wg_gateway=true, run ansible-playbook
+Terraform:  enable_wg_gateway = false scaffolding variable added to
+            infra/terraform/envs/onprem/variables.tf (flag for future use)
+            NOTE: No actual Proxmox VM resource added — wg-gw-onprem
+            requires new Proxmox Terraform work in a separate maintenance
+            window with VM IP planning.
+
+Collocated WireGuard path:   UNCHANGED — validated, production-safe
+Live migration:              DEFERRED — first maintenance window post-2026-03-26

@@ -1,0 +1,137 @@
+WireGuard Current-State Audit
+==============================
+Captured:  2026-03-18
+Author:    KATAR711 | Team: BCLC24
+
+1. WIREGUARD NODES — WHO TERMINATES THE TUNNEL TODAY
+-----------------------------------------------------
+
+On-prem node: pg-primary (10.0.96.11)
+  Source file: infra/ansible/inventories/dev/group_vars/pg_primary.yml
+  Role:          Initiator (wg_is_listener=false)
+  Tunnel IP:     10.200.0.1/30
+  Peer:          vm-pg-dr-fce (10.200.0.2)
+  AllowedIPs:    10.200.0.2/32
+  Endpoint:      20.216.128.32:51820 (Azure DR VM public IP)
+  Keepalive:     PersistentKeepalive=25 (keeps NAT mapping alive)
+  Config mgmt:   Ansible wireguard role (infra/ansible/roles/wireguard/)
+                 + Terraform cloud-init sets up Azure side
+  Private key:   ansible-vault encrypted in group_vars/pg_primary.yml
+
+Azure node: vm-pg-dr-fce (10.200.0.2)
+  Source files:  infra/terraform/envs/dr-fce/cloud_init.tftpl
+                 infra/ansible/inventories/dev/group_vars/pg_dr.yml
+  Role:          Listener (wg_is_listener=true)
+  Tunnel IP:     10.200.0.2/30
+  Public IP:     20.216.128.32 (static, WireGuard-only endpoint)
+  ListenPort:    51820 (UDP)
+  Peer:          pg-primary (10.200.0.1)
+  AllowedIPs:    10.200.0.1/32, 10.0.96.0/24
+  Config mgmt:   cloud-init bootstraps at first boot; Ansible wireguard
+                 role re-applies idempotently
+  Private key:   TF_VAR_wg_azure_privkey + ansible-vault (pg_dr.yml)
+
+No other on-prem nodes run WireGuard:
+  pg-standby (10.0.96.14): PostgreSQL standby only, no WireGuard
+  app-onprem (10.0.96.13): FastAPI app only, no WireGuard
+
+2. POSTGRESQL REPLICATION FLOW
+-------------------------------
+
+  pg-primary (10.200.0.1)
+    |
+    | streaming replication over WireGuard tunnel (encrypted)
+    | TCP 5432, source IP = 10.200.0.1 (tunnel IP)
+    v
+  vm-pg-dr-fce (10.200.0.2)
+
+DR VM configuration:
+  pg_primary_host: "10.200.0.1"    (group_vars/pg_dr.yml)
+  pg_primary_port: 5432
+  primary_conninfo (in postgresql.auto.conf):
+    host=10.200.0.1 port=5432 user=replicator ...
+
+NSG rule:
+  azurerm_network_security_rule.dr_postgres — TCP 5432
+  source: var.pg_dr_onprem_cidrs (includes 10.200.0.0/30 — WG tunnel subnet)
+
+pg_hba.conf on DR VM (ansible-managed):
+  host appdb appuser 10.200.0.0/30 scram-sha-256   (post S5-07 tightening)
+  # replication rule also covers 10.200.0.0/30
+
+3. SSH / CONTROL PATH DEPENDENCIES
+------------------------------------
+
+All DR script and Ansible operations reach the DR VM through this chain:
+
+  WSL (10.200.0.x) --> PVE (10.0.10.71, Proxmox hypervisor)
+    --> pg-primary (10.0.96.11, SSH ProxyJump)
+    --> [WireGuard tunnel] --> vm-pg-dr-fce (10.200.0.2)
+
+Ansible inventory (hosts.ini):
+  vm-pg-dr ansible_host=dr-tunnel
+  Connects via ~/.ssh/dr_tunnel.cfg which defines the 3-hop ProxyJump:
+    WSL -> PVE -> pg-primary -> DR VM (10.200.0.2)
+
+ssh-precheck.sh:
+  Tests vm-pg-dr-fce as a "direct host" — relies on ~/.ssh/config Host alias
+  which resolves to the WireGuard tunnel path.
+
+fullsite-failover.sh:
+  - FS-3: Stops postgresql + keepalived on pg-primary. WireGuard is
+    INTENTIONALLY left running (wg-quick@wg0 is a separate service).
+    Comment in script: "WireGuard is NOT stopped — SSH chain to DR VM stays intact."
+  - FS-4 through FS-10: All SSH to vm-pg-dr-fce via the same tunnel path.
+    This works because pg-primary SSH daemon and WireGuard remain up
+    after FS-3 (only postgresql and keepalived are stopped).
+
+fullsite-fallback.sh:
+  - FB-1/H-2: SSH to DR VM to stop app and verify state
+  - FB-3, FB-8: pg_basebackup operations require SSH to both DR VM and pg-primary
+  - All paths depend on WireGuard being up on pg-primary
+
+4. WHAT WOULD BREAK ON ABRUPT WIREGUARD RELOCATION
+----------------------------------------------------
+
+If WireGuard was removed from pg-primary without a migration plan:
+
+  (a) Replication breaks immediately
+      DR VM primary_conninfo host=10.200.0.1 becomes unreachable.
+      DR VM enters replication error state; WAL replay stops.
+
+  (b) SSH to DR VM is lost
+      The tunnel is the only SSH path to vm-pg-dr-fce (NSG blocks port 22
+      from internet; only allows SSH from 10.200.0.1/32 = WG tunnel source).
+      Losing the tunnel = losing all management access to DR VM.
+      Recovery would require Azure Bastion or NSG emergency-patch.
+
+  (c) Ansible control is lost
+      All pg_dr group playbooks become unreachable.
+
+  (d) DR scripts abort at ssh-precheck.sh
+      vm-pg-dr-fce fails connectivity test -> DR operations blocked.
+
+5. EXISTING MITIGATION IN CURRENT DESIGN
+-----------------------------------------
+
+The current design is explicitly aware of this dependency. In fullsite-failover.sh:
+  - Only postgresql and keepalived are stopped (FS-3), NOT WireGuard.
+  - This is correct for the planned failover scenario.
+  - WireGuard on pg-primary acts as the persistent management plane.
+
+The gap is UNPLANNED pg-primary downtime:
+  - Hardware fault, kernel panic, OOM, admin reboot
+  - In these cases: WireGuard goes down with the VM
+  - pg-standby cannot substitute (no WireGuard)
+  - DR VM becomes unmanageable until pg-primary recovers
+
+6. SUMMARY TABLE
+-----------------
+
+Component               Runs on pg-primary?   Impact of pg-primary crash
+-----------------------  -------------------   --------------------------
+PostgreSQL primary        YES                   Expected (HA failover to pg-standby)
+Keepalived MASTER         YES                   Expected (VIP moves to pg-standby)
+WireGuard wg0             YES                   Tunnel down -> DR VM island
+SSH relay to DR VM        YES (via tunnel)      DR VM unreachable
+DR replication            YES (source)          Replication stops

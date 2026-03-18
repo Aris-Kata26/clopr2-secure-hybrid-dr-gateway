@@ -238,3 +238,20 @@ variable "mgmt_jump_ipconfig0" {
   default     = "ip=dhcp"
   description = "Cloud-Init IP config for mgmt-jump"
 }
+
+# ---------------------------------------------------------------------------
+# WireGuard gateway VM — wg-gw-onprem (ADR-006)
+# Dedicated VM with single responsibility: WireGuard tunnel endpoint.
+# Decouples tunnel from pg-primary so unexpected pg-primary downtime does not
+# isolate the Azure DR VM.
+#
+# Deploy: set enable_wg_gateway = true in terraform.tfvars and run
+#         terraform apply, then ansible-playbook wg_tunnel.yml -l wg_gateway
+# Default: false — collocated WireGuard on pg-primary preserved (current state)
+# ---------------------------------------------------------------------------
+
+variable "enable_wg_gateway" {
+  type        = bool
+  description = "Provision a dedicated WireGuard gateway VM (wg-gw-onprem). See ADR-006."
+  default     = false
+}

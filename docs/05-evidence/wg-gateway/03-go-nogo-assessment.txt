@@ -1,0 +1,114 @@
+WireGuard Gateway — GO / NO-GO Assessment
+==========================================
+Date:   2026-03-18
+Author: KATAR711 | Team: BCLC24
+
+PROPOSAL UNDER EVALUATION
+--------------------------
+Live migration of WireGuard from pg-primary to dedicated wg-gw-onprem VM.
+Includes: new Proxmox VM, Ansible reconfiguration, replication primary_conninfo
+update, removal of WireGuard from pg-primary.
+
+GO CRITERIA
+-----------
+To GO, all of the following must be true:
+
+  [ ] Migration can be executed with full rollback path at every step
+  [ ] Tunnel blackout window < 30s (replication gap acceptable)
+  [ ] SSH to DR VM available throughout migration OR recovery plan exists
+  [ ] No new untested Terraform provider resources required
+  [ ] Estimated time <= 2 hours (maintenance window constraint)
+  [ ] Platform validation (ssh-precheck.sh + dr-preflight.sh) can run post-migration
+
+ASSESSMENT AGAINST GO CRITERIA
+--------------------------------
+
+[X] Rollback path
+    YES — pg-primary WireGuard config can be re-enabled in <5 min.
+    But rollback requires SSH to pg-primary (which requires PVE access).
+    If migration fails at Step 4+ (primary_conninfo already changed),
+    rollback requires re-enabling pg-primary WireGuard AND reverting
+    primary_conninfo on DR VM. This is a two-system coordinated undo.
+    PARTIAL PASS.
+
+[X] Tunnel blackout window
+    During Step 5-6 (remove pg-primary peer, disable WG on pg-primary):
+    - Step 5 (wg syncconf) is online — no blackout, new peer already up
+    - Step 6 (disable on pg-primary) causes no impact if Step 5 is done first
+    The migration is designed to add new tunnel BEFORE removing old one.
+    PASS — if executed in sequence, blackout = 0s.
+
+[FAIL] SSH to DR VM throughout migration
+    After Step 3 (new gateway peer added), SSH can route via new gateway.
+    But Step 3 requires updating dr_tunnel.cfg (SSH config) to use new
+    ProxyJump path FIRST — otherwise SSH still routes via pg-primary.
+    If pg-primary's WireGuard goes down between Step 3 and Step 9 (config update),
+    SSH access is lost. This is a race condition risk.
+    PARTIAL FAIL — ordering is critical; no automated rollback if SSH lost.
+
+[FAIL] No new untested Terraform resources
+    wg-gw-onprem requires a new bpg/proxmox VM resource.
+    The onprem Terraform env has not been exercised since initial provisioning.
+    Applying a new Proxmox VM resource in a live environment carries
+    non-trivial risk of Proxmox provider plan artifacts (similar to dr-fce
+    tfvars placeholder issue).
+    FAIL — new, untested Terraform path.
+
+[FAIL] Estimated time <= 2 hours
+    Realistic estimate:
+      New Proxmox VM (TF + cloud-init): 20-30 min
+      Ansible WG setup on new VM:        15 min
+      DR VM wg0.conf update + verify:    15 min
+      primary_conninfo update + reload:  10 min
+      Remove from pg-primary:            10 min
+      SSH config update across scripts:  30 min
+      Validation (precheck + preflight): 20 min
+      Buffer for unexpected issues:      30 min
+      TOTAL:                            ~2.5-3 hours minimum
+    FAIL — exceeds 2-hour target.
+
+[FAIL] Platform validation post-migration
+    ssh-precheck.sh and dr-preflight.sh have not been run against a
+    topology where WireGuard is NOT on pg-primary. Both scripts check
+    vm-pg-dr-fce reachability via pg-primary-based routing in ~/.ssh/config.
+    Scripts would need updating BEFORE validation can pass. This is an
+    untested code path.
+    FAIL — validation path not tested for new topology.
+
+RISK SUMMARY
+------------
+Risk 1: SSH to DR VM lost mid-migration (no WG on pg-primary, new gateway
+        not yet in SSH config) -> recovery requires Azure console/Bastion.
+Risk 2: Proxmox Terraform apply fails or produces unexpected changes ->
+        manual VM provisioning fallback required.
+Risk 3: primary_conninfo update causes WAL apply gap -> replication may
+        need manual reconnect.
+Risk 4: Time overrun -> maintenance window exceeded -> incomplete state.
+
+DECISION
+--------
+NO-GO — do NOT execute live migration.
+
+Reasoning:
+  - 3 of 5 GO criteria FAIL outright
+  - Critical SSH path has a race-condition risk with no automated recovery
+  - Presentation deadline 2026-03-26 (8 days) — zero tolerance for
+    platform instability
+  - The weakness only affects UNPLANNED pg-primary downtime, which is a
+    lower-probability event than the risk introduced by the migration itself
+  - Risk/benefit ratio is negative: introducing real risk to address a
+    theoretical risk, with a presentation imminent
+
+DELIVERABLES PRODUCED UNDER NO-GO
+-----------------------------------
+  ADR-006: Architecture decision recorded, target design specified
+  options-analysis: All options evaluated with pros/cons
+  Migration sequence: Step-by-step plan ready for post-presentation window
+  Terraform scaffolding: enable_wg_gateway variable added (gated off)
+
+POST-PRESENTATION ACTION
+--------------------------
+Schedule dedicated 3-hour maintenance window (post 2026-03-26):
+  - Execute migration sequence from 02-options-analysis.txt (Steps 1-10)
+  - Run full dr-preflight.sh and fullsite-failover dry-run post-migration
+  - Update ssh-precheck.sh DIRECT_HOSTS to include wg-gw-onprem

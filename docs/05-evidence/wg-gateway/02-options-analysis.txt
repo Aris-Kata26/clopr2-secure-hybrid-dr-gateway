@@ -1,0 +1,132 @@
+WireGuard Gateway — Options Analysis
+======================================
+Date:   2026-03-18
+Author: KATAR711 | Team: BCLC24
+
+OBJECTIVE
+---------
+Decouple the WireGuard tunnel from the PostgreSQL primary VM so that
+unexpected pg-primary downtime does not simultaneously break:
+  - DR replication (WAL flow to Azure)
+  - Management SSH path to Azure DR VM
+
+OPTION A — Keep current state (no change)
+------------------------------------------
+Risk accepted: tunnel tied to pg-primary lifecycle.
+
+For PLANNED failover (fullsite-failover.sh): no problem — WireGuard stays up.
+For UNPLANNED crash: DR VM becomes island until pg-primary recovers.
+
+Mitigated by: both on-prem HA failover (VIP to pg-standby) and DR failover
+are scripted with WireGuard preserved. Real risk is only on unexpected VM death.
+
+Pros:  Zero effort, zero risk.
+Cons:  Architectural weakness remains; DR VM unmanageable if pg-primary fails.
+Blast radius if unchanged: LOW (only on unexpected failure).
+
+OPTION B — Dedicated on-prem WireGuard gateway VM (wg-gw-onprem) [RECOMMENDED]
+--------------------------------------------------------------------------------
+New Proxmox VM, single responsibility: WireGuard only.
+
+  wg-gw-onprem (10.0.96.15, new Proxmox VM)
+    - Lightweight: 1 vCPU, 512MB RAM, 10GB disk (wg-only)
+    - Static IP: 10.0.96.15 (same subnet as pg-primary)
+    - wg-quick@wg0 service only; no PostgreSQL, no Docker, no Keepalived
+    - New WireGuard keypair: different public key (new peer on DR VM side)
+    - On-prem tunnel IP: 10.200.0.3/30 (new /30 or reuse 10.200.0.1 with care)
+    - pg-primary: WireGuard removed (wg-quick@wg0 disabled + wg0.conf removed)
+
+  DR VM changes:
+    - NSG dr_allowed_ssh_cidrs: add 10.200.0.3/32 (new gateway tunnel IP)
+    - wg0.conf [Peer] PublicKey updated to new gateway key
+    - AllowedIPs: add 10.200.0.3/32 (or replace 10.200.0.1/32)
+    - primary_conninfo: host changes from 10.200.0.1 to 10.200.0.3
+    - pg_hba.conf WireGuard block: update source CIDR
+
+  SSH path: WSL -> PVE -> wg-gw-onprem -> WireGuard -> DR VM
+
+Pros:
+  - pg-primary crash no longer breaks tunnel or DR VM management
+  - Clean separation of concerns
+  - wg-gw-onprem can be kept always-on (no auto-shutdown, no PG workload)
+
+Cons:
+  - New Proxmox VM (Terraform + Ansible work: ~3-4 hours)
+  - Migration requires changing active replication config on DR VM
+    (primary_conninfo update -> requires postgresql reload + brief replication gap)
+  - Brief tunnel blackout during migration (WG moved from pg-primary to new VM)
+    During blackout: DR VM SSH unreachable, replication paused
+    Recovery if migration fails mid-way: complex (need emergency NSG access)
+  - One more VM to maintain (patch, monitor)
+  - Must coordinate: new VM up + WireGuard connected BEFORE removing from pg-primary
+
+OPTION C — Add WireGuard to pg-standby
+----------------------------------------
+Reuse existing pg-standby (10.0.96.14) as second WireGuard peer.
+
+  pg-standby becomes dual-role: PostgreSQL standby + WireGuard endpoint
+
+Pros:
+  - No new VM needed
+  - pg-standby already in same subnet
+
+Cons:
+  - Wrong separation: pg-standby is already dual-role (PostgreSQL HA standby)
+  - If on-prem HA failover occurs, pg-standby becomes primary — having WireGuard
+    on the promoted primary recreates the original problem
+  - AllowedIPs on DR VM would need to cover both 10.0.96.11 and 10.0.96.14
+    as potential tunnel sources — more complex NAT/routing
+  - pg_hba rules become more complex (two possible source IPs)
+  - REJECTED: does not solve the root problem; just moves it
+
+OPTION D — Azure VPN Gateway (replace WireGuard entirely)
+----------------------------------------------------------
+Replace WireGuard with Azure VPN Gateway (IKEv2/IPsec).
+
+  Scaffolding already exists in dr-fce/main.tf:
+    azurerm_virtual_network_gateway, azurerm_local_network_gateway
+    (enable_vpn_gateway = false by default)
+
+Pros:
+  - Azure-managed; no on-prem WireGuard process to maintain
+  - VPN Gateway is HA within Azure (redundant endpoints)
+
+Cons:
+  - Azure VPN Gateway SKU VpnGw1 = ~€130/month (vs €0 for WireGuard)
+  - Provisioning time: 30-45 minutes per apply
+  - Requires on-prem router or dedicated VPN appliance for IKEv2
+  - Massive scope increase; far beyond presentation timeline
+  - REJECTED: cost and complexity are prohibitive for this project scale
+
+RECOMMENDED TARGET: Option B (wg-gw-onprem)
+--------------------------------------------
+See ADR-006 for full specification and migration steps.
+Deploy in first maintenance window after presentation (post 2026-03-26).
+
+MIGRATION SEQUENCE (for Option B, to be executed in maintenance window)
+------------------------------------------------------------------------
+Pre-condition: maintenance window, no active DR event, pg-primary healthy
+
+Step 1: Create wg-gw-onprem VM (Terraform apply, bpg/proxmox)
+Step 2: Run ansible-playbook wg_tunnel.yml targeting new VM
+        - Generates keypair on new VM
+        - wg-gw-onprem becomes WireGuard initiator (new tunnel IP)
+Step 3: Add new peer to DR VM wg0.conf (add-peer, do NOT remove pg-primary yet)
+        - DR VM now has TWO WireGuard peers (pg-primary + gateway)
+        - Verify tunnel to gateway is up: ping 10.200.0.3 from DR VM
+Step 4: Update primary_conninfo on DR VM to use new gateway tunnel IP
+        - PostgreSQL reload (no restart, no connection drop to app)
+        - Verify pg_stat_replication shows new source IP
+Step 5: Remove pg-primary from DR VM wg0.conf
+        - wg syncconf (no tunnel restart required)
+Step 6: Disable wg-quick@wg0 on pg-primary
+        - systemctl stop wg-quick@wg0 && systemctl disable wg-quick@wg0
+        - Remove /etc/wireguard/wg0.conf from pg-primary
+Step 7: Update Ansible group_vars: remove wg_* vars from pg_primary.yml,
+        add pg-gateway to wg_nodes group
+Step 8: Update scripts/dr/*.sh — change ssh_run routing for vm-pg-dr-fce
+        from "via pg-primary" to "via wg-gw-onprem"
+Step 9: Update ~/.ssh/config dr-tunnel ProxyJump chain
+Step 10: Run ssh-precheck.sh, dr-preflight.sh — verify all PASS
+
+Rollback: Keep pg-primary WireGuard config backed up; re-enable in <5 min.

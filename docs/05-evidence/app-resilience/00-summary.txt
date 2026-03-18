@@ -1,0 +1,63 @@
+CLOPR2 Secure Hybrid DR Gateway — Application Resilience + Observability Evidence
+==================================================================================
+Date:       2026-03-18
+Task:       S5-06 Application Resilience + Observability
+ClickUp:    https://app.clickup.com/t/86c8wx7ma
+Implemented by: KATAR711
+
+ACCEPTANCE CRITERIA RESULTS
+============================
+[PASS] /health returns HTTP 200 when DB is reachable
+[PASS] /health returns HTTP 503 when DB is unreachable
+[PASS] Structured JSON logging emitted to stdout for all health check events
+[PASS] /readyz endpoint returns 200 always (liveness — no DB check)
+[PASS] /metrics endpoint returns in-memory counters as JSON (no external deps)
+[PASS] Container health: docker-app-1 Up 11 minutes (healthy)
+[PASS] App version bumped to 0.2.0
+[PASS] IaC: Ansible app_deploy.yml updated (healthcheck uses /readyz)
+[PASS] Documentation: docs/03-operations/app-observability.md
+
+CHANGES IMPLEMENTED
+====================
+app/src/main.py:
+  - Structured JSON logging via custom _JSONFormatter (stdlib only, no extra deps)
+  - logger emits JSON: ts, level, logger, msg, plus event-specific fields
+  - Startup event logged with app_env, db_host, version
+  - Health check events logged with db status, pg_is_in_recovery (or error)
+  - /readyz endpoint — always 200, no DB check
+  - /metrics endpoint — in-memory counters (health_checks_total, db_ok_total,
+    db_error_total, db_disabled_total, readyz_total) + uptime_seconds
+  - Version bumped from 0.1.0 to 0.2.0
+  - No new dependencies added
+
+infra/ansible/playbooks/app_deploy.yml:
+  - Docker HEALTHCHECK: /health → /readyz (liveness check separation)
+  - Added: "Wait for /readyz" step before "Wait for /health"
+
+ENDPOINT BEHAVIOUR SUMMARY
+============================
+GET /health    — 200 + JSON when DB ok; 503 + JSON when DB unreachable
+GET /readyz    — 200 + JSON always (process alive check)
+GET /metrics   — 200 + JSON in-memory counters (resets on container restart)
+GET /          — 200 + app info including endpoint map
+
+VALIDATED ON app-onprem (10.0.96.13)
+======================================
+Container: docker-app-1, image clopr2-prototype-a:latest (rebuilt in-place)
+Host port: 8080 → container port 8000
+
+  /health   200: {"status":"ok","db":"ok","db_host":"10.0.96.10","pg_is_in_recovery":false,"app_env":"dev","ts":"..."}
+  /health   503: {"status":"error","db":"unreachable","db_host":"10.0.96.10","error":"...","app_env":"dev","ts":"..."}
+            (observed during VIP ARP stale period — 14 db_error events in metrics)
+  /readyz   200: {"status":"ready","ts":"..."}
+            (confirmed 200 during same DB outage period)
+  /metrics  200: {"uptime_seconds":666.8,"health_checks_total":47,"db_ok_total":33,"db_error_total":14,...}
+
+DR STORY COMPATIBILITY
+========================
+- Failover path unaffected: /health still returns pg_is_in_recovery for app to detect
+  which PostgreSQL node is serving (false=primary, true=standby)
+- 503 on DB down is additive — failover does not cause DB unavailability
+- /readyz gives ops a clean liveness signal independent of DB state
+
+FINAL STATUS: PASS

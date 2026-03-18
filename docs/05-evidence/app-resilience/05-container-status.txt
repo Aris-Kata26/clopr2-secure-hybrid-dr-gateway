@@ -1,0 +1,19 @@
+Container Status Post-Deploy
+=============================
+Captured: 2026-03-18T14:02:28Z on app-onprem (10.0.96.13)
+
+$ docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Image}}\t{{.Ports}}'
+
+NAMES          STATUS                    IMAGE                       PORTS
+docker-app-1   Up 11 minutes (healthy)   clopr2-prototype-a:latest   0.0.0.0:8080->8000/tcp, [::]:8080->8000/tcp
+
+Docker HEALTHCHECK (updated):
+  test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/readyz')"]
+  interval: 15s
+  timeout: 5s
+  retries: 3
+  start_period: 10s
+
+Image: clopr2-prototype-a:latest
+  Built in-place on app-onprem using DOCKER_BUILDKIT=0 --pull=false
+  (Docker Hub unreachable from on-prem VMs — base image already cached locally)

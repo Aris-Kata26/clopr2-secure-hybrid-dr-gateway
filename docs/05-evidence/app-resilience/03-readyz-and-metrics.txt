@@ -1,0 +1,31 @@
+GET /readyz and GET /metrics
+=============================
+Captured: 2026-03-18T14:02:50Z
+
+=== GET /readyz ===
+$ curl -s -w '\nHTTP_STATUS:%{http_code}' http://10.0.96.13:8080/readyz
+
+{"status":"ready","ts":"2026-03-18T14:02:50Z"}
+HTTP_STATUS:200
+
+Structured log:
+{"ts": "2026-03-18T14:02:50Z", "level": "INFO", "logger": "clopr2.app", "msg": "readyz"}
+
+=== GET /metrics ===
+$ curl -s http://10.0.96.13:8080/metrics
+
+{"uptime_seconds":666.8,"health_checks_total":47,"db_ok_total":33,"db_error_total":14,"db_disabled_total":0,"readyz_total":4,"app_env":"dev","version":"0.2.0"}
+HTTP_STATUS:200
+
+Counter interpretation:
+  health_checks_total: 47  — total /health calls since container start
+  db_ok_total:         33  — successful DB connections
+  db_error_total:      14  — failed DB connections (VIP ARP stale period)
+  readyz_total:          4 — total /readyz calls
+  uptime_seconds:    666.8 — seconds since container start (~11 minutes)
+
+=== GET / (root) ===
+$ curl -s http://10.0.96.13:8080/
+
+{"app":"clopr2-prototype-a","version":"0.2.0","env":"dev","db_host":"10.0.96.10","endpoints":{"health":"/health","readyz":"/readyz","metrics":"/metrics"}}
+HTTP_STATUS:200

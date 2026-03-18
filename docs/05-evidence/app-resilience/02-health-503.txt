@@ -1,0 +1,16 @@
+GET /health — 503 path (DB unreachable)
+========================================
+Captured: 2026-03-18T13:53:24Z (during VIP ARP stale period — psycopg connect_timeout=5s)
+
+$ curl -s -w '\nHTTP_STATUS:%{http_code}' http://10.0.96.13:8080/health
+
+{"status":"error","db":"unreachable","db_host":"10.0.96.10","error":"connection failed: connection to server at \"10.0.96.10\", port 5432 failed: server closed the connection unexpectedly\n\tThis probably means the server terminated abnormally\n\tbefore or while processing the request.","app_env":"dev","ts":"2026-03-18T13:53:24Z"}
+HTTP_STATUS:503
+
+Structured log entry (container stdout):
+{"ts": "2026-03-18T13:53:24Z", "level": "WARNING", "logger": "clopr2.app", "msg": "health_check", "db": "unreachable", "db_host": "10.0.96.10", "error": "connection failed: connection to server at \"10.0.96.10\", port 5432 failed: server closed the connection unexpectedly\n\tThis probably means the server terminated abnormally\n\tbefore or while processing the request."}
+INFO:     172.18.0.1:56108 - "GET /health HTTP/1.1" 503 Service Unavailable
+
+NOTE: /readyz returned 200 during the same DB outage:
+{"status":"ready","ts":"2026-03-18T13:53:24Z"}
+HTTP_STATUS:200

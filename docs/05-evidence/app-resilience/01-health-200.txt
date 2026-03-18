@@ -1,0 +1,11 @@
+GET /health — 200 path (DB reachable)
+======================================
+Captured: 2026-03-18T14:02:49Z
+
+$ curl -s -w '\nHTTP_STATUS:%{http_code}' http://10.0.96.13:8080/health
+
+{"status":"ok","db":"ok","db_host":"10.0.96.10","pg_is_in_recovery":false,"app_env":"dev","ts":"2026-03-18T14:02:49Z"}
+HTTP_STATUS:200
+
+Structured log entry (container stdout):
+{"ts": "2026-03-18T14:02:49Z", "level": "INFO", "logger": "clopr2.app", "msg": "health_check", "db": "ok", "db_host": "10.0.96.10", "pg_is_in_recovery": false}

@@ -1,0 +1,29 @@
+Structured JSON Logs — Sample (docker logs docker-app-1)
+=========================================================
+Captured: 2026-03-18
+
+=== Startup event ===
+{"ts": "2026-03-18T13:51:43Z", "level": "INFO", "logger": "clopr2.app", "msg": "App starting", "app_env": "dev", "db_host": "10.0.96.10", "version": "0.2.0"}
+
+=== Health check — DB ok (INFO) ===
+{"ts": "2026-03-18T14:01:26Z", "level": "INFO", "logger": "clopr2.app", "msg": "health_check", "db": "ok", "db_host": "10.0.96.10", "pg_is_in_recovery": false}
+{"ts": "2026-03-18T14:01:27Z", "level": "INFO", "logger": "clopr2.app", "msg": "health_check", "db": "ok", "db_host": "10.0.96.10", "pg_is_in_recovery": false}
+
+=== Health check — DB unreachable (WARNING) ===
+{"ts": "2026-03-18T13:52:55Z", "level": "WARNING", "logger": "clopr2.app", "msg": "health_check", "db": "unreachable", "db_host": "10.0.96.10", "error": "connection failed: connection to server at \"10.0.96.10\", port 5432 failed: server closed the connection unexpectedly\n\tThis probably means the server terminated abnormally\n\tbefore or while processing the request."}
+{"ts": "2026-03-18T13:53:10Z", "level": "WARNING", "logger": "clopr2.app", "msg": "health_check", "db": "unreachable", "db_host": "10.0.96.10", "error": "connection failed: ..."}
+{"ts": "2026-03-18T13:53:24Z", "level": "WARNING", "logger": "clopr2.app", "msg": "health_check", "db": "unreachable", "db_host": "10.0.96.10", "error": "connection failed: ..."}
+
+=== /readyz event (INFO) ===
+{"ts": "2026-03-18T13:53:24Z", "level": "INFO", "logger": "clopr2.app", "msg": "readyz"}
+{"ts": "2026-03-18T14:02:50Z", "level": "INFO", "logger": "clopr2.app", "msg": "readyz"}
+
+=== Log format fields ===
+ts:       ISO-8601 UTC timestamp
+level:    INFO / WARNING / ERROR
+logger:   clopr2.app
+msg:      health_check / readyz / App starting
+db:       ok / unreachable / disabled (on health_check events)
+db_host:  VIP or DB_HOST value
+pg_is_in_recovery: bool (on db=ok events only)
+error:    psycopg exception message (on db=unreachable events only)

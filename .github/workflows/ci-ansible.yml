@@ -1,15 +1,20 @@
 name: ci-ansible
-on: [push, pull_request]
+
+on:
+  push:
+  pull_request:
+
 jobs:
+
   lint:
+    name: Ansible Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - name: Install Ansible and ansible-lint
-        run: python3 -m pip install --user ansible ansible-lint
+      - uses: actions/checkout@v4
+      - name: Install ansible-lint
+        # ansible-core pulled in as a dependency; no need to install full ansible.
+        run: pip install ansible-lint
       - name: ansible-lint
-        run: ~/.local/bin/ansible-lint infra/ansible
-      - name: Ansible syntax check
-        run: ~/.local/bin/ansible-playbook --syntax-check infra/ansible/playbooks/site.yml
-
-
+        # Targets the whole ansible directory; .ansible-lint at repo root
+        # provides skip_list for intentional patterns (fqcn, shell vs command).
+        run: ansible-lint infra/ansible

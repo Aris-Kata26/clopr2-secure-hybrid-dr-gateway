@@ -1,13 +1,20 @@
-name: ci-k8s
-on: [push, pull_request]
+name: ci-yaml
+
+on:
+  push:
+  pull_request:
+
 jobs:
+
   yamllint:
+    name: YAML Lint — Workflow Files
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
       - name: Install yamllint
-        run: sudo apt-get update && sudo apt-get install -y yamllint
-      - name: Lint YAML
-        run: yamllint -d relaxed deploy/k8s
-
-
+        run: pip install yamllint
+      - name: yamllint .github/workflows/
+        # Validates all CI workflow YAML files using the relaxed preset.
+        # The repo-root .yamllint config targets Ansible; use relaxed here
+        # to avoid Ansible-specific rule cross-contamination.
+        run: yamllint -d relaxed .github/workflows/

@@ -1,0 +1,30 @@
+name: ci-app
+
+on:
+  push:
+  pull_request:
+
+jobs:
+
+  python-lint:
+    name: Python Lint — ruff
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install ruff
+        run: pip install ruff
+      - name: ruff check app/src/
+        run: ruff check app/src/
+
+  docker-build:
+    name: Docker Build — clopr2-app
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        # Build-only validation — image is not pushed (no registry credentials in CI).
+        # Confirms Dockerfile syntax, base image resolution, pip install, COPY.
+        run: docker build -t clopr2-app:ci app/

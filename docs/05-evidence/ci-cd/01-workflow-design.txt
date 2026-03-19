@@ -1,0 +1,108 @@
+CI/CD Workflow Design — CLOPR2
+===============================
+Date:   2026-03-19
+Author: KATAR711 | Team: BCLC24
+
+WORKFLOW INVENTORY
+------------------
+
+ci-terraform.yml (3 jobs)
+  fmt:
+    Runs: terraform fmt -check -recursive infra/terraform
+    Fails on: any .tf file with non-canonical formatting
+    Purpose: enforces consistent Terraform style; prevents whitespace-only diffs
+
+  validate (matrix: dev, dr-fce, swe-aks, onprem):
+    Runs: terraform init -backend=false + terraform validate per env
+    fail-fast: false — all 4 envs validated independently even if one fails
+    Providers validated:
+      dev, dr-fce, swe-aks: azurerm ~4.0
+      onprem:               bpg/proxmox ~0.97
+    init -backend=false: avoids remote state access; only downloads providers
+    Purpose: catches HCL syntax errors, type mismatches, missing required fields
+    Note: validate does not require variable values for required variables;
+          it validates expression types, not runtime values.
+
+  shellcheck:
+    Runs: shellcheck --severity=error --shell=bash scripts/dr/*.sh
+    Scope: 10 DR scripts (ssh-precheck, dr-preflight, onprem-failover,
+           onprem-fallback, fullsite-failover, fullsite-fallback,
+           evidence-export, deploy-workbook, clickup-create-tasks, fullsite-failback)
+    --severity=error: only fails on actual errors, not style warnings
+    --shell=bash: explicit target; all scripts use #!/usr/bin/env bash
+    Purpose: catches undefined variables, broken quoting, subshell issues
+
+ci-ansible.yml (1 job)
+  lint:
+    Runs: ansible-lint infra/ansible
+    Config: .ansible-lint at repo root (skip_list + warn_list)
+    offline: true (no galaxy dependency resolution)
+    Purpose: validates playbook/role quality: task structure, idempotency
+             patterns, module usage, YAML consistency
+
+ci-k8s.yml → renamed ci-yaml (1 job)
+  yamllint:
+    Runs: yamllint -d relaxed .github/workflows/
+    Purpose: validates CI workflow YAML files themselves for syntax
+    Note: uses relaxed preset to avoid Ansible-rule cross-contamination
+          from repo-root .yamllint which has Ansible-specific settings
+
+ci-app.yml (2 jobs)
+  python-lint:
+    Runs: ruff check app/src/
+    Python: 3.12 (matches Dockerfile base: python:3.12-slim)
+    Rules: ruff defaults (E, F categories)
+    Purpose: catches syntax errors, undefined names, unused imports,
+             style violations in FastAPI app
+
+  docker-build:
+    Runs: docker build -t clopr2-app:ci app/
+    Purpose: validates full build chain: base image pull, pip install
+             -r requirements.txt, COPY src/, CMD syntax
+    Note: image not pushed; no registry credentials required
+
+DESIGN DECISIONS
+----------------
+
+1. Separate workflow files per concern (terraform/ansible/app)
+   Rationale: independent status checks in GitHub PR; teams can see which
+   concern failed without parsing a combined log. Consistent with existing
+   project structure.
+
+2. No paths: filters on triggers
+   Rationale: all checks run on every push. Simpler; ensures no silent
+   regressions when cross-cutting changes are made (e.g. Terraform change
+   that also requires script update).
+
+3. fail-fast: false on terraform validate matrix
+   Rationale: all 4 envs have independent failures. Seeing all validation
+   results in one run is more useful than stopping at first failure.
+
+4. shellcheck --severity=error not default
+   Rationale: DR scripts are complex bash; default shellcheck produces
+   informational notes that are not actionable right now. Errors are
+   genuine bugs. This is the correct starting threshold for a first CI pass.
+
+5. ansible-lint offline: true
+   Rationale: no galaxy roles used; CI does not have vault password;
+   offline mode avoids unnecessary network calls and role install attempts.
+
+6. Docker build-only (no push)
+   Rationale: no registry credentials in CI; image push is performed
+   manually by operators during deployment. Build-only confirms the
+   Dockerfile and requirements chain is valid.
+
+SECRETS / CREDENTIALS REQUIRED
+-------------------------------
+None. All CI jobs use:
+  - Public Terraform providers (downloaded from registry.terraform.io)
+  - Public PyPI packages (ansible-lint, ruff, yamllint)
+  - Public Docker Hub base image (python:3.12-slim)
+  - GitHub-provided ubuntu-latest runner
+
+No cloud credentials (Azure, Proxmox) are needed because:
+  - terraform validate uses -backend=false (no state access)
+  - No deployment steps in CI
+  - Docker image not pushed
+
+This is intentional: CI validates code quality, not live infrastructure.

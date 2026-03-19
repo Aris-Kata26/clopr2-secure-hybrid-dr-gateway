@@ -1,0 +1,33 @@
+---
+# .ansible-lint — CLOPR2 Secure Hybrid DR Gateway
+# Configured for CI (S5 architecture maturity sprint, 2026-03-19)
+#
+# skip_list: rules intentionally not enforced in this project.
+# Rationale documented per-rule below.
+
+skip_list:
+  # Short module names (e.g. apt:, copy:, file:) used throughout roles.
+  # Migrating all to ansible.builtin.* FQCN is a separate refactor task.
+  - fqcn[action-core]
+  - fqcn[action]
+
+  # wireguard role uses shell: for pipe commands (wg pubkey < key | ...),
+  # which cannot be expressed with command: (no pipe support).
+  - command-instead-of-shell
+
+  # wg_tunnel.yml nc probe uses ignore_errors: true intentionally —
+  # nc to port 5432 is expected to fail before PostgreSQL bootstrap.
+  - ignore-errors
+
+warn_list:
+  # Task names: allow lowercase starts (project convention).
+  - name[casing]
+
+# Do not attempt to install or resolve galaxy roles/collections.
+# All roles are local; no galaxy dependency.
+offline: true
+
+# Exclude inventory files — host connection strings are not playbook logic.
+exclude_paths:
+  - infra/ansible/inventories/
+  - infra/ansible/inventory/

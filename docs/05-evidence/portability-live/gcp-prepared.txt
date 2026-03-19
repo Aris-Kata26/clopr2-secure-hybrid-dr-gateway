@@ -1,0 +1,76 @@
+GCP Proof-of-Portability — Terraform Validated, Awaiting Cloud Shell Execution
+===============================================================================
+Date:         2026-03-19T10:59:06+00:00
+Project:      aris-project-490607 (akatagaruka@gmail.com)
+Region:       europe-west3
+Task:         S5 portability execution (ClickUp: 86c8xe9rj)
+
+=== LOCAL CONSTRAINT ===
+gcloud CLI is not installed on the local Windows machine.
+GCP provider requires Application Default Credentials (ADC) or a service account key.
+Without credentials, `terraform apply` cannot proceed locally.
+
+=== TERRAFORM INIT — COMPLETED LOCALLY ===
+Command:  terraform -chdir=infra/terraform/envs/gcp-proof init
+Result:   Terraform has been successfully initialized!
+Provider: hashicorp/google v5.45.2 (downloaded to .terraform/)
+Credential step: SKIPPED (init does not require auth)
+
+=== TERRAFORM VALIDATE — PASS ===
+Command:  terraform -chdir=infra/terraform/envs/gcp-proof validate
+Result:   Success! The configuration is valid.
+This confirms all HCL is syntactically and structurally correct.
+
+=== RESOURCES THAT WILL BE CREATED (pending apply) ===
+  google_compute_network.proof         clopr2-proof-vpc (10.22.0.0/16)
+  google_compute_subnetwork.proof      clopr2-proof-subnet (10.22.1.0/24)
+  google_compute_firewall.wg_inbound   clopr2-proof-wireguard (UDP 51820)
+  google_compute_firewall.egress_all   clopr2-proof-egress
+  google_compute_address.proof         clopr2-proof-ip (EXTERNAL static)
+  google_service_account.proof         clopr2-proof-dr-vm@aris-project-490607.iam.gserviceaccount.com
+  google_compute_instance.proof        clopr2-proof-dr-vm (e2-micro, europe-west3-b)
+
+=== PORTABILITY EQUIVALENCES (to be demonstrated on apply) ===
+  google_compute_instance    -> azurerm_linux_virtual_machine
+  google_service_account     -> SystemAssigned Managed Identity
+  google_compute_network     -> azurerm_virtual_network
+  google_compute_subnetwork  -> azurerm_subnet
+  google_compute_firewall    -> azurerm_network_security_group
+  google_compute_address     -> azurerm_public_ip (Static)
+
+=== NETWORK ISOLATION ===
+VPC CIDR 10.22.0.0/16 does NOT overlap:
+  Azure dr-fce VNet:  10.20.0.0/16  (VALIDATED DR PLATFORM — UNTOUCHED)
+  On-prem network:    10.0.0.0/16
+  AWS proof:          10.21.0.0/16
+  WireGuard tunnel:   10.200.0.0/24
+
+=== CLOUD SHELL EXECUTION INSTRUCTIONS ===
+1. Open: console.cloud.google.com (signed in as akatagaruka@gmail.com)
+2. Activate Cloud Shell (top-right terminal icon)
+3. Run:
+   git clone https://github.com/Aris-Kata26/clopr2-secure-hybrid-dr-gateway.git
+   cd clopr2-secure-hybrid-dr-gateway
+   bash scripts/portability/gcp-proof-deploy.sh
+
+4. Script will:
+   - Set project aris-project-490607
+   - Enable compute.googleapis.com + iam.googleapis.com
+   - Configure ADC from Cloud Shell gcloud auth
+   - Install Terraform if needed
+   - Run init / plan / apply
+   - Write evidence to: docs/05-evidence/portability/gcp-proof-deploy.txt
+   - Print instance name, public IP
+
+5. After execution:
+   - Commit evidence file and update this record to DEPLOYED status
+   - ClickUp task 86c8xe9rj to be updated to COMPLETE
+
+=== TEARDOWN (after proof is complete) ===
+  terraform -chdir=infra/terraform/envs/gcp-proof destroy -auto-approve
+
+=== AZURE IMPACT ===
+Zero. This is a fully isolated GCP project with no connection to Azure resources.
+envs/dr-fce, envs/dev, envs/swe-aks, modules/ — all unchanged.
+
+Status: TERRAFORM VALIDATED — PENDING CLOUD SHELL EXECUTION

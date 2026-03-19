@@ -21,7 +21,7 @@ WORKFLOW COVERAGE CONFIRMATION
 ci-terraform.yml  — 3 jobs:
   fmt:       terraform fmt -check -recursive infra/terraform
   validate:  matrix [dev, dr-fce, swe-aks, onprem], fail-fast=false
-  shellcheck: scripts/dr/*.sh (10 scripts), severity=error
+  shellcheck: scripts/dr/*.sh (10 scripts), severity=erro
 
 ci-ansible.yml    — 1 job:
   lint:      ansible-lint infra/ansible (with .ansible-lint config)
@@ -62,7 +62,7 @@ ruff may flag one unexpected style issue:
   - The app code is well-structured and should pass defaults
 
 terraform validate onprem:
-  - Uses bpg/proxmox ~0.97 provider
+  - Uses bpg/proxmox ~0.97 provide
   - Downloaded from registry.terraform.io during init
   - init -backend=false skips state access; validate checks schema only
   - Risk level: LOW

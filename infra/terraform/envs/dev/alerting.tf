@@ -72,7 +72,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "onprem_heartbeat_sile
   description             = "CRITICAL: pg-primary or app-onprem has not sent a heartbeat in 10 minutes. Host may be down or Arc agent has failed. Investigate immediately."
 
   criteria {
-    query = <<-KQL
+    query                   = <<-KQL
       let monitored_hosts = datatable(Computer: string) [
         "pg-primary",
         "app-onprem"
@@ -98,9 +98,9 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "onprem_heartbeat_sile
   action {
     action_groups = [azurerm_monitor_action_group.ops.id]
     custom_properties = {
-      "alert_type" = "host_availability"
+      "alert_type"  = "host_availability"
       "environment" = "on-prem"
-      "runbook"    = "docs/03-operations/alerting-architecture.md"
+      "runbook"     = "docs/03-operations/alerting-architecture.md"
     }
   }
 }
@@ -127,7 +127,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "keepalived_priority_d
   description             = "HIGH: Keepalived on pg-primary has dropped priority from 100 to 80 — pg_isready failed 3 checks. PostgreSQL may be unresponsive. Check if VIP moves to pg-standby."
 
   criteria {
-    query = <<-KQL
+    query                   = <<-KQL
       Syslog
       | where Computer == "pg-primary"
       | where ProcessName == "Keepalived_vrrp"
@@ -176,7 +176,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "keepalived_vip_state_
   description             = "CRITICAL: pg-primary Keepalived has entered BACKUP state. VIP 10.0.96.10 has moved to pg-standby. Production PostgreSQL traffic is now served by the standby. Confirm application health and begin failback procedure if unplanned."
 
   criteria {
-    query = <<-KQL
+    query                   = <<-KQL
       Syslog
       | where Computer == "pg-primary"
       | where ProcessName == "Keepalived_vrrp"
@@ -226,7 +226,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "app_docker_failure" {
   description             = "HIGH: Docker service on app-onprem has stopped or failed according to systemd. The FastAPI application (/health endpoint) is likely unavailable. Check app-onprem Docker status."
 
   criteria {
-    query = <<-KQL
+    query                   = <<-KQL
       Syslog
       | where Computer == "app-onprem"
       | where ProcessName == "systemd"

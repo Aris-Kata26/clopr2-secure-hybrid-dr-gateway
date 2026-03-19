@@ -10,7 +10,7 @@ output "resource_group_name" {
 
 output "backend_config_snippet" {
   description = "Backend configuration snippet for use in each environment"
-  value = <<-EOT
+  value       = <<-EOT
     terraform {
       backend "azurerm" {
         resource_group_name  = "${azurerm_resource_group.tfstate.name}"

@@ -18,7 +18,7 @@ Three workflow files existed but were non-functional:
   ci-terraform.yml — actions/checkout@v6 (does not exist; latest is v4)
                      only validated envs/dev; missing 3 other environments
   ci-ansible.yml   — actions/checkout@v6 (broken); brittle ~/.local/bin/ path;
-                     syntax-check step had no inventory → would error
+                     syntax-check step had no inventory → would erro
   ci-k8s.yml       — actions/checkout@v6 (broken); targeted deploy/k8s
                      which does not exist in repo → always fails
 

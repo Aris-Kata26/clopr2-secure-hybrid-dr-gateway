@@ -66,8 +66,8 @@ resource "azurerm_storage_account" "tfstate" {
   account_kind             = "StorageV2"
 
   # Security baseline
-  min_tls_version           = "TLS1_2"
-  https_traffic_only_enabled = true
+  min_tls_version                 = "TLS1_2"
+  https_traffic_only_enabled      = true
   allow_nested_items_to_be_public = false
 
   blob_properties {

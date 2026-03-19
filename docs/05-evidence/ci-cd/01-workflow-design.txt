@@ -98,7 +98,7 @@ None. All CI jobs use:
   - Public Terraform providers (downloaded from registry.terraform.io)
   - Public PyPI packages (ansible-lint, ruff, yamllint)
   - Public Docker Hub base image (python:3.12-slim)
-  - GitHub-provided ubuntu-latest runner
+  - GitHub-provided ubuntu-latest runne
 
 No cloud credentials (Azure, Proxmox) are needed because:
   - terraform validate uses -backend=false (no state access)

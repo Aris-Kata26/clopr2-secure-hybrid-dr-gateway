@@ -5,21 +5,14 @@
 extends: default
 
 rules:
-  # Allow Ansible-specific custom tags (!vault, !include, etc.)
-  tags:
-    allowed: ["!vault", "!include", "!unsafe"]
-
   # Allow longer lines for encrypted vault content
   line-length:
     max: 120
     level: warning
 
-  # Ansible uses variable syntax that can look like jinja2
+  # Ansible uses true/false/yes/no in variable files
   truthy:
-    allowed: ["true", "false", "yes", "no"]
-
-  # Allow block scalars in mappings (vault content)
-  block-mapping-content-indent: disable
+    allowed-values: ["true", "false", "yes", "no"]
 
   # Standard indentation for consistency
   indentation:

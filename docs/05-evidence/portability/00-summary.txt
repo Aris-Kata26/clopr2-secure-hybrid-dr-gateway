@@ -1,0 +1,143 @@
+S5 Architecture Maturity — Cloud Portability Layer
+====================================================
+Sprint task: Architecture maturity — cloud portability
+Completed:   2026-03-19
+Author:      KATAR711 | Team: BCLC24
+
+Context
+-------
+Post-CI/CD sprint task. The validated Azure DR platform is complete.
+This task packages the infrastructure design as cloud-agnostic without
+modifying the current Azure implementation.
+
+Critical constraint: Do NOT break the validated Azure platform.
+Approach: Additive structure only — new folders alongside existing envs/.
+
+Phase 1 — Current-State Portability Audit
+-------------------------------------------
+34 components classified across 4 categories:
+
+Cloud-neutral (no changes needed):
+  PostgreSQL 16 (streaming replication)
+  Keepalived / VIP (on-prem only, not a cloud concern)
+  WireGuard (software VPN — runs on any Linux VM)
+  FastAPI app / Docker container
+  pgBackRest core (repo backend is a config variable)
+  All Ansible roles: postgres, postgres_primary, postgres_standby,
+    keepalived, wireguard, pgbackrest, app_deploy
+  All DR scripts: dr-preflight, onprem-failover, onprem-fallback,
+    fullsite-failover, evidence-export
+
+Azure-specific (replaced by provider equivalents):
+  Key Vault → AWS Secrets Manager / GCP Secret Manager
+  Managed Identity → EC2 IAM profile / GCP service account
+  Log Analytics → CloudWatch / Cloud Logging
+  Azure Monitor alerts → CloudWatch alarms / GCP alert policies
+  VNet + NSG → VPC + security groups / VPC + firewall rules
+  AKS → EKS / GKE (dev only — not in DR path)
+  ACR → ECR / Artifact Registry (dev only — not in DR path)
+  Azure Arc → no equivalent (Azure-specific feature)
+
+Tightly coupled / unsafe to change before presentation:
+  envs/dr-fce/ — validated DR environment
+  envs/dev/, envs/swe-aks/ — live
+  modules/network/, modules/keyvault/, modules/loganalytics/ — live
+
+Phase 2 — Shared Interface Modules Created
+--------------------------------------------
+5 interface contract modules (variables-only, no resource blocks):
+  infra/terraform/shared/compute-db/     DR DB VM interface
+  infra/terraform/shared/compute-app/    App VM interface
+  infra/terraform/shared/secrets-interface/  Secret store interface
+  infra/terraform/shared/monitoring/     Log/alert sink interface
+  infra/terraform/shared/core-network/   Network layer interface
+
+Phase 3 — Provider Adapter Stubs Created
+------------------------------------------
+Azure:
+  infra/terraform/providers/azure/README.md
+    Maps to existing live envs/ and modules/ — no new resources
+
+AWS (scaffold — NOT deployed):
+  infra/terraform/providers/aws/README.md
+  infra/terraform/providers/aws/compute-db/main.tf   (commented EC2)
+  infra/terraform/providers/aws/compute-db/variables.tf
+  infra/terraform/providers/aws/compute-db/outputs.tf
+  infra/terraform/providers/aws/secrets/main.tf       (commented Secrets Manager)
+  infra/terraform/providers/aws/secrets/variables.tf
+  infra/terraform/providers/aws/secrets/outputs.tf
+
+GCP (scaffold — NOT deployed):
+  infra/terraform/providers/gcp/README.md
+  infra/terraform/providers/gcp/compute-db/main.tf   (commented Compute Engine)
+  infra/terraform/providers/gcp/compute-db/variables.tf
+  infra/terraform/providers/gcp/compute-db/outputs.tf
+  infra/terraform/providers/gcp/secrets/main.tf       (commented Secret Manager)
+  infra/terraform/providers/gcp/secrets/variables.tf
+
+Phase 4 — Documentation
+------------------------
+  docs/06-portability/00-portability-overview.md  — structure + live/scaffold/roadmap
+  docs/06-portability/01-provider-mapping.md      — Azure ↔ AWS ↔ GCP mapping table
+  docs/06-portability/02-portability-audit.md     — 34-component portability audit
+  docs/06-portability/03-ansible-portability.md   — Ansible role portability + examples
+
+Files Changed
+-------------
+New files created (additive — zero existing files modified):
+  infra/terraform/shared/compute-db/variables.tf
+  infra/terraform/shared/compute-db/README.md
+  infra/terraform/shared/compute-app/variables.tf
+  infra/terraform/shared/secrets-interface/variables.tf
+  infra/terraform/shared/monitoring/variables.tf
+  infra/terraform/shared/core-network/variables.tf
+  infra/terraform/providers/azure/README.md
+  infra/terraform/providers/aws/README.md
+  infra/terraform/providers/aws/compute-db/main.tf
+  infra/terraform/providers/aws/compute-db/variables.tf
+  infra/terraform/providers/aws/compute-db/outputs.tf
+  infra/terraform/providers/aws/secrets/main.tf
+  infra/terraform/providers/aws/secrets/variables.tf
+  infra/terraform/providers/aws/secrets/outputs.tf
+  infra/terraform/providers/gcp/README.md
+  infra/terraform/providers/gcp/compute-db/main.tf
+  infra/terraform/providers/gcp/compute-db/variables.tf
+  infra/terraform/providers/gcp/compute-db/outputs.tf
+  infra/terraform/providers/gcp/secrets/main.tf
+  infra/terraform/providers/gcp/secrets/variables.tf
+  docs/06-portability/00-portability-overview.md
+  docs/06-portability/01-provider-mapping.md
+  docs/06-portability/02-portability-audit.md
+  docs/06-portability/03-ansible-portability.md
+  docs/05-evidence/portability/00-summary.txt
+
+Azure Platform Impact
+---------------------
+ZERO. No existing files were modified. All changes are additive.
+The validated Azure DR platform (envs/dr-fce, envs/dev, envs/swe-aks,
+modules/) is completely untouched.
+
+Terraform validate on existing envs is unaffected — shared/ and providers/
+directories have no providers configured, so they do not interfere with
+existing state or plans.
+
+AWS/GCP Proof-of-Portability Status
+-------------------------------------
+Scaffold created: YES
+Deployed to AWS/GCP: NO
+Safe to claim: Interface contracts + mapping tables demonstrate portability.
+               Actual deployment is roadmap — requires accounts, credentials,
+               WireGuard peer updates, and Ansible inventory additions.
+
+Roadmap (Not Implemented)
+--------------------------
+  providers/aws/core-network/ (VPC + security groups)
+  providers/aws/monitoring/ (CloudWatch)
+  providers/gcp/core-network/ (VPC + firewall rules)
+  providers/gcp/monitoring/ (Cloud Logging + alert policies)
+  Ansible inventory for AWS/GCP DR hosts
+  Multi-peer WireGuard wg0.conf template
+  pgBackRest S3/GCS backend variable abstraction
+  Live deployment to AWS or GCP
+
+Final Status: COMPLETE — portability layer created, Azure platform intact

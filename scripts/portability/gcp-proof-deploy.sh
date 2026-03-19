@@ -19,6 +19,7 @@ set -euo pipefail
 
 PROJECT_ID="aris-project-490607"
 REGION="europe-west3"
+ZONE="${REGION}-c"
 PROOF_DIR="infra/terraform/envs/gcp-proof"
 
 echo "======================================================"
@@ -89,7 +90,7 @@ SA_EMAIL=$(terraform -chdir="$PROOF_DIR" output -raw service_account_email)
 echo ""
 echo "=== Step 9: Verify instance state ==="
 gcloud compute instances describe "$INSTANCE_NAME" \
-    --zone="${REGION}-b" \
+    --zone="$ZONE" \
     --format="table(name,status,machineType.basename(),networkInterfaces[0].accessConfigs[0].natIP,networkInterfaces[0].networkIP)"
 
 # ── Step 10: Write evidence file ──────────────────────────────────────────────
@@ -101,7 +102,7 @@ GCP Proof-of-Portability — Deployment Evidence
 Date:         $(date -u)
 Project:      $PROJECT_ID
 Region:       $REGION
-Zone:         ${REGION}-b
+Zone:         $ZONE
 
 Instance Name:  $INSTANCE_NAME
 Instance ID:    $INSTANCE_ID

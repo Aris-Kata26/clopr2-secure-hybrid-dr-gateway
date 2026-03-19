@@ -142,7 +142,7 @@ locals {
 resource "google_compute_instance" "proof" {
   name         = "clopr2-proof-dr-vm"
   machine_type = var.vm_size
-  zone         = "${var.region}-b"
+  zone         = var.zone
   description  = "CLOPR2 GCP proof-of-portability DR VM"
 
   tags = ["clopr2-proof-dr-vm"]

@@ -12,6 +12,12 @@ variable "region" {
   default     = "europe-west3"
 }
 
+variable "zone" {
+  type        = string
+  description = "GCP zone — override to retry on capacity errors (preferred: europe-west3-c, then europe-west3-a)"
+  default     = "europe-west3-c"
+}
+
 variable "subnet_cidr" {
   type        = string
   description = "Subnet CIDR — isolated, does not overlap Azure (10.20.0.0/16) or on-prem (10.0.0.0/16) or AWS proof (10.21.0.0/16)"

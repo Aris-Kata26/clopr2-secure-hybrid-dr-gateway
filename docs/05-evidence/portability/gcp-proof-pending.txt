@@ -1,0 +1,55 @@
+GCP Proof-of-Portability — Pending Cloud Shell Execution
+==========================================================
+Date prepared: 2026-03-19
+Project:       aris-project-490607 (akatagaruka@gmail.com)
+Region:        europe-west3
+
+Status: PREPARED — PENDING CLOUD SHELL EXECUTION
+Reason: gcloud not installed locally on Windows. Terraform files are complete.
+
+Files ready to deploy:
+  infra/terraform/envs/gcp-proof/main.tf
+  infra/terraform/envs/gcp-proof/variables.tf
+  infra/terraform/envs/gcp-proof/outputs.tf
+  infra/terraform/envs/gcp-proof/terraform.tfvars
+  scripts/portability/gcp-proof-deploy.sh
+
+To deploy (run in GCP Cloud Shell at console.cloud.google.com):
+  git clone https://github.com/Aris-Kata26/clopr2-secure-hybrid-dr-gateway.git
+  cd clopr2-secure-hybrid-dr-gateway
+  bash scripts/portability/gcp-proof-deploy.sh
+
+Expected resources to be created:
+  google_compute_network.proof         clopr2-proof-vpc
+  google_compute_subnetwork.proof      clopr2-proof-subnet (10.22.1.0/24)
+  google_compute_firewall.wg_inbound   clopr2-proof-wireguard (UDP 51820)
+  google_compute_firewall.egress_all   clopr2-proof-egress
+  google_compute_address.proof         clopr2-proof-ip (EXTERNAL static)
+  google_service_account.proof         clopr2-proof-dr-vm@aris-project-490607.iam.gserviceaccount.com
+  google_compute_instance.proof        clopr2-proof-dr-vm (e2-micro, europe-west3-b)
+
+Expected equivalences:
+  google_compute_instance    → azurerm_linux_virtual_machine
+  google_service_account     → SystemAssigned Managed Identity
+  google_compute_network     → azurerm_virtual_network
+  google_compute_subnetwork  → azurerm_subnet
+  google_compute_firewall    → azurerm_network_security_group
+  google_compute_address     → azurerm_public_ip (Static)
+
+SSH key prepared: ~/.ssh/id_ed25519_clopr2_proof
+  (same key used for AWS proof; Cloud Shell would need private key to SSH)
+
+APIs required:
+  compute.googleapis.com
+  iam.googleapis.com
+  (script enables these automatically)
+
+Network isolation:
+  VPC CIDR 10.22.0.0/16 does NOT overlap:
+    Azure dr-fce VNet:  10.20.0.0/16
+    On-prem network:    10.0.0.0/16
+    AWS proof:          10.21.0.0/16
+    WireGuard tunnel:   10.200.0.0/24
+
+Teardown (after proof is complete):
+  terraform -chdir=infra/terraform/envs/gcp-proof destroy -auto-approve

@@ -1,0 +1,59 @@
+AWS Proof-of-Portability — Deployment Evidence
+================================================
+Date:         2026-03-19T09:40:23+00:00
+Account:      000767025812 (educloud-cli, local credentials)
+Region:       us-east-1
+AZ:           us-east-1a
+
+Terraform apply: COMPLETE — 8 resources added, 0 changed, 0 destroyed
+
+Instance ID:    i-03819fe1f280bece1
+Instance Name:  clopr2-proof-dr-vm (tag)
+Public IP:      44.215.122.180
+Private IP:     10.21.1.92
+State:          running
+AMI:            ami-00e1181affe35cfd8
+AMI Name:       ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-20260317
+Instance type:  t3.micro
+Key pair:       clopr2-proof-key
+VPC:            vpc-0830299930e120598  (CIDR: 10.21.0.0/16)
+Subnet:         subnet-0b1746d01cd238099  (CIDR: 10.21.1.0/24)
+Security group: sg-0416ebf2bbc2eae30
+Route table:    rtb-0e493c03579f1c889
+IGW:            igw-0cf628ad9bb411e48
+Disk:           20 GB gp3 (encrypted)
+Launch time:    2026-03-19T09:40:23+00:00
+
+Terraform state: infra/terraform/envs/aws-proof/terraform.tfstate (local)
+
+Equivalence to Azure:
+  aws_instance              → azurerm_linux_virtual_machine
+  aws_vpc                   → azurerm_virtual_network
+  aws_subnet                → azurerm_subnet
+  aws_internet_gateway      → (implicit in Azure VNet)
+  aws_route_table           → azurerm_route_table
+  aws_security_group        → azurerm_network_security_group
+  aws_key_pair              → admin_ssh_key in azurerm_linux_virtual_machine
+  (IAM instance profile)    → SystemAssigned Managed Identity [not created in proof]
+
+Bootstrap (user_data):
+  Installs: wireguard, postgresql-client-16, curl
+  Proof marker: /etc/clopr2-proof
+  Log: /var/log/clopr2-proof-init.log
+
+Network isolation:
+  VPC CIDR 10.21.0.0/16 does NOT overlap:
+    Azure dr-fce VNet:  10.20.0.0/16
+    On-prem network:    10.0.0.0/16
+    GCP proof planned:  10.22.0.0/16
+    WireGuard tunnel:   10.200.0.0/24
+
+No Azure resources were created, modified, or touched.
+No on-prem resources were touched.
+No WireGuard tunnel configured (proof validates infra provisioning only).
+
+Teardown:
+  terraform -chdir=infra/terraform/envs/aws-proof destroy -auto-approve
+  → destroys all 8 resources (EC2, VPC, subnet, SG, IGW, RT, RTassoc, key pair)
+
+Status: DEPLOYED — RUNNING

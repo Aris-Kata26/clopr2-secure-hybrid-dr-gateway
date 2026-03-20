@@ -1,0 +1,163 @@
+# dr-inventory.yml
+# =================
+# CLOPR2 DR Onboarding Manifest
+#
+# This file is the SINGLE SOURCE OF TRUTH for which on-prem VMs are under
+# DR governance. A VM not listed here is invisible to all DR automation.
+#
+# Policy:
+#   - dr_managed: true  → VM has an active DR path (see dr_mode)
+#   - dr_managed: false → VM is explicitly excluded or protected by another VM
+#
+# Roles (defined in docs/07-dr-onboarding/01-role-taxonomy.md):
+#   db-primary    → Live streaming standby on Azure + pgBackRest
+#   db-standby    → Protected by db-primary's Azure DR path
+#   app           → Backup-only (snapshot); rebuild standby in Phase 3
+#   utility       → Backup-only (snapshot) if dr_managed: true
+#   management    → Always excluded. dr_managed value is ignored.
+#
+# DR modes:
+#   live-standby        → Azure DR VM + streaming replication + pgBackRest
+#   protected-by-primary → No independent Azure action; covered by primary's path
+#   backup-only         → Azure Recovery Services Vault snapshot policy
+#   excluded            → No Azure-side action
+#
+# Classifier:  scripts/dr/classify-vm.sh
+# ADR:         docs/07-dr-onboarding/02-adr-manifest-model.md
+# Last updated: 2026-03-20 | Owner: KATAR711 | Team: BCLC24
+# ------------------------------------------------------------------------------
+
+schema_version: "1.0"
+
+vms:
+
+  - name: pg-primary
+    role: db-primary
+    dr_managed: true
+    dr_mode: live-standby
+    ip: "10.0.96.11"
+    vm_id: 201
+    proxmox_node: pve
+    ansible_group: pg_primary
+    keepalived_role: MASTER
+    keepalived_vrid: 51
+    keepalived_priority: 100
+    wg_tunnel_ip: "10.200.0.1"
+    wg_peer_ip: "10.200.0.2"
+    azure_dr_vm: vm-pg-dr-fce
+    pgbackrest_stanza: main
+    notes: >
+      Current validated DR primary. WireGuard tunnel to Azure DR VM (vm-pg-dr-fce).
+      Keepalived VRRP MASTER for VIP 10.0.96.10. pgBackRest archives WAL to Azure
+      Blob (clopr2backupkatar / pgbackrest). Streaming replication to both
+      pg-standby (on-prem) and vm-pg-dr-fce (Azure). Validated S4-03, S4-09.
+      DO NOT modify DR path before presentation.
+
+  - name: pg-standby
+    role: db-standby
+    dr_managed: false
+    dr_mode: protected-by-primary
+    ip: "10.0.96.14"
+    vm_id: 202
+    proxmox_node: pve
+    ansible_group: pg_standby
+    keepalived_role: BACKUP
+    keepalived_vrid: 51
+    keepalived_priority: 90
+    wg_tunnel_ip: null
+    wg_peer_ip: null
+    azure_dr_vm: null
+    pgbackrest_stanza: null
+    notes: >
+      On-prem hot standby. Keepalived BACKUP (priority 90, nopreempt). Streams
+      WAL from pg-primary. NEVER independently promoted in the current design —
+      correct failover trigger is systemctl stop keepalived on pg-primary.
+      Protected by pg-primary's Azure DR path. No independent Azure DR resource.
+      pg_is_in_recovery()=true always in steady state.
+
+  - name: app-onprem
+    role: app
+    dr_managed: true
+    dr_mode: backup-only
+    ip: "10.0.96.13"
+    vm_id: 203
+    proxmox_node: pve
+    ansible_group: app_onprem
+    keepalived_role: null
+    keepalived_vrid: null
+    keepalived_priority: null
+    wg_tunnel_ip: null
+    wg_peer_ip: null
+    azure_dr_vm: null
+    pgbackrest_stanza: null
+    notes: >
+      FastAPI application host (Docker, port 8080). Connects to PostgreSQL via
+      Keepalived VIP 10.0.96.10:5432 — not a direct host address. Stateless from
+      a replication perspective; data is in the database tier. DR mode is
+      backup-only (Azure snapshot policy). Azure-side rebuild path (Phase 3) will
+      re-run app_deploy.yml with DB_HOST pointing to Azure DR endpoint.
+      Azure Recovery Services Vault backup policy: NOT YET APPLIED (Phase 2).
+
+  - name: mgmt-jump
+    role: management
+    dr_managed: false
+    dr_mode: excluded
+    ip: "dhcp"
+    vm_id: 204
+    proxmox_node: pve
+    ansible_group: null
+    keepalived_role: null
+    keepalived_vrid: null
+    keepalived_priority: null
+    wg_tunnel_ip: null
+    wg_peer_ip: null
+    azure_dr_vm: null
+    pgbackrest_stanza: null
+    notes: >
+      Management jump box. on_boot=false (cost saving). DHCP address. Used
+      exclusively for SSH access and Ansible/Terraform operations. Has no
+      application data. Not included in any DR path. Excluded permanently —
+      the classifier ignores dr_managed value for the management role.
+
+# ------------------------------------------------------------------------------
+# Reserved resource allocations (update this when adding new VMs)
+# ------------------------------------------------------------------------------
+resource_registry:
+  keepalived_vrids:
+    - vrid: 51
+      cluster: pg-nodes
+      vms: [pg-primary, pg-standby]
+      status: active
+
+  wireguard_subnets:
+    - cidr: "10.200.0.0/30"
+      peers: [pg-primary, vm-pg-dr-fce]
+      tunnel_ips: ["10.200.0.1", "10.200.0.2"]
+      status: active
+    - cidr: "10.200.0.4/30"
+      peers: []
+      tunnel_ips: ["10.200.0.5", "10.200.0.6"]
+      status: reserved  # next cluster
+
+  pgbackrest_stanzas:
+    - stanza: main
+      cluster: pg-primary
+      blob_path: "/pgbackrest"
+      status: active
+
+  static_ips_onprem:
+    - ip: "10.0.96.10"
+      purpose: Keepalived VIP (pg-nodes)
+      status: active
+    - ip: "10.0.96.11"
+      purpose: pg-primary
+      vm: pg-primary
+      status: active
+    - ip: "10.0.96.13"
+      purpose: app-onprem
+      vm: app-onprem
+      status: active
+    - ip: "10.0.96.14"
+      purpose: pg-standby
+      vm: pg-standby
+      status: active

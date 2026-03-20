@@ -10,7 +10,7 @@ jobs:
     name: Python Lint — ruff
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -23,7 +23,7 @@ jobs:
     name: Docker Build — clopr2-app
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Build Docker image
         # Build-only validation — image is not pushed (no registry credentials in CI).
         # Confirms Dockerfile syntax, base image resolution, pip install, COPY.

@@ -1,0 +1,69 @@
+name: ci-dr-governance
+
+on:
+  push:
+    paths:
+      - 'dr-inventory.yml'
+      - 'scripts/dr/classify-vm.sh'
+      - 'scripts/dr/validate-registry.sh'
+      - 'docs/07-dr-onboarding/**'
+      - '.github/workflows/ci-dr-governance.yml'
+  pull_request:
+    paths:
+      - 'dr-inventory.yml'
+      - 'scripts/dr/classify-vm.sh'
+      - 'scripts/dr/validate-registry.sh'
+      - 'docs/07-dr-onboarding/**'
+      - '.github/workflows/ci-dr-governance.yml'
+
+jobs:
+
+  manifest-classify:
+    name: DR Manifest — Classify VMs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install yq
+        run: |
+          wget -qO /usr/local/bin/yq \
+            https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          chmod +x /usr/local/bin/yq
+          yq --version
+
+      - name: Validate dr-inventory.yml is present and parseable
+        run: |
+          test -f dr-inventory.yml || { echo "ERROR: dr-inventory.yml not found"; exit 1; }
+          yq '.' dr-inventory.yml > /dev/null
+          echo "dr-inventory.yml: valid YAML"
+
+      - name: Run DR inventory classifier
+        # classify-vm.sh exits 0 on success, non-zero on:
+        #   1 — YAML parse error or missing file
+        #   2 — yq not found
+        #   3 — unsupported schema version
+        #   1 — one or more VMs have UNKNOWN_ROLE
+        run: bash scripts/dr/classify-vm.sh
+
+  registry-validate:
+    name: DR Registry — Conflict Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install yq
+        run: |
+          wget -qO /usr/local/bin/yq \
+            https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          chmod +x /usr/local/bin/yq
+          yq --version
+
+      - name: Validate resource_registry for allocation conflicts
+        # validate-registry.sh checks for:
+        #   - duplicate Keepalived VRIDs
+        #   - duplicate pgBackRest stanza names
+        #   - duplicate static on-prem IPs
+        #   - duplicate or overlapping WireGuard CIDRs
+        # Exits 0 if conflict-free. Exits 1 if any conflict is found.
+        # Read-only — no Azure calls, no Terraform, no SSH.
+        run: bash scripts/dr/validate-registry.sh

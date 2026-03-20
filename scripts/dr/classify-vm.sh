@@ -195,6 +195,7 @@ fi
 
 # ─── Table output ─────────────────────────────────────────────────────────────
 
+# shellcheck disable=SC2059  # HEADER_FMT and ROW_FMT are intentional format strings
 HEADER_FMT="%-15s  %-14s  %-10s  %-20s  %-10s  %-20s  %s"
 ROW_FMT="%-15s  %-14s  %-10s  %-20s  %-10s  %-20s  %s"
 
@@ -232,11 +233,11 @@ for i in $(seq 0 $((VM_COUNT - 1))); do
     "${display_azure}" "${status}"
 
   case "${status}" in
-    MANAGED)              ((managed_count++)) ;;
-    EXCLUDED)             ((excluded_count++)) ;;
-    BACKUP_ONLY)          ((backup_count++)) ;;
-    PROTECTED_BY_PRIMARY) ((protected_count++)) ;;
-    UNKNOWN_ROLE)         ((unknown_count++)) ;;
+    MANAGED)              managed_count=$(( managed_count + 1 )) ;;
+    EXCLUDED)             excluded_count=$(( excluded_count + 1 )) ;;
+    BACKUP_ONLY)          backup_count=$(( backup_count + 1 )) ;;
+    PROTECTED_BY_PRIMARY) protected_count=$(( protected_count + 1 )) ;;
+    UNKNOWN_ROLE)         unknown_count=$(( unknown_count + 1 )) ;;
   esac
 done
 
@@ -251,9 +252,10 @@ echo "  UNKNOWN_ROLE         : ${unknown_count}"
 echo ""
 
 if [[ ${unknown_count} -gt 0 ]]; then
-  echo "WARNING: ${unknown_count} VM(s) have UNKNOWN_ROLE — review dr-inventory.yml" >&2
-  echo "         See docs/07-dr-onboarding/01-role-taxonomy.md for valid roles." >&2
+  echo "ERROR: ${unknown_count} VM(s) have UNKNOWN_ROLE — review dr-inventory.yml" >&2
+  echo "       See docs/07-dr-onboarding/01-role-taxonomy.md for valid roles." >&2
   echo ""
+  exit 1
 fi
 
 echo "Policy: docs/07-dr-onboarding/00-policy-model.md"

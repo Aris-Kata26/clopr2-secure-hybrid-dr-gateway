@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: hashicorp/setup-terraform@v3
+      - uses: hashicorp/setup-terraform@v4
       - name: terraform fmt -check (recursive)
         run: terraform fmt -check -recursive infra/terraform
 
@@ -24,7 +24,7 @@ jobs:
         env: [dev, dr-fce, swe-aks, onprem]
     steps:
       - uses: actions/checkout@v4
-      - uses: hashicorp/setup-terraform@v3
+      - uses: hashicorp/setup-terraform@v4
       - name: terraform init -backend=false
         run: terraform -chdir=infra/terraform/envs/${{ matrix.env }} init -backend=false
       - name: terraform validate

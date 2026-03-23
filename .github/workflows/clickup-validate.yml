@@ -1,0 +1,108 @@
+name: clickup-validate
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
+
+jobs:
+
+  validate-task-reference:
+    name: Validate ClickUp task reference
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check for ClickUp task ID in PR title or branch name
+        env:
+          PR_TITLE:  ${{ github.event.pull_request.title }}
+          BRANCH:    ${{ github.head_ref }}
+        run: |
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "  ClickUp task reference check"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "  PR title : ${PR_TITLE}"
+          echo "  Branch   : ${BRANCH}"
+          echo ""
+
+          # ── Exemption: Dependabot and other bots ─────────────────────────
+          ACTOR="${{ github.actor }}"
+          if [[ "${ACTOR}" == "dependabot[bot]" || "${ACTOR}" == "github-actions[bot]" ]] \
+             || echo "${BRANCH}" | grep -q "^dependabot/"; then
+            echo "  SKIP  Automated bot PR (actor: ${ACTOR}) — ClickUp task reference not required."
+            echo ""
+            exit 0
+          fi
+
+          # ── Exemption: [skip-cu] token in PR title ────────────────────────
+          if echo "${PR_TITLE}" | grep -qF '[skip-cu]'; then
+            echo "  SKIP  [skip-cu] token found in PR title."
+            echo "        ClickUp task reference check bypassed."
+            echo "        Add a task ID when the ClickUp task is created."
+            echo ""
+            exit 0
+          fi
+
+          # ── Check 1: PR title contains [CU-TASKID] ────────────────────────
+          # Accepted pattern: [CU-{alphanumeric ID}] anywhere in the title.
+          # The CU- prefix is case-sensitive (must be uppercase CU).
+          if echo "${PR_TITLE}" | grep -qE '\[CU-[A-Za-z0-9]+\]'; then
+            TASK_ID=$(echo "${PR_TITLE}" | grep -oE 'CU-[A-Za-z0-9]+' | head -1)
+            echo "  PASS  Task ID found in PR title: ${TASK_ID}"
+            echo ""
+            echo "  ClickUp: https://app.clickup.com/t/$(echo "${TASK_ID}" | sed 's/^CU-//')"
+            echo ""
+            exit 0
+          fi
+
+          # ── Check 2: Branch name starts with cu-TASKID/ ───────────────────
+          # Accepted pattern: cu-{alphanumeric ID}/description
+          if echo "${BRANCH}" | grep -qE '^cu-[A-Za-z0-9]+/'; then
+            TASK_ID=$(echo "${BRANCH}" | grep -oE '^cu-[A-Za-z0-9]+' | sed 's/^cu-//')
+            echo "  PASS  Task ID found in branch name: ${TASK_ID}"
+            echo "        (Tip: also add [CU-${TASK_ID}] to the PR title for"
+            echo "         better traceability in the ClickUp comment history.)"
+            echo ""
+            echo "  ClickUp: https://app.clickup.com/t/${TASK_ID}"
+            echo ""
+            exit 0
+          fi
+
+          # ── No task ID found — fail with guidance ─────────────────────────
+          echo "  FAIL  No ClickUp task ID found in PR title or branch name."
+          echo ""
+          echo "  ── Required formats ───────────────────────────────────────"
+          echo ""
+          echo "  PR title (preferred):"
+          echo "    [CU-86c8u3pwy] Brief description of change"
+          echo "    ^^^^^^^^^^^^^"
+          echo "    Task ID from: https://app.clickup.com/t/86c8u3pwy"
+          echo ""
+          echo "  Branch name (fallback):"
+          echo "    cu-86c8u3pwy/short-description"
+          echo "    ^^^^^^^^^^^^"
+          echo ""
+          echo "  ── Your PR ────────────────────────────────────────────────"
+          echo "    Current title : ${PR_TITLE}"
+          echo "    Current branch: ${BRANCH}"
+          echo ""
+          echo "  ── How to fix ─────────────────────────────────────────────"
+          echo "    1. Edit the PR title to start with [CU-TASKID]"
+          echo "       Example: [CU-86c8u3pwy] ${PR_TITLE}"
+          echo ""
+          echo "    2. OR rename your branch to cu-TASKID/description"
+          echo "       (requires closing this PR and opening a new one)"
+          echo ""
+          echo "    3. OR add [skip-cu] to the PR title if no task exists yet"
+          echo "       Example: [skip-cu] ${PR_TITLE}"
+          echo "       Use sparingly. Document the reason in the PR description."
+          echo ""
+          echo "  ── Convention reference ───────────────────────────────────"
+          echo "    docs/09-process/clickup-task-id-convention.md"
+          echo ""
+          exit 1

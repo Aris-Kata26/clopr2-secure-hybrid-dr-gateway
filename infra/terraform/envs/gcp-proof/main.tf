@@ -175,8 +175,8 @@ resource "google_compute_instance" "proof" {
   }
 
   metadata = {
-    ssh-keys         = "${var.ssh_username}:${var.ssh_public_key}"
-    startup-script   = local.startup_script
+    ssh-keys           = "${var.ssh_username}:${var.ssh_public_key}"
+    startup-script     = local.startup_script
     serial-port-enable = "TRUE"
   }
 

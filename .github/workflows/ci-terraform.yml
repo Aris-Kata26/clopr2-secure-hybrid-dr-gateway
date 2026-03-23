@@ -2,7 +2,15 @@ name: ci-terraform
 
 on:
   push:
+    paths:
+      - 'infra/terraform/**'
+      - 'scripts/dr/*.sh'
+      - '.github/workflows/ci-terraform.yml'
   pull_request:
+    paths:
+      - 'infra/terraform/**'
+      - 'scripts/dr/*.sh'
+      - '.github/workflows/ci-terraform.yml'
 
 jobs:
 

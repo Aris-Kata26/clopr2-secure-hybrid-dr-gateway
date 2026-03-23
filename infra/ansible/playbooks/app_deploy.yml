@@ -160,6 +160,7 @@
       args:
         chdir: "{{ compose_dir }}"
       register: compose_up
+      changed_when: true
 
     - name: Show compose output
       debug:

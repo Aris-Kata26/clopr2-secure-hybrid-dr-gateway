@@ -2,7 +2,15 @@ name: ci-ansible
 
 on:
   push:
+    paths:
+      - 'infra/ansible/**'
+      - '.ansible-lint'
+      - '.github/workflows/ci-ansible.yml'
   pull_request:
+    paths:
+      - 'infra/ansible/**'
+      - '.ansible-lint'
+      - '.github/workflows/ci-ansible.yml'
 
 jobs:
 

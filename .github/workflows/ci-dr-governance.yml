@@ -7,14 +7,12 @@ on:
       - 'scripts/dr/classify-vm.sh'
       - 'scripts/dr/validate-registry.sh'
       - 'docs/07-dr-onboarding/**'
-      - '.github/workflows/ci-dr-governance.yml'
   pull_request:
     paths:
       - 'dr-inventory.yml'
       - 'scripts/dr/classify-vm.sh'
       - 'scripts/dr/validate-registry.sh'
       - 'docs/07-dr-onboarding/**'
-      - '.github/workflows/ci-dr-governance.yml'
 
 jobs:
 

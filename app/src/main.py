@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import socket
 import time
 from datetime import datetime, timezone
 
@@ -11,7 +12,7 @@ from fastapi import FastAPI, Response
 load_dotenv()
 
 APP_ENV = os.getenv("APP_ENV", "dev")
-APP_VERSION = "0.2.0"
+APP_VERSION = "0.3.0"
 DB_ENABLED = os.getenv("DB_ENABLED", "true").lower() == "true"
 DB_HOST = os.getenv("DB_HOST", "10.0.96.10")
 DB_PORT = int(os.getenv("DB_PORT", "5432"))
@@ -111,18 +112,25 @@ def health(response: Response):
             "ts": ts,
         }
 
+    app_host = socket.gethostname()
+    t0 = time.perf_counter()
+
     try:
         with psycopg.connect(DSN, connect_timeout=5) as conn:
             with conn.cursor() as cur:
                 cur.execute("SELECT pg_is_in_recovery()")
                 recovery = cur.fetchone()[0]
+        latency_ms = round((time.perf_counter() - t0) * 1000, 1)
+        db_role = "PRIMARY" if not recovery else "STANDBY"
         _COUNTERS["db_ok_total"] += 1
         logger.info(
             "health_check",
             extra={"extra": {
                 "db": "ok",
                 "db_host": DB_HOST,
+                "db_role": db_role,
                 "pg_is_in_recovery": recovery,
+                "latency_ms": latency_ms,
                 "ts": ts,
             }},
         )
@@ -130,11 +138,15 @@ def health(response: Response):
             "status": "ok",
             "db": "ok",
             "db_host": DB_HOST,
+            "db_role": db_role,
             "pg_is_in_recovery": recovery,
+            "latency_ms": latency_ms,
+            "app_host": app_host,
             "app_env": APP_ENV,
             "ts": ts,
         }
     except Exception as exc:
+        latency_ms = round((time.perf_counter() - t0) * 1000, 1)
         _COUNTERS["db_error_total"] += 1
         response.status_code = 503
         logger.warning(
@@ -142,6 +154,8 @@ def health(response: Response):
             extra={"extra": {
                 "db": "unreachable",
                 "db_host": DB_HOST,
+                "db_role": "UNREACHABLE",
+                "latency_ms": latency_ms,
                 "error": str(exc),
                 "ts": ts,
             }},
@@ -150,6 +164,9 @@ def health(response: Response):
             "status": "error",
             "db": "unreachable",
             "db_host": DB_HOST,
+            "db_role": "UNREACHABLE",
+            "latency_ms": latency_ms,
+            "app_host": app_host,
             "error": str(exc),
             "app_env": APP_ENV,
             "ts": ts,

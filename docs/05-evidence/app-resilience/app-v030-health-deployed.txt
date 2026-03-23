@@ -1,0 +1,36 @@
+=== app v0.3.0 deployment evidence ===
+Timestamp: 2026-03-23T23:48:12Z
+Host: Aristide
+
+=== /health ===
+{
+    "status": "ok",
+    "db": "ok",
+    "db_host": "10.0.96.10",
+    "db_role": "PRIMARY",
+    "pg_is_in_recovery": false,
+    "latency_ms": 38.6,
+    "app_host": "1699fc47439e",
+    "app_env": "dev",
+    "ts": "2026-03-23T23:48:18Z"
+}
+
+=== /metrics ===
+{
+    "uptime_seconds": 96.0,
+    "health_checks_total": 2,
+    "db_ok_total": 2,
+    "db_error_total": 0,
+    "db_disabled_total": 0,
+    "readyz_total": 8,
+    "app_env": "dev",
+    "version": "0.3.0"
+}
+
+=== docker ps ===
+NAMES          IMAGE        STATUS                   PORTS
+docker-app-1   docker-app   Up 2 minutes (healthy)   0.0.0.0:8080->8000/tcp, [::]:8080->8000/tcp
+
+=== app version in container ===
+0.3.0
+{"ts": "2026-03-23T23:48:27Z", "level": "INFO", "logger": "clopr2.app", "msg": "App starting", "app_env": "dev", "db_host": "10.0.96.10", "version": "0.3.0"}

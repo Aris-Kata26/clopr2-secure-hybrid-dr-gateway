@@ -49,11 +49,30 @@ network_id:            projects/aris-project-490607/global/networks/clopr2-proof
 service_account_email: clopr2-proof-dr-vm@aris-project-490607.iam.gserviceaccount.com
 
 === BOOTSTRAP (startup-script) ===
-Method:      GCP instance metadata startup-script (equivalent to Azure custom_data / AWS user_data)
-Installs:    wireguard, postgresql-client-16, curl
+Method:       GCP instance metadata startup-script (equivalent to Azure custom_data / AWS user_data)
+Installs:     wireguard, postgresql-client, curl
 Proof marker: /etc/clopr2-proof
 Bootstrap log: /var/log/clopr2-proof-init.log
-[Bootstrap log content to be appended after SSH verification]
+
+Bootstrap initial run (2026-03-19T11:30:12Z):
+  Instance: clopr2-proof-dr-vm
+  Zone:     projects/46993918266/zones/europe-west3-c
+  Note:     postgresql-client-16 not found in Ubuntu 22.04 default repos
+            (requires PostgreSQL APT repo — corrected to postgresql-client)
+  Exit:     Script aborted at apt-get (set -euo pipefail)
+
+Bootstrap re-run (2026-03-23 — corrected package name via SSH):
+  wireguard-tools v1.0.20210914 - https://git.zx2c4.com/wireguard-tools/
+  psql (PostgreSQL) 14.22 (Ubuntu 14.22-0ubuntu0.22.04.1)
+  Packages installed (dpkg -l):
+    ii  wireguard         1.0.20210914-1ubuntu2  all  fast, modern, secure kernel VPN tunnel
+    ii  postgresql-client 14+238                 all  front-end programs for PostgreSQL
+
+Proof marker (/etc/clopr2-proof):
+  clopr2-portability-proof-gcp-20260323
+
+Terraform fix: startup-script updated postgresql-client-16 -> postgresql-client
+  (main.tf committed — ci-terraform validate passes)
 
 === NETWORK ISOLATION ===
 VPC CIDR 10.22.0.0/16 does NOT overlap:
@@ -80,4 +99,4 @@ On-prem Proxmox, WireGuard, PostgreSQL — all unchanged.
   terraform -chdir=infra/terraform/envs/gcp-proof destroy -auto-approve
   -> destroys all 7 resources (VPC, subnet, 2 firewalls, static IP, SA, VM)
 
-Status: DEPLOYED — RUNNING — VERIFIED
+Status: DEPLOYED — RUNNING — BOOTSTRAP VERIFIED — PROOF MARKER WRITTEN

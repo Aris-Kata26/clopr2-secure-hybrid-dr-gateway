@@ -118,7 +118,7 @@ locals {
     echo "Zone:     $(curl -s -H 'Metadata-Flavor: Google' http://metadata.google.internal/computeMetadata/v1/instance/zone)"
 
     apt-get update -qq
-    apt-get install -y wireguard postgresql-client-16 curl 2>&1
+    apt-get install -y wireguard postgresql-client curl 2>&1
 
     echo ""
     echo "=== Package validation ==="

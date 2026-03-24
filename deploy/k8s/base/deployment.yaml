@@ -13,11 +13,22 @@ spec:
       labels:
         app: app
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
       containers:
       - name: app
         image: acrb2clckatargwc.azurecr.io/clopr2-prototype-a:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 8000
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
         env:
         - name: DB_ENABLED
           value: "false"

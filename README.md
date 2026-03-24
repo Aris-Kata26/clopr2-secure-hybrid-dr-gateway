@@ -70,3 +70,7 @@ This repository contains three distinct layers:
 - **Team:** BCLC24
 - **Compliance target:** EU regions/services only
 - **Hybrid scope:** Azure + on-prem Proxmox
+
+## AI assistance note
+
+AI tools were used during this project as a development and documentation assistant for tasks such as drafting code, troubleshooting ideas, improving wording, and structuring documentation. All architecture decisions, infrastructure deployment, validation tests, evidence capture, and final technical judgments were performed and verified by the author on live systems.

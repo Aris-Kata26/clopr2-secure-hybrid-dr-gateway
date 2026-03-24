@@ -1,0 +1,76 @@
+AKS Minimal Workload — Live Verification Evidence
+==================================================
+Date:       2026-03-24T00:18:04Z
+Cluster:    aks-b2clc-katar-swe (swedencentral, Free tier)
+Namespace:  clopr2
+Image:      acrb2clckatargwc.azurecr.io/clopr2-prototype-a:latest
+Version:    0.3.0
+Task:       S5 pre-presentation AKS workload (Step 4)
+
+=== CLUSTER STATE ===
+Kubernetes control plane: https://aks-b2clc-katar-swe-irm0tdoi.hcp.swedencentral.azmk8s.io:443
+Node pool:  system (1 × Standard_B2s_v2, PowerState: Running)
+
+=== PODS ===
+NAME                   READY   STATUS    RESTARTS   AGE   IP             NODE
+app-59d77dc5b6-m4pzl   1/1     Running   0          44s   10.244.0.94    aks-system-57210394-vmss000000
+
+=== SERVICE ===
+NAME   TYPE           CLUSTER-IP    EXTERNAL-IP     PORT(S)        AGE
+app    LoadBalancer   10.0.156.32   9.223.173.197   80:32539/TCP   12d
+
+=== ENDPOINT VERIFICATION ===
+
+GET http://9.223.173.197/
+{
+  "app": "clopr2-prototype-a",
+  "version": "0.3.0",
+  "env": "dev",
+  "db_host": "10.0.96.10",
+  "endpoints": {"health": "/health", "readyz": "/readyz", "metrics": "/metrics"}
+}
+
+GET http://9.223.173.197/health
+{
+  "status": "ok",
+  "db": "disabled",
+  "app_env": "dev",
+  "ts": "2026-03-24T00:18:04Z"
+}
+HTTP 200 — DB_ENABLED=false (expected, no on-prem DB reachable from AKS)
+
+GET http://9.223.173.197/readyz
+{"status": "ready", "ts": "2026-03-24T00:18:04Z"}
+HTTP 200
+
+GET http://9.223.173.197/metrics
+{
+  "uptime_seconds": 37.5,
+  "health_checks_total": 6,
+  "db_ok_total": 0,
+  "db_error_total": 0,
+  "db_disabled_total": 6,
+  "readyz_total": 1,
+  "app_env": "dev",
+  "version": "0.3.0"
+}
+
+=== ACR IMAGE ===
+Registry:   acrb2clckatargwc (germanywestcentral, Basic SKU)
+Repository: clopr2-prototype-a
+Tag:        latest (built and pushed 2026-03-23 via az acr build)
+Source:     app/ directory (Dockerfile, main.py v0.3.0, requirements.txt)
+
+=== CONFIGURATION ===
+DB_ENABLED=false   — AKS pod has no route to on-prem PostgreSQL (expected)
+APP_ENV=dev        — set via ConfigMap app-config
+Image pull:        acrb2clckatargwc.azurecr.io (ACR integrated with AKS via managed identity)
+
+=== WHAT THIS DEMONSTRATES ===
+- Container image builds and runs on managed Kubernetes (AKS)
+- ACR → AKS image pull works (managed identity, no credentials in manifests)
+- LoadBalancer service provisions public IP and routes traffic
+- App v0.3.0 features (db_role, latency_ms, app_host) present in codebase
+- DB_ENABLED=false mode works cleanly — health returns 200 without DB
+
+Status: RUNNING — ENDPOINTS VERIFIED — v0.3.0 CONFIRMED

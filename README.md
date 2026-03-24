@@ -63,3 +63,10 @@ This repository contains three distinct layers:
 **Supporting workload** — AKS in Sweden Central running the application with security hardening. Live and functional, but not part of the validated DR runtime.
 
 **Portability appendix** — AWS and GCP Terraform proofs showing the same VM/network/bootstrap pattern on other providers. These are appendix demonstrations, not active DR targets.
+
+## Project metadata
+
+- **Owner (IAMCODE):** KATAR711
+- **Team:** BCLC24
+- **Compliance target:** EU regions/services only
+- **Hybrid scope:** Azure + on-prem Proxmox

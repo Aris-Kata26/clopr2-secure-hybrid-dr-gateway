@@ -18,7 +18,7 @@ jobs:
     name: Terraform Format Check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: hashicorp/setup-terraform@v3
       - name: terraform fmt -check (recursive)
         run: terraform fmt -check -recursive infra/terraform
@@ -31,7 +31,7 @@ jobs:
       matrix:
         env: [dev, dr-fce, swe-aks, onprem]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: hashicorp/setup-terraform@v3
       - name: terraform init -backend=false
         run: terraform -chdir=infra/terraform/envs/${{ matrix.env }} init -backend=false
@@ -42,7 +42,7 @@ jobs:
     name: ShellCheck — DR Scripts
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: shellcheck (severity=error)
         # Only fail on errors; notes/warnings are informational.
         # Scripts use bash-specific syntax declared via #!/usr/bin/env bash.

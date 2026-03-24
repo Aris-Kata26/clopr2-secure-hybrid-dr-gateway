@@ -1,0 +1,28 @@
+=== Tag Audit Post-Fix ===
+Timestamp: 2026-03-23T23:58:59Z
+
+--- Storage Account: clopr2backupkatar ---
+Team    Owner     Environment
+BCLC24  KATAR711  prod
+
+--- DCR: dcr-hybrid-monitoring ---
+Team    Owner     Environment
+BCLC24  KATAR711  dev
+
+--- Arc Machine: pg-primary ---
+Env  Node        Owner     Project  Team    Environment
+dev  pg-primary  KATAR711  clopr2   BCLC24  prod
+
+--- Arc Machine: pg-standby ---
+Env  Node        Owner     Project  Team    Environment
+dev  pg-standby  KATAR711  clopr2   BCLC24  prod
+
+--- Arc Machine: app-onprem ---
+Env  Node        Owner     Project  Team    Environment
+dev  app-onprem  KATAR711  clopr2   BCLC24  prod
+
+--- Resource Group: rg-clopr2-tfstate ---
+Team    Owner     Environment
+BCLC24  KATAR711  mgmt
+
+All 5 resources tagged. rg-clopr2-katar711-fce (DR env) not touched.

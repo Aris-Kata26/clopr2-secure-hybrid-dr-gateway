@@ -1,0 +1,25 @@
+=== Arc AMA Extension State — Step 3 Bounded Check ===
+Timestamp: 2026-03-24T00:09:14Z
+
+--- Initial state (read-only check) ---
+pg-standby:    AzureMonitorLinuxAgent = NOT INSTALLED (empty extension list)
+app-onprem:    AzureMonitorLinuxAgent = Succeeded
+               DependencyAgentLinux   = Failed (Ubuntu 24.04 unsupported — unrelated)
+
+--- DCR associations ---
+pg-standby:    assoc-dcr-hybrid-monitoring-pg-standby = exists
+app-onprem:    assoc-dcr-hybrid-monitoring-app-onprem = exists
+
+--- Action taken ---
+pg-standby:    AzureMonitorLinuxAgent created (publisher: Microsoft.Azure.Monitor, v1.40.0)
+app-onprem:    No action — AMA already Succeeded
+
+--- State at hard stop (10 min cap) ---
+pg-standby:    AzureMonitorLinuxAgent = Creating (provisioning in progress)
+app-onprem:    AzureMonitorLinuxAgent = Succeeded / DCR association = present
+
+--- Note ---
+HCRP400 error on first attempt (lowercase publisher/type). Fixed with exact
+casing from pg-primary working extension (Microsoft.Azure.Monitor / AzureMonitorLinuxAgent).
+pg-standby extension install triggered successfully. Provisioning continues
+asynchronously. Check Azure Portal > Log Analytics > Heartbeat in ~10 min.
